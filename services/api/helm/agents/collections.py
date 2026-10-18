@@ -100,7 +100,7 @@ def run(inp: CollectionsIn) -> CollectionsOut:
         res = forecast(what_if)
         low = _low(res, inp.unmanaged_commit_fn(res))
         p = res.scen.p_ok(inp.unmanaged_commit_fn(res), inp.min_balance)
-        effect = max(0.0, low - base_low)
+        effect = min(max(0.0, low - base_low), total)  # one invoice cannot lift the low point by more than it is worth
         biggest = max(c.open, key=lambda i: i.amount)
         when = fdate(biggest.expected) if biggest.expected else "after the 90-day window"
         why = (f"{c.name} owes {rm(total)}; the biggest invoice ({rm(biggest.amount)}) is expected around {when}. "

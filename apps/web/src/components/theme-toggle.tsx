@@ -1,14 +1,13 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
-import { en } from "@/i18n/en";
+import { useCallback, useEffect, useState } from "react";
+import { useT } from "@/i18n";
 
 type Theme = "light" | "dark";
 
-export function ThemeToggle() {
+export function useTheme() {
   const [theme, setTheme] = useState<Theme>("light");
-
   useEffect(() => {
     let saved: string | null = null;
     try {
@@ -17,23 +16,28 @@ export function ThemeToggle() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved === "dark") setTheme("dark");
   }, []);
-
-  function toggle() {
-    const next: Theme = theme === "light" ? "dark" : "light";
+  const toggle = useCallback(() => {
+    const cur = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+    const next: Theme = cur === "light" ? "dark" : "light";
     setTheme(next);
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem("helm-theme", next);
     } catch {}
-  }
+  }, []);
+  return { theme, toggle };
+}
 
+export function ThemeToggle() {
+  const { t } = useT();
+  const { theme, toggle } = useTheme();
   return (
     <button
       onClick={toggle}
-      aria-label={en.theme.toggle}
-      className="inline-flex size-11 items-center justify-center rounded-lg border border-border bg-surface text-text hover:bg-bg"
+      aria-label={t("theme.toggle")}
+      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg border border-border bg-surface text-text hover:bg-bg"
     >
-      {theme === "light" ? <Moon className="size-4" /> : <Sun className="size-4" />}
+      {theme === "light" ? <Moon aria-hidden className="size-4" /> : <Sun aria-hidden className="size-4" />}
     </button>
   );
 }

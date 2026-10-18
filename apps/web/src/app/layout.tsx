@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Shell } from "@/components/shell";
+import { Providers } from "@/components/providers";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body>
-        <Shell>{children}</Shell>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

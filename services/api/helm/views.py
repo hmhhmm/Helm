@@ -254,7 +254,8 @@ def payments_view(session: Session) -> dict:
             continue
         due = date.fromisoformat(p.meta["due"]) if p.meta.get("due") else p.proposed_date
         if row["bill_kind"] in ("statutory", "payroll"):
-            groups["statutory"].append(row)
+            if due <= today + timedelta(days=30):  # further-out calendar items are scheduled but not worth the screen space
+                groups["statutory"].append(row)
         elif due <= today + timedelta(days=14) or row["verdict"] in ("ESCALATE", "DENY"):
             groups["due_soon"].append(row)
         else:

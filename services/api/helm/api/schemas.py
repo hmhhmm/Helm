@@ -1,7 +1,7 @@
 """Response models. They exist so the web client is generated from the OpenAPI spec and typed end to end."""
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 Verdict = Literal["ALLOW", "HOLD", "ESCALATE", "DENY"]
 
@@ -158,12 +158,23 @@ class Change(BaseModel):
     proposal_id: str
     payee: str
     amount: float
-    from_: Verdict | None = None
+    from_: Verdict | None = Field(default=None, alias="from")
     to: Verdict
     release_from: str | None = None
     release_to: str | None = None
     why: str
     why_ms: str
+
+    model_config = {"populate_by_name": True}
+
+
+class PolicyChange(BaseModel):
+    payee: str
+    amount: float
+    from_: Verdict = Field(alias="from")
+    to: Verdict
+    release_from: str | None = None
+    release_to: str | None = None
 
     model_config = {"populate_by_name": True}
 
@@ -191,7 +202,7 @@ class ForecastOut(BaseModel):
     assumptions: dict[str, Any]
     track_record: TrackRecord
     whatif: bool | None = None
-    changes: list[dict[str, Any]] | None = None
+    changes: list[Change] | None = None
     baseline: Baseline | None = None
 
 
@@ -363,7 +374,7 @@ class PolicyIn(BaseModel):
 class PolicyPreview(BaseModel):
     counts: dict[str, int]
     baseline: dict[str, int]
-    changes: list[dict[str, Any]]
+    changes: list[PolicyChange]
 
 
 class Step(BaseModel):

@@ -88,3 +88,28 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
 }
+
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes stamp { 0% { transform: scale(1.35); opacity: 0; } 60% { transform: scale(0.96); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.stamp { animation: stamp 200ms ease-out; }
+.rise { animation: rise 180ms ease-out both; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+:root { --chat-bg: #ece8f4; }
+:root[data-theme="dark"] { --chat-bg: #1a1d27; }
+
+/* pipeline diagram node fills: same families as the architecture slide */
+:root {
+  --n-agent: #fff0b3; --n-agent-b: #e2b93b;
+  --n-code: #e9dafb; --n-code-b: #a67bd9;
+  --n-store: #fad1ce; --n-store-b: #e08a84;
+  --n-human: #c9f1bf; --n-human-b: #5fb84a;
+}
+:root[data-theme="dark"] {
+  --n-agent: #4a3f14; --n-agent-b: #b8962b;
+  --n-code: #3b2b5e; --n-code-b: #8a62c4;
+  --n-store: #5a2c2a; --n-store-b: #b3615b;
+  --n-human: #1f4d2b; --n-human-b: #4f9a3d;
+}

@@ -5,6 +5,8 @@
     "dev": "pnpm --filter web dev",
     "dev:api": "cd services/api && .venv/bin/uvicorn helm.main:app --reload --port 8000",
     "build": "pnpm --filter web build",
-    "test:api": "cd services/api && .venv/bin/pytest -q"
+    "test:api": "cd services/api && .venv/bin/pytest -q",
+    "gen:api": "./scripts/gen-api.sh",
+    "test:e2e": "pnpm --filter e2e exec playwright test"
   }
 }
