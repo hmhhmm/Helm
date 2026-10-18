@@ -1,3 +1,8 @@
 packages:
   - "apps/*"
   - "e2e"
+
+# Native build scripts are not needed (prebuilt binaries ship as optional dependencies).
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
