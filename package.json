@@ -1,0 +1,10 @@
+{
+  "name": "helm",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:api": "cd services/api && .venv/bin/uvicorn helm.main:app --reload --port 8000",
+    "build": "pnpm --filter web build",
+    "test:api": "cd services/api && .venv/bin/pytest -q"
+  }
+}

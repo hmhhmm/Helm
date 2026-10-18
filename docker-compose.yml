@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: helm
+      POSTGRES_PASSWORD: helm
+      POSTGRES_DB: helm
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helm"]
+      interval: 3s
+      retries: 20
+  api:
+    build: ./services/api
+    env_file: [.env.example]
+    environment:
+      DATABASE_URL: postgresql+psycopg://helm:helm@db:5432/helm
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["8000:8000"]
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    depends_on: [api]
+    ports: ["3000:3000"]
+volumes:
+  pgdata:
