@@ -57,13 +57,35 @@ def drop_audit_triggers(conn) -> None:
         conn.execute(text("DROP TRIGGER IF EXISTS audit_no_delete ON audit_log"))
 
 
+_PG_ROLES = [
+    "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'helm_agent') THEN CREATE ROLE helm_agent NOLOGIN; END IF; END $$",
+    "GRANT SELECT ON ALL TABLES IN SCHEMA public TO helm_agent",
+    # agents hand off through these records ...
+    "GRANT INSERT, UPDATE, DELETE ON documents, invoices, bills, cash_range, chase_ideas, bill_plan, proposals, decisions, agent_runs, agent_steps, alerts TO helm_agent",
+    "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO helm_agent",
+    # ... but never write the owner's rules, and can only append to the audit log
+    "REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON rules FROM helm_agent",
+    "GRANT INSERT ON audit_log TO helm_agent",
+    "REVOKE UPDATE, DELETE, TRUNCATE ON audit_log FROM helm_agent",
+]
+
+
+def install_pg_roles(conn) -> None:
+    """Postgres only: a database role for agents with read-only access to the owner's rules."""
+    if IS_SQLITE:
+        return
+    for stmt in _PG_ROLES:
+        conn.execute(text(stmt))
+
+
 def init_db() -> None:
-    """Idempotent: creates missing tables and (re)installs the append-only triggers."""
+    """Idempotent: creates missing tables, installs the append-only triggers and the agent role."""
     from helm import models  # noqa: F401  (registers tables)
 
     Base.metadata.create_all(engine)
     with engine.begin() as conn:
         install_audit_triggers(conn)
+        install_pg_roles(conn)
 
 
 def reset_db() -> None:

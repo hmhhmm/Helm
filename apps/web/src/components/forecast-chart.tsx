@@ -78,6 +78,9 @@ export function ForecastChart({
   const markers = data.events
     .filter((e) => e.kind !== "payroll" && e.kind !== "statutory")
     .map((e) => ({ x: X(idx(e.date)), y: markerY + (e.kind === "invoice" ? (yMax - yMin) * 0.045 : 0), kind: e.kind, verdict: e.verdict }));
+  const step = compact ? 40000 : 20000;
+  const yTicks: number[] = [];
+  for (let v = Math.ceil(yMin / step) * step; v <= yMax; v += step) yTicks.push(v);
   const ticks = data.days.map((_, i) => X(i)).filter((x) => (x - 1) % 14 === 0);
   const low = data.low;
   const lowIdx = idx(view === "unmanaged" ? low.worst_date : data.managed_low.date);
@@ -97,7 +100,7 @@ export function ForecastChart({
             tickFormatter={(x: number) => fdate(data.days[x - 1], lang)} stroke="var(--border)" tick={{ fill: "var(--muted)", fontSize: 12 }}
           />
           <YAxis
-            domain={[yMin, yMax]} width={compact ? 44 : 56} stroke="var(--border)" tick={{ fill: "var(--muted)", fontSize: 12 }}
+            domain={[yMin, yMax]} ticks={yTicks} width={compact ? 44 : 56} stroke="var(--border)" tick={{ fill: "var(--muted)", fontSize: 12 }}
             tickFormatter={(v: number) => (v < 0 ? `(${Math.abs(v / 1000)}k)` : `${v / 1000}k`)}
           />
           {/* ranges as a transparent base plus a visible width, stacked */}
@@ -110,7 +113,7 @@ export function ForecastChart({
             label={{ value: `${t("chart.minimum")} ${rm(B)}`, position: "insideTopRight", fill: "var(--deny)", fontSize: 12, fontWeight: 600 }} />
           <ReferenceLine x={1} stroke="var(--muted)" strokeDasharray="2 3" label={{ value: t("chart.today"), position: "insideTopLeft", fill: "var(--muted)", fontSize: 11 }} />
           <ReferenceDot x={X(lowIdx)} y={lowVal} r={6} fill="var(--deny)" stroke="var(--surface)" strokeWidth={2}
-            label={{ value: `${rm(lowVal)} · ${fdate(data.days[lowIdx], lang)}`, position: lowIdx > 55 ? "left" : "right", fill: "var(--text)", fontSize: 12, fontWeight: 700 }} />
+            label={compact ? undefined : { value: `${rm(lowVal)} · ${fdate(data.days[lowIdx], lang)}`, position: lowIdx > 55 ? "left" : "right", fill: "var(--text)", fontSize: 12, fontWeight: 700 }} />
           <Scatter data={markers} dataKey="y" shape={<Marker />} isAnimationActive={false} legendType="none" />
           <Tooltip
             cursor={{ stroke: "var(--muted)", strokeDasharray: "3 3" }}

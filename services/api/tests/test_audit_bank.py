@@ -76,3 +76,18 @@ def test_bank_rejects_expired_forged_and_reused_keys(session):
     assert _submit(session, forged)["reason"] == "bad signature"
     assert _submit(session, k)["status"] == "accepted"
     assert _submit(session, k)["reason"] == "key already used"
+
+
+# ---- database-level guarantees (Postgres only) -----------------------------------------------
+def test_agent_role_cannot_write_rules_or_edit_the_audit_log():
+    from helm.db import IS_SQLITE
+    if IS_SQLITE:
+        pytest.skip("role grants are a Postgres feature")
+    with engine.connect() as conn:
+        conn.execute(text("SET ROLE helm_agent"))
+        assert conn.execute(text("SELECT min_balance FROM rules")).scalar_one() > 0
+        for stmt in ("UPDATE rules SET min_balance = 0", "DELETE FROM rules", "UPDATE audit_log SET event = 'x'", "DELETE FROM audit_log"):
+            with pytest.raises(Exception, match="permission denied|append-only"):
+                conn.execute(text(stmt))
+            conn.rollback()
+            conn.execute(text("SET ROLE helm_agent"))

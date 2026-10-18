@@ -3,7 +3,7 @@ import tempfile
 
 # one throw-away database per test session; must be set before helm is imported
 _tmp = tempfile.mkdtemp(prefix="helm-test-")
-os.environ["DATABASE_URL"] = f"sqlite:///{_tmp}/test.db"
+os.environ.setdefault("DATABASE_URL", f"sqlite:///{_tmp}/test.db")  # set DATABASE_URL to run the suite on Postgres
 os.environ["LLM_MODE"] = "fixtures"
 
 import pytest  # noqa: E402

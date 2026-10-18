@@ -229,6 +229,19 @@ def agents(session: Session = Depends(get_session)):
     return views.agents_view(session)
 
 
+@router.get("/agents/graph", tags=["screens"])
+def agents_graph(session: Session = Depends(get_session)):
+    from helm import graph
+    from sqlalchemy import select as _sel
+    from helm.models import AgentRun, AgentStep
+    last = session.execute(_sel(AgentRun).order_by(AgentRun.id.desc()).limit(1)).scalar_one_or_none()
+    escalated = False
+    if last:
+        h = session.execute(_sel(AgentStep).where(AgentStep.run_id == last.id, AgentStep.node == "human")).scalars().first()
+        escalated = bool(h and h.status == "ok")
+    return {"engine": "langgraph", "mermaid": graph.mermaid(), "path": graph.replay(escalated), "run_id": last.id if last else None}
+
+
 @router.get("/audit", response_model=S.AuditPage, tags=["audit"])
 def audit_rows(before: int | None = None, limit: int = Query(40, le=200), session: Session = Depends(get_session)):
     return views.audit_page(session, before, limit)

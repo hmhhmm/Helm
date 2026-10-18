@@ -2,11 +2,20 @@
   "name": "helm",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter web dev",
+    "setup": "pnpm install && pnpm setup:api",
+    "setup:api": "cd services/api && python3 -m venv .venv && .venv/bin/pip install -q -e '.[dev]'",
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"pnpm dev:api\" \"pnpm dev:web\"",
+    "dev:web": "pnpm --filter web dev",
     "dev:api": "cd services/api && .venv/bin/uvicorn helm.main:app --reload --port 8000",
     "build": "pnpm --filter web build",
+    "start": "concurrently -k -n api,web \"cd services/api && .venv/bin/uvicorn helm.main:app --port 8000\" \"pnpm --filter web exec next start -p 3000\"",
+    "seed": "cd services/api && .venv/bin/python -m helm.seed",
+    "test": "pnpm test:api && pnpm test:e2e",
     "test:api": "cd services/api && .venv/bin/pytest -q",
-    "gen:api": "./scripts/gen-api.sh",
-    "test:e2e": "pnpm --filter e2e exec playwright test"
+    "test:e2e": "pnpm --filter e2e exec playwright test",
+    "gen:api": "./scripts/gen-api.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
   }
 }

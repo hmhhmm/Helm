@@ -1,11 +1,19 @@
 [project]
 name = "helm-api"
 version = "0.1.0"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
-  "fastapi", "uvicorn[standard]", "sqlalchemy>=2", "psycopg[binary]",
-  "pydantic>=2", "numpy", "ortools", "httpx",
+  "fastapi", "uvicorn[standard]", "sqlalchemy>=2", "psycopg[binary]", "pydantic>=2",
+  "numpy", "ortools", "httpx", "reportlab", "langgraph",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+llm = ["anthropic"]  # only used when LLM_MODE=live (Reader and Explainer wording)
+
+[tool.setuptools.packages.find]
+include = ["helm*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
