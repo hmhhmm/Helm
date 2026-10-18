@@ -65,8 +65,9 @@ const en = {
   "approval.nothingMoves": "Nothing changes; no money moves.", "approval.safeDate": "If you approve, Helm releases it on {date}, once it is safe.",
   "approval.approve": "Approve", "approval.hold": "Hold", "approval.ask": "Ask why", "approval.whyTitle": "Why Helm stopped to ask:",
   "approval.reason.anomaly": "Something about it looks unusual: a new payee, a changed account or odd text.", "approval.reason.limit": "It is above the approval limit you set.",
-  "approval.reason.protected": "The bank details do not match a protected payee.", "approval.reason.other": "A rule asked for your OK.",
+  "approval.reason.protected": "The bank details do not match a protected payee.", "approval.reason.chance": "Paying it right now would put your minimum balance at risk.", "approval.reason.other": "A rule asked for your OK.",
   "approval.youApprove": "Approve", "approval.youHold": "Hold", "approval.approved": "Approved. Helm will release it on the safe date, and you will see it in the audit log.",
+  "approval.confirm": "This invoice tried to give Helm orders. Approving means real money goes to a new account. Approve anyway?", "approval.confirmYes": "Yes, approve anyway", "approval.cancel": "Cancel",
   "approval.held": "Held. No money moved, and the invoice stays out of the queue.", "approval.notWaiting": "This payment is not waiting for you any more.",
 
   "forecast.title": "Forecast", "forecast.question": "What will my cash look like, and what if…?",
@@ -221,8 +222,9 @@ const ms: Record<Key, string> = {
   "approval.nothingMoves": "Tiada perubahan; tiada wang bergerak.", "approval.safeDate": "Jika anda lulus, Helm melepaskannya pada {date}, apabila selamat.",
   "approval.approve": "Lulus", "approval.hold": "Tahan", "approval.ask": "Tanya sebab", "approval.whyTitle": "Sebab Helm berhenti untuk bertanya:",
   "approval.reason.anomaly": "Ada sesuatu yang luar biasa: penerima baharu, akaun berubah atau teks ganjil.", "approval.reason.limit": "Ia melebihi had kelulusan yang anda tetapkan.",
-  "approval.reason.protected": "Butiran bank tidak sepadan dengan penerima dilindungi.", "approval.reason.other": "Satu peraturan meminta persetujuan anda.",
+  "approval.reason.protected": "Butiran bank tidak sepadan dengan penerima dilindungi.", "approval.reason.chance": "Membayarnya sekarang akan meletakkan baki minimum anda dalam risiko.", "approval.reason.other": "Satu peraturan meminta persetujuan anda.",
   "approval.youApprove": "Lulus", "approval.youHold": "Tahan", "approval.approved": "Diluluskan. Helm akan melepaskannya pada tarikh selamat, dan anda boleh lihat dalam log audit.",
+  "approval.confirm": "Invois ini cuba memberi arahan kepada Helm. Meluluskan bermakna wang sebenar pergi ke akaun baharu. Lulus juga?", "approval.confirmYes": "Ya, lulus juga", "approval.cancel": "Batal",
   "approval.held": "Ditahan. Tiada wang dipindahkan, dan invois kekal di luar barisan.", "approval.notWaiting": "Bayaran ini tidak lagi menunggu anda.",
 
   "forecast.title": "Ramalan", "forecast.question": "Bagaimana tunai saya nanti, dan bagaimana jika…?",

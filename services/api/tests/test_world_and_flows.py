@@ -124,3 +124,38 @@ def test_a_payment_is_rechecked_on_the_day_it_would_go(fresh, session):
     for pid in paid & held_ids:
         d = executor.latest_decision(session, pid)
         assert d.verdict == "ALLOW"
+
+
+def test_owner_approval_is_the_only_way_a_flagged_invoice_gets_paid(fresh, session):
+    from fastapi.testclient import TestClient
+    from helm.main import app
+    session.close()
+    with TestClient(app) as c:
+        m = c.post("/sim/malicious-invoice").json()["data"]
+        pid = m["proposal_id"]
+        assert c.get("/bank/ledger").json()["rows"] == []                   # nothing moved before the owner acts
+        r = c.post(f"/decisions/{pid}/owner", json={"choice": "approve"}).json()
+        assert r["verdict"] in ("ALLOW", "HOLD") and r["owner_choice"] == "approved"
+        audit_events = [a["event"] for a in c.get("/audit?limit=200").json()["rows"]]
+        assert "owner.approved" in audit_events
+        assert c.post("/audit/verify").json()["ok"]
+
+
+def test_holding_a_flagged_invoice_keeps_it_out_of_the_queue_for_good(fresh, session):
+    from fastapi.testclient import TestClient
+    from helm.main import app
+    session.close()
+    with TestClient(app) as c:
+        pid = c.post("/sim/malicious-invoice").json()["data"]["proposal_id"]
+        assert c.post(f"/decisions/{pid}/owner", json={"choice": "hold"}).json()["status"] == "held_by_owner"
+        c.post("/sim/advance-week")
+        assert c.get("/bank/ledger").json()["rows"] == [] or all(r["to"] != "DEMO-9999-0042" for r in c.get("/bank/ledger").json()["rows"])
+        assert pid not in [r["proposal_id"] for g in c.get("/payments").json()["groups"].values() for r in g if r["status"] == "queued"]
+
+
+def test_four_weeks_run_without_trouble(fresh, session):
+    for _ in range(4):
+        simulator.advance_week(session)
+        session.commit()
+    assert audit.verify_chain(session)["ok"]
+    assert session.get(Balance, (sim_today(session), "operating")).amount > 0

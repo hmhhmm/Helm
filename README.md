@@ -32,7 +32,7 @@ docker compose up        # Postgres 16 + API + web  ->  http://localhost:3000
 ### Tests
 
 ```bash
-pnpm test:api            # 43 pytest tests: engine rules and verdicts, audit chain, bank, simulator flows
+pnpm test:api            # 46 pytest tests: engine rules and verdicts, audit chain, bank, simulator flows, API contract
 pnpm --filter web build && pnpm test:e2e   # 29 Playwright tests: demo flows, axe accessibility (both themes), 375px phone checks
 DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres (adds the role-grant test)
 ```

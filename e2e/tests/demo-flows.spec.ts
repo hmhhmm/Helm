@@ -56,6 +56,9 @@ test("malicious invoice: ESCALATE on the approval card, hold it, no money moved,
   await expect(card).toContainText("Careful.");
   await card.getByRole("button", { name: "Ask why" }).click();
   await expect(card).toContainText("Why Helm stopped to ask");
+  await card.getByRole("button", { name: "Approve" }).click();  // a quarantined invoice needs a second, deliberate tap
+  await expect(card).toContainText("Approve anyway?");
+  await card.getByRole("button", { name: "Cancel" }).click();
   await card.getByRole("button", { name: "Hold" }).click();
   await expect(card).toContainText("No money moved");
 

@@ -19,6 +19,7 @@ export function ApprovalCard({ id, onDone }: { id: string; onDone?: () => void }
   const qc = useQueryClient();
   const [phase, setPhase] = useState<Phase>("ask");
   const [asked, setAsked] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const act = useAct(async (choice: "approve" | "hold") => {
     unwrap(await api.POST("/decisions/{proposal_id}/owner", { params: { path: { proposal_id: id } }, body: { choice } }));
     setPhase(choice === "approve" ? "approved" : "held");
@@ -88,10 +89,19 @@ export function ApprovalCard({ id, onDone }: { id: string; onDone?: () => void }
 
       {waiting && (
         <div className="grid grid-cols-3 gap-2 pt-1">
-          <Button variant="success" disabled={act.isPending} onClick={() => act.mutate("approve")}><Check aria-hidden className="size-4" />{t("approval.approve")}</Button>
+          <Button variant="success" disabled={act.isPending} onClick={() => (d.row.quarantined ? setConfirming(true) : act.mutate("approve"))}><Check aria-hidden className="size-4" />{t("approval.approve")}</Button>
           <Button variant="secondary" disabled={act.isPending} onClick={() => act.mutate("hold")}><Pause aria-hidden className="size-4" />{t("approval.hold")}</Button>
           <Button variant="ghost" className="bg-surface/70" onClick={() => setAsked(true)}><HelpCircle aria-hidden className="size-4" />{t("approval.ask")}</Button>
         </div>
+      )}
+      {waiting && confirming && (
+        <Bubble tone="warn">
+          <p className="text-sm font-semibold">{t("approval.confirm")}</p>
+          <div className="mt-2 flex gap-2">
+            <Button size="sm" variant="danger" disabled={act.isPending} onClick={() => act.mutate("approve")} data-testid="approve-anyway">{t("approval.confirmYes")}</Button>
+            <Button size="sm" variant="secondary" onClick={() => setConfirming(false)}>{t("approval.cancel")}</Button>
+          </div>
+        </Bubble>
       )}
       {!waiting && phase === "ask" && (
         <Bubble><p className="text-sm text-muted">{t("approval.notWaiting")}</p></Bubble>
@@ -105,6 +115,7 @@ function reasonFor(rule: string, t: ReturnType<typeof useT>["t"]): string {
     case "duplicate_or_anomaly": return t("approval.reason.anomaly");
     case "approval_limit": return t("approval.reason.limit");
     case "protected_payee": return t("approval.reason.protected");
+    case "min_balance_chance": return t("approval.reason.chance");
     default: return t("approval.reason.other");
   }
 }
