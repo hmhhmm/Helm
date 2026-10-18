@@ -1,4 +1,22 @@
 import os
+from pathlib import Path
+
+
+def _load_dotenv() -> None:
+    """Tiny .env reader (no dependency). Real environment variables always win."""
+    here = Path.cwd().resolve()
+    for d in [here, *here.parents][:4]:
+        f = d / ".env"
+        if f.is_file():
+            for line in f.read_text().splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+            return
+
+
+_load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./helm.db")
 LLM_MODE = os.getenv("LLM_MODE", "fixtures")  # fixtures | live
