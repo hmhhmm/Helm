@@ -154,13 +154,18 @@ def _to_policy_inputs(p: Proposal, today: date, approved: set[str]) -> ProposalI
     return ProposalIn(p.id, p.kind, p.payee, p.account_ref, p.amount, idx, "treasury", "", False, p.id in approved, idx)
 
 
+def _jsonable(x):
+    import json
+    return json.loads(json.dumps(x, default=float))
+
+
 def _persist_decision(session: Session, run_id: str, p: Proposal, d: PDecision, prev: Decision | None, today: date) -> str:
     """Insert a new row when the verdict or release date changed; otherwise refresh the trace in place."""
     changed = prev is None or prev.verdict != d.verdict or prev.release_on != d.release_on
     if changed:
         row = Decision(
             run_id=run_id, proposal_id=p.id, verdict=d.verdict, release_on=d.release_on, checks=d.checks, why=d.why,
-            why_ms=d.why_ms, p_ok=d.p_ok, owner_choice=(prev.owner_choice if prev and prev.owner_choice == "approved" else None),
+            why_ms=d.why_ms, p_ok=d.p_ok, consequence=_jsonable(d.consequence), owner_choice=(prev.owner_choice if prev and prev.owner_choice == "approved" else None),
             created_at=now_iso(),
         )
         session.add(row)
@@ -172,20 +177,37 @@ def _persist_decision(session: Session, run_id: str, p: Proposal, d: PDecision, 
         })
         return "changed"
     prev.run_id, prev.checks, prev.why, prev.why_ms, prev.p_ok = run_id, d.checks, d.why, d.why_ms, d.p_ok
+    prev.consequence = _jsonable(d.consequence)
     return "same"
 
 
-def policy_pass(session: Session, run_id: str, today: date, rules: RulesView, plan: dict[str, tuple[date | None, int]]):
-    """Forecast on current facts, then judge every open proposal. Returns (ctx, result, inp, decisions, stats)."""
-    inp = build_input(session, today, rules.horizon_days)
-    res = forecaster.run(forecaster.ForecasterIn(inp)).result
-    proposals = _upsert_proposals(session, today, rules, plan)
+def evaluate(session: Session, today: date, rules: RulesView, inp, res: ForecastResult, plan: dict[str, tuple[date | None, int]],
+             *, skip_bills: set[str] | None = None, override_dates: dict[str, date] | None = None):
+    """Judge every open proposal without saving anything. Used by the pipeline, what-ifs, previews and 'try paying'."""
     treasury_open = session.execute(select(Proposal).where(Proposal.kind.in_(("sweep", "top_up")), Proposal.status == "open")).scalars().all()
+    open_props = session.execute(select(Proposal).where(Proposal.status == "open", Proposal.kind == "pay_bill")).scalars().all()
+    if skip_bills:
+        open_props = [p for p in open_props if p.bill_id not in skip_bills]
     prevs = latest_decisions(session)
     approved = {pid for pid, d in prevs.items() if d.owner_choice == "approved"}
     ctx, _ = _policy_inputs(session, today, rules, res, inp)
-    ordered = _order([p for p in proposals if p.status == "open"] + list(treasury_open), today)
-    decisions = evaluate_all([_to_policy_inputs(p, today, approved) for p in ordered], ctx)
+    ordered = _order(open_props + list(treasury_open), today)
+    inputs = []
+    for p in ordered:
+        pi = _to_policy_inputs(p, today, approved)
+        if override_dates and p.id in override_dates:
+            from dataclasses import replace as _r
+            pi = _r(pi, proposed_idx=max(0, (override_dates[p.id] - today).days))
+        inputs.append(pi)
+    return ctx, evaluate_all(inputs, ctx), ordered, prevs
+
+
+def policy_pass(session: Session, run_id: str, today: date, rules: RulesView, plan: dict[str, tuple[date | None, int]]):
+    """Forecast on current facts, then judge and record every open proposal."""
+    inp = build_input(session, today, rules.horizon_days)
+    res = forecaster.run(forecaster.ForecasterIn(inp)).result
+    _upsert_proposals(session, today, rules, plan)
+    ctx, decisions, ordered, prevs = evaluate(session, today, rules, inp, res, plan)
     by_id = {p.id: p for p in ordered}
     stats = {"changed": 0, "same": 0, "ALLOW": 0, "HOLD": 0, "ESCALATE": 0, "DENY": 0, "flips": []}
     for d in decisions:
@@ -201,14 +223,15 @@ def policy_pass(session: Session, run_id: str, today: date, rules: RulesView, pl
     return ctx, res, inp, decisions, stats
 
 
-def _write_cash_range(session: Session, run_id: str, today: date, rules: RulesView, res: ForecastResult, ctx: PolicyContext) -> dict:
+def range_summary(rules: RulesView, res: ForecastResult, ctx: PolicyContext) -> dict:
+    """Quantile bands and headline numbers for a forecast. Pure: no database."""
     scen, B = res.scen, rules.min_balance
     un = res.unmanaged_commit()
     ub, mb = scen.bands(un), scen.bands(ctx.committed)
     p50 = ub["p50"]
     i50 = int(np.argmin(p50[1:])) + 1
     i10 = int(np.argmin(ub["p10"][1:])) + 1
-    summary = {
+    return {
         "days": [scen.day(i).isoformat() for i in range(scen.horizon + 1)],
         "start": scen.start, "min_balance": B, "required_confidence": rules.required_confidence,
         "unmanaged": _bands_json(ub), "managed": _bands_json(mb),
@@ -222,14 +245,17 @@ def _write_cash_range(session: Session, run_id: str, today: date, rules: RulesVi
         "invoice_expect": {k: {kk: (vv.isoformat() if vv else None) for kk, vv in v.items()} for k, v in res.invoice_expect.items()},
         "shape": [scen.n, scen.horizon + 1],
     }
+
+
+def _write_cash_range(session: Session, run_id: str, today: date, rules: RulesView, res: ForecastResult, ctx: PolicyContext) -> dict:
+    summary = range_summary(rules, res, ctx)
     row = session.get(CashRange, run_id)
     if row is None:
-        session.add(CashRange(run_id=run_id, created_at=now_iso(), summary=summary, paths_blob=_compress(scen.cumbase)))
+        session.add(CashRange(run_id=run_id, created_at=now_iso(), summary=summary, paths_blob=_compress(res.scen.cumbase)))
     else:
         row.summary = summary
-        row.paths_blob = _compress(scen.cumbase)
+        row.paths_blob = _compress(res.scen.cumbase)
     session.flush()
-    # keep only the most recent few ranges
     old = session.execute(select(CashRange.run_id).order_by(CashRange.created_at.desc()).offset(4)).scalars().all()
     if old:
         session.execute(delete(CashRange).where(CashRange.run_id.in_(old)))

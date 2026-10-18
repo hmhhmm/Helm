@@ -211,6 +211,7 @@ class Decision(Base):
     why: Mapped[str] = mapped_column(Text)
     why_ms: Mapped[str] = mapped_column(Text, default="")
     p_ok: Mapped[float | None] = mapped_column(Float, nullable=True)
+    consequence: Mapped[dict] = mapped_column(JSON, default=dict)
     owner_choice: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[str] = mapped_column(String(32))
 
