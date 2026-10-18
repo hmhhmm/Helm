@@ -17,7 +17,7 @@ Needs Node 20+, pnpm (`corepack enable`), and Python 3.11+.
 
 ```bash
 cp .env.example .env     # optional: defaults already work
-pnpm setup               # installs web deps and creates services/api/.venv
+pnpm bootstrap           # installs web deps and creates services/api/.venv
 pnpm dev                 # API http://localhost:8000/docs  +  web http://localhost:3000
 ```
 

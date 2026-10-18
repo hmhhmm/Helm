@@ -2,8 +2,6 @@
   "name": "helm",
   "private": true,
   "scripts": {
-    "setup": "pnpm install && pnpm setup:api",
-    "setup:api": "cd services/api && python3 -m venv .venv && .venv/bin/pip install -q -e '.[dev]'",
     "dev": "concurrently -k -n api,web -c cyan,magenta \"pnpm dev:api\" \"pnpm dev:web\"",
     "dev:web": "pnpm --filter web dev",
     "dev:api": "cd services/api && .venv/bin/uvicorn helm.main:app --reload --port 8000",
@@ -13,7 +11,9 @@
     "test": "pnpm test:api && pnpm test:e2e",
     "test:api": "cd services/api && .venv/bin/pytest -q",
     "test:e2e": "pnpm --filter e2e exec playwright test",
-    "gen:api": "./scripts/gen-api.sh"
+    "gen:api": "./scripts/gen-api.sh",
+    "bootstrap": "pnpm install && pnpm bootstrap:api",
+    "bootstrap:api": "cd services/api && python3 -m venv .venv && .venv/bin/pip install -q -e '.[dev]'"
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
