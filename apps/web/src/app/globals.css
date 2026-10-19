@@ -2,34 +2,41 @@
 
 /* Design tokens. Light is default; dark via [data-theme="dark"]. */
 :root {
-  --bg: #f7f7f5;
-  --surface: #ffffff;
-  --border: #e4e4e0;
+  --bg: #f3f4fa;
+  --surface: rgb(255 255 255 / 0.82);
+  --border: rgb(30 30 80 / 0.09);
   --text: #16181d;
   --muted: #5b6170;
-  --accent: #6e4bd8;
+  --accent: #6240d6;
   --accent-contrast: #ffffff;
+  --grad: linear-gradient(135deg, #6a47e0 0%, #4a64ea 55%, #2f7fe8 100%);
+  --glow: 0 6px 20px -6px rgb(88 72 230 / 0.55);
   --allow: #0b7a45;
   --hold: #9a5b00;
   --escalate: #2457d6;
   --deny: #c23b2e;
-  --shadow: 0 1px 2px rgb(22 24 29 / 0.06), 0 4px 16px rgb(22 24 29 / 0.06);
-  --radius: 12px;
+  --shadow: 0 1px 2px rgb(30 30 80 / 0.05), 0 12px 32px -12px rgb(30 30 80 / 0.14);
+  --radius: 18px;
+  --blob1: rgb(106 71 224 / 0.16);
+  --blob2: rgb(34 190 220 / 0.14);
 }
 
 :root[data-theme="dark"] {
-  --bg: #0f1115;
-  --surface: #171a21;
-  --border: #2a2e38;
+  --bg: #090a12;
+  --surface: rgb(22 24 40 / 0.72);
+  --border: rgb(255 255 255 / 0.09);
   --text: #eceef3;
   --muted: #a0a6b5;
-  --accent: #a58bf2;
-  --accent-contrast: #0f1115;
+  --accent: #b39cff;
+  --accent-contrast: #ffffff;
+  --glow: 0 6px 24px -6px rgb(110 90 255 / 0.6);
   --allow: #3ccb84;
   --hold: #f0b04a;
   --escalate: #7fa3ff;
   --deny: #ff7b6b;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.3);
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 16px 40px -16px rgb(0 0 0 / 0.7);
+  --blob1: rgb(106 71 224 / 0.26);
+  --blob2: rgb(34 190 220 / 0.14);
 }
 
 @theme inline {
@@ -46,6 +53,7 @@
   --color-deny: var(--deny);
   --radius-card: var(--radius);
   --shadow-card: var(--shadow);
+  --shadow-glow: var(--glow);
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
@@ -54,6 +62,26 @@ html {
 }
 html[data-theme="dark"] {
   color-scheme: dark;
+}
+
+@utility bg-grad { background-image: var(--grad); }
+@utility text-grad {
+  background-image: linear-gradient(120deg, var(--text) 30%, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* soft colour blooms behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 45% at 8% -5%, var(--blob1), transparent 70%),
+    radial-gradient(45% 40% at 100% 0%, var(--blob2), transparent 70%);
 }
 
 body {

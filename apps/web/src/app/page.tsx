@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, Clock, Download, MailQuestion, PiggyBank, ShieldAlert, UserCheck } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock, Download, MailQuestion, PiggyBank, ShieldAlert, ShieldCheck, Timer, TrendingDown, UserCheck, Wallet } from "lucide-react";
 import Link from "next/link";
 import { Async } from "@/components/async";
 import { DecisionRow } from "@/components/decision-row";
@@ -28,6 +28,7 @@ export default function TodayPage() {
       {(d) => {
         const StatusIcon = d.status === "ok" ? CheckCircle2 : d.status === "watch" ? Clock : AlertTriangle;
         const tone = d.status === "ok" ? "text-allow" : d.status === "watch" ? "text-hold" : "text-deny";
+        const tint = d.status === "ok" ? "var(--allow)" : d.status === "watch" ? "var(--hold)" : "var(--deny)";
         return (
           <>
             <ScreenHeader title={t("today.title")} answer={t("today.strap", { min: rm(d.min_balance) })}>
@@ -36,7 +37,7 @@ export default function TodayPage() {
               </Button>
             </ScreenHeader>
 
-            <Card className="mb-4 flex items-start gap-4" data-testid="headline">
+            <Card className="mb-4 flex items-start gap-4 p-6" data-testid="headline" style={{ backgroundImage: `linear-gradient(115deg, color-mix(in oklab, ${tint} 16%, transparent), transparent 60%)` }}>
               <StatusIcon aria-hidden className={cn("mt-1 size-8 shrink-0", tone)} />
               <div className="min-w-0">
                 <p className={cn("text-sm font-bold uppercase tracking-wide", tone)}>{t(`today.status.${d.status}`)}</p>
@@ -45,11 +46,11 @@ export default function TodayPage() {
             </Card>
 
             <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <Metric label={t("today.cash")} value={rm(d.cash_now)} sub={t("today.cash.sub", { reserve: rm(d.reserve) })} hero />
-              <Metric label={t("today.buffer")} value={t("today.days", { n: Math.round(d.buffer_days) })} sub={t("today.buffer.sub", { min: rm(d.min_balance) })} />
-              <Metric label={t("today.runway")} value={t("today.days", { n: Math.round(d.runway_days) })} sub={t("today.runway.sub", { burn: rm(d.daily_burn) })} />
+              <Metric icon={Wallet} label={t("today.cash")} value={rm(d.cash_now)} sub={t("today.cash.sub", { reserve: rm(d.reserve) })} hero />
+              <Metric icon={ShieldCheck} label={t("today.buffer")} value={t("today.days", { n: Math.round(d.buffer_days) })} sub={t("today.buffer.sub", { min: rm(d.min_balance) })} />
+              <Metric icon={Timer} label={t("today.runway")} value={t("today.days", { n: Math.round(d.runway_days) })} sub={t("today.runway.sub", { burn: rm(d.daily_burn) })} />
               <Metric
-                label={t("today.low")} value={rm(d.low_point.worst)} danger={d.low_point.worst < d.min_balance}
+                icon={TrendingDown} label={t("today.low")} value={rm(d.low_point.worst)} danger={d.low_point.worst < d.min_balance}
                 sub={t("today.low.sub", { date: fdate(d.low_point.worst_date, lang), expected: rm(d.low_point.p50) })}
               />
             </div>
@@ -121,11 +122,14 @@ export default function TodayPage() {
   );
 }
 
-function Metric({ label, value, sub, hero, danger }: { label: string; value: string; sub: string; hero?: boolean; danger?: boolean }) {
+function Metric({ icon: Icon, label, value, sub, hero, danger }: { icon: typeof Wallet; label: string; value: string; sub: string; hero?: boolean; danger?: boolean }) {
   return (
     <Card className="min-w-0">
-      <p className="text-sm font-medium text-muted">{label}</p>
-      <p className={cn("num mt-1 font-bold tracking-tight", hero ? "text-3xl md:text-4xl" : "text-2xl md:text-3xl", danger && "text-deny")}>{value}</p>
+      <div className="flex items-center gap-2">
+        <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent/10 text-accent"><Icon className="size-4" /></span>
+        <p className="text-sm font-medium text-muted">{label}</p>
+      </div>
+      <p className={cn("num mt-3 font-bold tracking-tight", hero ? "text-grad text-3xl md:text-4xl" : "text-2xl md:text-3xl", danger && "text-deny")}>{value}</p>
       <p className="mt-1 text-xs text-muted">{sub}</p>
     </Card>
   );

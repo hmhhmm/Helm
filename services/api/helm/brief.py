@@ -101,6 +101,6 @@ def build_pdf(session: Session) -> bytes:
             el.append(Spacer(1, 3))
     el += [Spacer(1, 10), Paragraph(
         "Targets and methods are not results. Every number here comes from a simulation on synthetic data. Helm is a non-custodial decision layer; "
-        "payments in this demo go to a mock Demo bank. Mentions of EPF, SOCSO, EIS, PCB, SST and LHDN are context, not compliance claims.", small)]
+        "payments in this demo are sent through the Demo bank, a simulation. Mentions of EPF, SOCSO, EIS, PCB, SST and LHDN are context, not compliance claims.", small)]
     doc.build(el)
     return buf.getvalue()

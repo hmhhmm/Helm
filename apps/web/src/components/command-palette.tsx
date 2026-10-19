@@ -94,7 +94,7 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
             {filtered.length === 0 && <li className="px-3 py-6 text-center text-sm text-muted">{t("palette.none")}</li>}
             {filtered.map((it, i) => (
               <li key={it.id} id={`opt-${it.id}`} role="option" aria-selected={i === active} onMouseEnter={() => setActive(i)} onClick={it.run}
-                className={cn("flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 text-sm", i === active ? "bg-accent text-accent-contrast" : "hover:bg-bg")}>
+                className={cn("flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 text-sm", i === active ? "bg-grad text-white shadow-glow" : "hover:bg-bg")}>
                 <span className="truncate">{it.label}</span>
                 <span className={cn("flex shrink-0 items-center gap-1 text-xs", i === active ? "opacity-80" : "text-muted")}>{it.group}{i === active && <CornerDownLeft aria-hidden className="size-3" />}</span>
               </li>

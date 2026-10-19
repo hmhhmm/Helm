@@ -60,7 +60,7 @@ function ForecastScreen() {
               <div role="group" aria-label={t("forecast.view")} className="inline-flex rounded-lg border border-border bg-surface p-1">
                 {(["unmanaged", "managed"] as const).map((v) => (
                   <button key={v} onClick={() => setView(v)} aria-pressed={view === v} data-testid={`view-${v}`}
-                    className={cn("min-h-11 cursor-pointer rounded-md px-3 text-sm font-medium md:min-h-9", view === v ? "bg-accent text-accent-contrast" : "text-muted hover:text-text")}>
+                    className={cn("min-h-11 cursor-pointer rounded-md px-3 text-sm font-medium md:min-h-9", view === v ? "bg-grad text-white shadow-glow" : "text-muted hover:text-text")}>
                     {t(v === "unmanaged" ? "forecast.view.unmanaged" : "forecast.view.managed")}
                   </button>
                 ))}

@@ -124,7 +124,7 @@ function Bubble({ children, self, tone = "plain" }: { children: React.ReactNode;
   const toneCls = tone === "warn" ? "border-deny/40 bg-deny/10" : tone === "ok" ? "border-allow/40 bg-allow/10" : "border-transparent";
   return (
     <div className={`rise flex ${self ? "justify-end" : ""}`}>
-      <div className={`max-w-[92%] rounded-xl border px-3 py-2 shadow-sm ${self ? "bg-accent text-accent-contrast" : "bg-surface"} ${toneCls}`}>{children}</div>
+      <div className={`max-w-[92%] rounded-xl border px-3 py-2 shadow-sm ${self ? "bg-grad text-white shadow-glow" : "bg-surface"} ${toneCls}`}>{children}</div>
     </div>
   );
 }

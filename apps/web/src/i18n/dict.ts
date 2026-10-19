@@ -3,9 +3,9 @@
 
 const en = {
   synthetic: "Synthetic demo data",
-  "brand.tagline": "Checks before it pays",
+  
   "bank.label": "Demo bank",
-  "bank.note": "Payments go to a mock bank. No real money, no real banks.",
+  "bank.note": "Payments are sent through the Demo bank. Not real money.",
   "common.close": "Close", "common.loading": "Loading", "common.retry": "Try again", "common.skip": "Skip to content",
   "error.title": "Helm can't load this right now", "error.body": "The Helm API at {url} did not answer. Start it with “pnpm dev:api” or docker compose up, then try again.",
   "nav.label": "Main", "nav.current": "(current page)", "lang.switch": "Switch language", "theme.toggle": "Switch theme",
@@ -138,7 +138,7 @@ const en = {
   "agents.verify": "Verify chain", "agents.verifying": "Verifying…", "agents.verify.ok": "Chain intact: {n} entries verified.", "agents.verify.bad": "Chain broken at row {row}: {reason}.",
   "agents.audit.time": "Time", "agents.audit.actor": "Actor", "agents.audit.event": "Event", "agents.audit.hash": "Hash", "agents.audit.more": "Load older entries",
   "agents.runlog": "Live run log", "agents.run": "Run", "agents.node": "Step", "agents.what": "What happened",
-  "agents.ledger": "Demo bank statement", "agents.ledger.sub": "The mock bank's own books: every instruction it accepted or refused.", "agents.ledger.to": "To account",
+  "agents.ledger": "Demo bank statement", "agents.ledger.sub": "The Demo bank's own books: every instruction it accepted or refused.", "agents.ledger.to": "To account",
   "agents.ledger.status": "Result", "agents.ledger.accepted": "accepted", "agents.ledger.rejected": "rejected", "agents.ledger.none": "No instructions yet.",
 
   "sim.open": "Open the simulator", "sim.title": "Simulator", "sim.sub": "Poke the demo and watch Helm respond.", "sim.date": "Simulated date",
@@ -160,9 +160,9 @@ export type Key = keyof typeof en;
 
 const ms: Record<Key, string> = {
   synthetic: "Data demo sintetik",
-  "brand.tagline": "Menyemak sebelum membayar",
+  
   "bank.label": "Bank demo",
-  "bank.note": "Bayaran pergi ke bank olok-olok. Tiada wang atau bank sebenar.",
+  "bank.note": "Bayaran dihantar melalui Bank demo. Bukan wang sebenar.",
   "common.close": "Tutup", "common.loading": "Memuatkan", "common.retry": "Cuba lagi", "common.skip": "Langkau ke kandungan",
   "error.title": "Helm tidak dapat memuatkan ini sekarang", "error.body": "API Helm di {url} tidak menjawab. Mulakannya dengan “pnpm dev:api” atau docker compose up, kemudian cuba lagi.",
   "nav.label": "Utama", "nav.current": "(halaman semasa)", "lang.switch": "Tukar bahasa", "theme.toggle": "Tukar tema",
@@ -295,7 +295,7 @@ const ms: Record<Key, string> = {
   "agents.verify": "Sahkan rantaian", "agents.verifying": "Mengesahkan…", "agents.verify.ok": "Rantaian utuh: {n} entri disahkan.", "agents.verify.bad": "Rantaian putus pada baris {row}: {reason}.",
   "agents.audit.time": "Masa", "agents.audit.actor": "Pelaku", "agents.audit.event": "Peristiwa", "agents.audit.hash": "Hash", "agents.audit.more": "Muat entri lebih lama",
   "agents.runlog": "Log larian langsung", "agents.run": "Larian", "agents.node": "Langkah", "agents.what": "Apa yang berlaku",
-  "agents.ledger": "Penyata Bank demo", "agents.ledger.sub": "Buku bank olok-olok sendiri: setiap arahan yang diterima atau ditolak.", "agents.ledger.to": "Ke akaun",
+  "agents.ledger": "Penyata Bank demo", "agents.ledger.sub": "Buku Bank demo sendiri: setiap arahan yang diterima atau ditolak.", "agents.ledger.to": "Ke akaun",
   "agents.ledger.status": "Keputusan", "agents.ledger.accepted": "diterima", "agents.ledger.rejected": "ditolak", "agents.ledger.none": "Belum ada arahan.",
 
   "sim.open": "Buka simulator", "sim.title": "Simulator", "sim.sub": "Cuit demo dan lihat Helm bertindak balas.", "sim.date": "Tarikh simulasi",

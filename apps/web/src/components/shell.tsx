@@ -47,17 +47,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[232px_1fr]">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-[70] focus:rounded focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-contrast">{t("common.skip")}</a>
-      <aside className="sticky top-0 hidden h-dvh border-r border-border bg-surface md:flex md:flex-col md:gap-1 md:p-4">
-        <div className="mb-4 px-3">
-          <div className="text-xl font-bold tracking-tight">Helm</div>
-          <div className="text-xs text-muted">{t("brand.tagline")}</div>
+      <aside className="sticky top-3 m-3 mr-0 hidden h-[calc(100dvh-1.5rem)] rounded-3xl border border-border bg-surface shadow-card backdrop-blur-xl md:flex md:flex-col md:gap-1 md:p-4">
+        <div className="mb-5 flex items-center gap-2.5 px-2 pt-1">
+          <span aria-hidden className="grid size-9 place-items-center rounded-xl bg-grad text-lg font-extrabold text-white shadow-glow">H</span>
+          <span className="text-xl font-bold tracking-tight">Helm</span>
         </div>
         <nav aria-label={t("nav.label")} className="flex flex-col gap-1">
           {NAV.map(({ href, key, Icon }) => (
             <Link
               key={href} href={href} aria-current={isActive(href) ? "page" : undefined}
-              className={cn("flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150",
-                isActive(href) ? "bg-accent text-accent-contrast" : "text-muted hover:bg-bg hover:text-text")}
+              className={cn("flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all duration-150",
+                isActive(href) ? "bg-grad text-white shadow-glow" : "text-muted hover:bg-bg hover:text-text")}
             >
               <Icon aria-hidden className="size-4" />
               {t(key)}
@@ -71,7 +71,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-col pb-20 md:pb-0">
-        <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-border bg-bg/90 px-4 py-2 backdrop-blur md:px-8">
+        <header className="sticky top-0 z-20 flex items-center gap-2 bg-bg/60 px-4 py-3 backdrop-blur-xl md:px-8">
           <span role="status" className="inline-flex min-h-8 min-w-0 items-center truncate rounded-full border border-border bg-surface px-3 text-[11px] font-semibold text-muted md:text-xs">
             {t("synthetic")}
           </span>
@@ -113,7 +113,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 md:px-8">{children}</main>
       </div>
 
-      <nav aria-label={t("nav.label")} className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 border-t border-border bg-surface md:hidden">
+      <nav aria-label={t("nav.label")} className="fixed inset-x-2 bottom-2 z-30 grid grid-cols-7 rounded-2xl border border-border bg-surface shadow-card backdrop-blur-xl md:hidden">
         {NAV.map(({ href, short, Icon }) => (
           <Link
             key={href} href={href} aria-current={isActive(href) ? "page" : undefined}
