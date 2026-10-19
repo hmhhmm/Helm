@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 };
 
 // Apply the saved theme before first paint to avoid a flash.
-const themeInit = `try{var t=localStorage.getItem("helm-theme");if(t==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
+const themeInit = `try{var t=localStorage.getItem("helm-theme");document.documentElement.dataset.theme=t==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={inter.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>

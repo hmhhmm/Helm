@@ -7,17 +7,17 @@ import { useT } from "@/i18n";
 type Theme = "light" | "dark";
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
   useEffect(() => {
     let saved: string | null = null;
     try {
       saved = localStorage.getItem("helm-theme");
     } catch {}
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (saved === "dark") setTheme("dark");
+    if (saved === "light") setTheme("light");
   }, []);
   const toggle = useCallback(() => {
-    const cur = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+    const cur = document.documentElement.dataset.theme === "light" ? "light" : "dark";
     const next: Theme = cur === "light" ? "dark" : "light";
     setTheme(next);
     document.documentElement.dataset.theme = next;

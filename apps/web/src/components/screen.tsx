@@ -5,7 +5,7 @@ export function ScreenHeader({ title, answer, children }: { title: string; answe
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0">
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">{title}</h1>
         <p className="mt-1 max-w-3xl text-[15px] text-muted">{answer}</p>
       </div>
       {children}

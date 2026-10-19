@@ -6,7 +6,7 @@ const sizes = (process.argv[4] ?? "desktop").split(",");
 const themes = (process.argv[5] ?? "light").split(",");
 const b = await chromium.launch();
 for (const size of sizes) for (const theme of themes) {
-  const [w, h] = size === "mobile" ? [375, 760] : [1280, 800];
+  const [w, h] = size === "mobile" ? [375, 760] : size.startsWith("w") ? [Number(size.slice(1)), 900] : [1280, 800];
   const ctx = await b.newContext({ viewport: { width: w, height: h } });
   await ctx.addInitScript((t) => localStorage.setItem("helm-theme", t), theme);
   const p = await ctx.newPage();

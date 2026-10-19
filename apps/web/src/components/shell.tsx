@@ -57,7 +57,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Link
               key={href} href={href} aria-current={isActive(href) ? "page" : undefined}
               className={cn("flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all duration-150",
-                isActive(href) ? "bg-grad text-white shadow-glow" : "text-muted hover:bg-bg hover:text-text")}
+                isActive(href) ? "bg-grad text-on-grad shadow-glow" : "text-muted hover:bg-bg hover:text-text")}
             >
               <Icon aria-hidden className="size-4" />
               {t(key)}
@@ -72,16 +72,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-col pb-20 md:pb-0">
         <header className="sticky top-0 z-20 flex items-center gap-2 bg-bg/60 px-4 py-3 backdrop-blur-xl md:px-8">
-          <span role="status" className="inline-flex min-h-8 min-w-0 items-center truncate rounded-full border border-border bg-surface px-3 text-[11px] font-semibold text-muted md:text-xs">
+          <span role="status" className="inline-flex min-h-8 min-w-0 shrink items-center truncate rounded-full border border-border bg-surface px-3 text-[11px] font-semibold text-muted md:text-xs">
             {t("synthetic")}
           </span>
           <span className="hidden min-h-8 items-center rounded-full border border-border bg-surface px-3 text-xs font-semibold text-muted sm:inline-flex">{t("bank.label")}</span>
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={openSimulator} data-testid="date-control" aria-label={`${s ? flong(s.today, lang) : ""}. ${t("sim.open")}`}
-              className="num inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-3 text-sm font-semibold hover:bg-bg"
+              className="num inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl border border-border bg-surface px-3 text-sm font-semibold hover:bg-bg"
             >
-              <SlidersHorizontal aria-hidden className="size-4 text-accent" />
+              <SlidersHorizontal aria-hidden className="hidden size-4 text-accent sm:block" />
               <span className="hidden md:inline">{s ? flong(s.today, lang) : "…"}</span>
               <span className="md:hidden">{s ? fdate(s.today, lang) : "…"}</span>
             </button>
@@ -110,7 +110,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         )}
         {s?.demo_mode && <div className="bg-accent/10 px-4 py-1.5 text-center text-xs text-muted">{t("banner.demo")}</div>}
 
-        <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 md:px-8">{children}</main>
+        <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8">{children}</main>
       </div>
 
       <nav aria-label={t("nav.label")} className="fixed inset-x-2 bottom-2 z-30 grid grid-cols-7 rounded-2xl border border-border bg-surface shadow-card backdrop-blur-xl md:hidden">

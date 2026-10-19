@@ -9,6 +9,7 @@
   --muted: #5b6170;
   --accent: #6240d6;
   --accent-contrast: #ffffff;
+  --on-grad: #ffffff;
   --grad: linear-gradient(135deg, #6a47e0 0%, #4a64ea 55%, #2f7fe8 100%);
   --glow: 0 6px 20px -6px rgb(88 72 230 / 0.55);
   --allow: #0b7a45;
@@ -22,21 +23,24 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #090a12;
-  --surface: rgb(22 24 40 / 0.72);
-  --border: rgb(255 255 255 / 0.09);
-  --text: #eceef3;
-  --muted: #a0a6b5;
-  --accent: #b39cff;
-  --accent-contrast: #ffffff;
-  --glow: 0 6px 24px -6px rgb(110 90 255 / 0.6);
-  --allow: #3ccb84;
-  --hold: #f0b04a;
-  --escalate: #7fa3ff;
-  --deny: #ff7b6b;
-  --shadow: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 16px 40px -16px rgb(0 0 0 / 0.7);
-  --blob1: rgb(106 71 224 / 0.26);
-  --blob2: rgb(34 190 220 / 0.14);
+  --bg: #05060d;
+  --surface: rgb(255 255 255 / 0.05);
+  --border: rgb(255 255 255 / 0.1);
+  --text: #f2f4ff;
+  --muted: #9ba5c4;
+  --accent: #5ee0f7;
+  --accent-contrast: #05060d;
+  --on-grad: #05060d;
+  --grad: linear-gradient(135deg, #9b6bff 0%, #5b8cff 50%, #22d3ee 100%);
+  --allow: #3ee69a;
+  --hold: #ffc15a;
+  --escalate: #8db0ff;
+  --deny: #ff7f8f;
+  --glow: 0 0 0 1px rgb(155 107 255 / 0.5), 0 10px 36px -8px rgb(120 100 255 / 0.7);
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px -24px rgb(0 0 0 / 0.9);
+  --blob1: rgb(139 92 246 / 0.38);
+  --blob2: rgb(34 211 238 / 0.2);
+  --blob3: rgb(236 72 153 / 0.1);
 }
 
 @theme inline {
@@ -65,6 +69,7 @@ html[data-theme="dark"] {
 }
 
 @utility bg-grad { background-image: var(--grad); }
+@utility text-on-grad { color: var(--on-grad); }
 @utility text-grad {
   background-image: linear-gradient(120deg, var(--text) 30%, var(--accent));
   -webkit-background-clip: text;
@@ -80,9 +85,24 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(55% 45% at 8% -5%, var(--blob1), transparent 70%),
-    radial-gradient(45% 40% at 100% 0%, var(--blob2), transparent 70%);
+    radial-gradient(55% 45% at 8% -8%, var(--blob1), transparent 70%),
+    radial-gradient(45% 40% at 100% 0%, var(--blob2), transparent 70%),
+    radial-gradient(50% 35% at 55% 105%, var(--blob3, transparent), transparent 70%);
 }
+/* faint engineering grid, fading out toward the edges */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(var(--gridline, transparent) 1px, transparent 1px), linear-gradient(90deg, var(--gridline, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(70% 60% at 50% 0%, #000 20%, transparent 80%);
+}
+:root[data-theme="dark"] { --gridline: rgb(255 255 255 / 0.05); }
+:root[data-theme="dark"] .recharts-line-curve { filter: drop-shadow(0 0 6px rgb(94 224 247 / 0.7)); }
+.hero-glow { box-shadow: var(--shadow), 0 0 80px -30px var(--tint, transparent); }
 
 body {
   background: var(--bg);

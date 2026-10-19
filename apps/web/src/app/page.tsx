@@ -37,16 +37,39 @@ export default function TodayPage() {
               </Button>
             </ScreenHeader>
 
-            <Card className="mb-4 flex items-start gap-4 p-6" data-testid="headline" style={{ backgroundImage: `linear-gradient(115deg, color-mix(in oklab, ${tint} 16%, transparent), transparent 60%)` }}>
-              <StatusIcon aria-hidden className={cn("mt-1 size-8 shrink-0", tone)} />
-              <div className="min-w-0">
-                <p className={cn("text-sm font-bold uppercase tracking-wide", tone)}>{t(`today.status.${d.status}`)}</p>
-                <p className="mt-1 text-lg font-medium leading-snug md:text-xl">{txt(d.headline)}</p>
+            <Card className="hero-glow mb-4 overflow-hidden p-0" data-testid="headline" style={{ ["--tint" as string]: tint, backgroundImage: `radial-gradient(120% 90% at 0% 0%, color-mix(in oklab, ${tint} 18%, transparent), transparent 60%)` }}>
+              <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+                <div className="flex flex-col justify-between gap-6 p-6 md:p-8">
+                  <div>
+                    <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider", tone)} style={{ borderColor: `color-mix(in oklab, ${tint} 45%, transparent)`, background: `color-mix(in oklab, ${tint} 12%, transparent)` }}>
+                      <StatusIcon aria-hidden className="size-3.5" />{t(`today.status.${d.status}`)}
+                    </span>
+                    <p className="mt-4 text-[22px] font-semibold leading-snug tracking-tight md:text-2xl">{txt(d.headline)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted">{t("today.cash")}</p>
+                    <p className="num text-grad text-5xl font-extrabold tracking-tight md:text-6xl">{rm(d.cash_now)}</p>
+                    <p className="mt-1 text-sm text-muted">{t("today.cash.sub", { reserve: rm(d.reserve) })}</p>
+                  </div>
+                </div>
+                <div className="border-t border-border p-3 lg:border-l lg:border-t-0 md:p-5">
+                  <div className="mb-1 flex items-center justify-between px-2">
+                    <h2 className="text-sm font-bold">{t("today.next90")}</h2>
+                    <Link href="/forecast" className="inline-flex min-h-11 items-center text-sm font-semibold text-accent">{t("today.openForecast")}</Link>
+                  </div>
+                  <Async q={f} skeleton={<BlockSkeleton h={230} />}>
+                    {(fd) => (
+                      <>
+                        <ForecastChart data={fd} view="unmanaged" height={250} compact />
+                        <p className="num px-2 pt-1 text-xs text-muted">{t("today.mini.note", { p: pct(1 - d.low_point.chance_below_min), min: rm(d.min_balance) })}</p>
+                      </>
+                    )}
+                  </Async>
+                </div>
               </div>
             </Card>
 
-            <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <Metric icon={Wallet} label={t("today.cash")} value={rm(d.cash_now)} sub={t("today.cash.sub", { reserve: rm(d.reserve) })} hero />
+            <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
               <Metric icon={ShieldCheck} label={t("today.buffer")} value={t("today.days", { n: Math.round(d.buffer_days) })} sub={t("today.buffer.sub", { min: rm(d.min_balance) })} />
               <Metric icon={Timer} label={t("today.runway")} value={t("today.days", { n: Math.round(d.runway_days) })} sub={t("today.runway.sub", { burn: rm(d.daily_burn) })} />
               <Metric
@@ -90,21 +113,6 @@ export default function TodayPage() {
               )}
             </section>
 
-            <section aria-labelledby="mini" className="mb-6">
-              <div className="mb-3 flex items-center justify-between">
-                <h2 id="mini" className="text-lg font-bold">{t("today.next90")}</h2>
-                <Link href="/forecast" className="inline-flex min-h-11 items-center text-sm font-semibold text-accent">{t("today.openForecast")}</Link>
-              </div>
-              <Async q={f} skeleton={<BlockSkeleton h={200} />}>
-                {(fd) => (
-                  <Card className="p-2 md:p-4">
-                    <ForecastChart data={fd} view="unmanaged" height={220} compact />
-                    <p className="num px-2 pb-1 text-xs text-muted">{t("today.mini.note", { p: pct(1 - d.low_point.chance_below_min), min: rm(d.min_balance) })}</p>
-                  </Card>
-                )}
-              </Async>
-            </section>
-
             <section aria-labelledby="week">
               <h2 id="week" className="mb-3 text-lg font-bold">{t("today.week")}</h2>
               {d.week_decisions.length === 0 ? (
@@ -129,7 +137,7 @@ function Metric({ icon: Icon, label, value, sub, hero, danger }: { icon: typeof 
         <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent/10 text-accent"><Icon className="size-4" /></span>
         <p className="text-sm font-medium text-muted">{label}</p>
       </div>
-      <p className={cn("num mt-3 font-bold tracking-tight", hero ? "text-grad text-3xl md:text-4xl" : "text-2xl md:text-3xl", danger && "text-deny")}>{value}</p>
+      <p className={cn("num mt-3 font-bold tracking-tight", hero ? "text-grad text-3xl md:text-4xl" : "text-3xl font-extrabold md:text-4xl", danger && "text-deny")}>{value}</p>
       <p className="mt-1 text-xs text-muted">{sub}</p>
     </Card>
   );
