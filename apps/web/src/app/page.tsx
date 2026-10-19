@@ -28,7 +28,6 @@ export default function TodayPage() {
       {(d) => {
         const StatusIcon = d.status === "ok" ? CheckCircle2 : d.status === "watch" ? Clock : AlertTriangle;
         const tone = d.status === "ok" ? "text-allow" : d.status === "watch" ? "text-hold" : "text-deny";
-        const bar = d.status === "ok" ? "border-l-allow" : d.status === "watch" ? "border-l-hold" : "border-l-deny";
         return (
           <>
             <ScreenHeader title={t("today.title")} answer={t("today.strap", { min: rm(d.min_balance) })}>
@@ -49,8 +48,8 @@ export default function TodayPage() {
               </dl>
             </Card>
 
-            <Card className={cn("mb-6 flex items-start gap-3 border-l-4 p-4", bar)} data-testid="headline">
-              <StatusIcon aria-hidden className={cn("mt-0.5 size-5 shrink-0", tone)} />
+            <Card className="mb-6 flex items-center gap-3 p-4" data-testid="headline">
+              <StatusIcon aria-hidden className={cn("size-5 shrink-0", tone)} />
               <div className="min-w-0">
                 <p className="text-[15px] leading-relaxed"><span className={cn("font-semibold", tone)}>{t(`today.status.${d.status}`)}.</span> {txt(d.headline)}</p>
               </div>

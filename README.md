@@ -43,7 +43,7 @@ DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on
 2. **Forecast** shows the next 90 days as a calibrated band (median, 50% and 80% ranges), the minimum-balance line, the lowest point, and the bill and invoice that cause it. What-ifs re-run the gate live.
 3. **Payments** is the queue. Every row has a verdict (`ALLOW`, `HOLD`, `ESCALATE`, `DENY`), a release date and a one-sentence reason. "See working" opens the decision trace.
 4. **Collections**, **Cash** and **Policy** act on the same numbers: who to chase (ranked by effect on the low point), where to park spare cash, and the owner's rules in plain words.
-5. **Agents & audit** shows the pipeline, the run log, the hash-chained audit log with a **Verify chain** button, the kill switch, and the Demo bank statement.
+5. **Audit** shows the pipeline, the run log, the hash-chained audit log with a **Verify chain** button, the kill switch, and the Demo bank statement.
 
 The **Simulator** (click the date, top right) has the three demo buttons: *Advance 1 week*, *Customer pays late*, *Inject malicious invoice*. See [docs/demo-script.md](docs/demo-script.md) for the 3-minute walkthrough.
 

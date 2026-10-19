@@ -51,43 +51,39 @@ export function Shell({ children }: { children: React.ReactNode }) {
   if (pathname.startsWith("/approve/")) return <>{children}</>;
 
   return (
-    <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
+    <div className="min-h-dvh md:grid md:grid-cols-[232px_1fr]">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-[70] focus:rounded focus:bg-accent-solid focus:px-3 focus:py-2 focus:text-on-accent">{t("common.skip")}</a>
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-border bg-surface md:flex">
-        <div className="flex h-16 items-center px-6">
-          <span className="text-lg font-semibold tracking-tight">Helm</span>
+        <div className="flex h-16 items-center px-5">
+          <span className="text-[19px] font-bold tracking-[-0.03em]">Helm<span className="text-accent">.</span></span>
         </div>
-        <nav aria-label={t("nav.label")} className="flex flex-1 flex-col gap-5 overflow-y-auto px-3 pb-4 pt-2">
-          {GROUPS.map((g) => (
-            <div key={g.label}>
-              <p className="px-3 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-muted">{t(g.label)}</p>
-              <div className="flex flex-col gap-0.5">
-                {g.items.map(({ href, key, Icon }) => (
-                  <Link
-                    key={href} href={href} aria-current={isActive(href) ? "page" : undefined}
-                    className={cn("relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150",
-                      isActive(href) ? "bg-subtle text-text" : "text-muted hover:bg-subtle hover:text-text")}
-                  >
-                    {isActive(href) && <span aria-hidden className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-accent-solid" />}
-                    <Icon aria-hidden className={cn("size-[18px]", isActive(href) && "text-accent")} />
-                    {t(key)}
-                  </Link>
-                ))}
-              </div>
+        <nav aria-label={t("nav.label")} className="flex flex-1 flex-col gap-4 overflow-y-auto px-3 pb-4 pt-1">
+          {GROUPS.map((g, gi) => (
+            <div key={gi} className={cn("flex flex-col gap-0.5", gi > 0 && "border-t border-border pt-4")}>
+              {g.items.map(({ href, key, Icon }) => (
+                <Link
+                  key={href} href={href} aria-current={isActive(href) ? "page" : undefined}
+                  className={cn("flex h-9 items-center gap-3 rounded-md px-3 text-[13.5px] font-medium transition-colors duration-150",
+                    isActive(href) ? "bg-subtle text-text" : "text-muted hover:bg-subtle hover:text-text")}
+                >
+                  <Icon aria-hidden className={cn("size-4 shrink-0", isActive(href) && "text-accent")} />
+                  {t(key)}
+                </Link>
+              ))}
             </div>
           ))}
         </nav>
         <div className="border-t border-border p-3">
-          <div className="flex items-center gap-3 rounded-lg px-2 py-1.5">
-            <span aria-hidden className="grid size-8 place-items-center rounded-full bg-subtle text-xs font-semibold text-muted">WP</span>
-            <span className="min-w-0 text-[13px] font-medium leading-tight">Warisan Printing</span>
+          <div className="flex items-center gap-3 px-3 py-1.5">
+            <span aria-hidden className="grid size-7 shrink-0 place-items-center rounded-md bg-subtle text-[11px] font-semibold text-muted">WP</span>
+            <span className="min-w-0 truncate text-[13px] font-medium">Warisan Printing</span>
           </div>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-col pb-16 md:pb-0">
         <header className="sticky top-0 z-20 flex min-h-16 items-center gap-3 border-b border-border bg-bg px-4 py-2 md:px-8">
-          <span className="text-base font-semibold tracking-tight md:hidden">Helm</span>
+          <span className="text-lg font-bold tracking-[-0.03em] md:hidden">Helm<span className="text-accent">.</span></span>
           <button onClick={openPalette} className="hidden h-10 w-full max-w-xl cursor-pointer items-center justify-between rounded-lg border border-border bg-surface px-3.5 text-sm text-muted hover:bg-subtle md:flex">
             <span className="flex items-center gap-2.5"><Search aria-hidden className="size-4" />{t("palette.search")}</span>
             <kbd className="rounded border border-border px-1.5 text-[11px]">⌘K</kbd>
