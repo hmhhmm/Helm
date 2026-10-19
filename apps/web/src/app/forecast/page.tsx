@@ -72,7 +72,6 @@ function ForecastScreen() {
               </p>
             </div>
 
-            <WhatIf base={b} late={late} skip={skip} setLate={setLate} setSkip={setSkip} />
             {active && whatif.data && <WhatIfDelta data={whatif.data} loading={whatif.isFetching} />}
 
             <Tabs defaultValue="chart" className="mt-2">
@@ -92,7 +91,9 @@ function ForecastScreen() {
               <TabsContent value="table" className="mt-3"><TableTab data={data} view={view} /></TabsContent>
             </Tabs>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="mt-4"><WhatIf base={b} late={late} skip={skip} setLate={setLate} setSkip={setSkip} /></div>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
               <TrackRecord data={b} />
               <Assumptions data={b} />
             </div>
@@ -156,7 +157,7 @@ function WhatIf({ base, late, skip, setLate, setSkip }: { base: ForecastOut; lat
   );
   const toggle = (arr: string[], id: string, set: (x: string[]) => void) => set(arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]);
   return (
-    <Card className="mb-4">
+    <Card>
       <div className="mb-3 flex items-center gap-2">
         <FlaskConical aria-hidden className="size-5 text-accent" />
         <h2 className="text-base font-bold">{t("whatif.title")}</h2>

@@ -5,7 +5,7 @@ import { BadgeCheck, Landmark, OctagonAlert, ShieldAlert, ShieldCheck } from "lu
 import { useSearchParams } from "next/navigation";
 import { Fragment, Suspense, useEffect, useState } from "react";
 import { Async } from "@/components/async";
-import { PipelineDiagram } from "@/components/pipeline-diagram";
+import { PipelineSteps } from "@/components/pipeline-steps";
 import { BlockSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,46 +23,22 @@ export default function AgentsPage() {
 function Agents() {
   const { t, lang } = useT();
   const q = useAgents();
-  const [sel, setSel] = useState<string | null>("policy");
   const kill = useAct(async (on: boolean) => unwrap(await api.POST("/kill-switch", { body: { on } })));
   const ledger = useAgentsLedger();
 
   return (
     <Async q={q} skeleton={<><ScreenHeader title={t("agents.title")} answer={t("agents.question")} /><BlockSkeleton h={420} /></>}>
       {(d) => {
-        const node = d.nodes.find((n) => n.id === sel);
         const open = d.alerts.filter((a) => !a.resolved);
         return (
           <>
             <ScreenHeader title={t("agents.title")} answer={t("agents.answer", { rows: d.audit_rows, run: d.last_run?.id ?? "—" })} />
 
-            <Card className="mb-4">
-              <h2 className="mb-1 text-base font-bold">{t("agents.pipeline")}</h2>
-              <p className="mb-3 text-sm text-muted">{t("agents.pipeline.sub")}</p>
-              <PipelineDiagram nodes={d.nodes} onSelect={setSel} selected={sel} />
-              <ol className="space-y-2 md:hidden" aria-label={t("agents.diagram")}>
-                {d.nodes.filter((n) => n.kind !== "store").map((n) => (
-                  <li key={n.id}>
-                    <button onClick={() => setSel(n.id)} aria-pressed={sel === n.id} className={cn("flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-lg border p-3 text-left text-sm", sel === n.id ? "border-accent bg-accent/10" : "border-border bg-surface")}>
-                      <span className="num grid size-7 place-items-center rounded-full border border-border text-xs font-bold">{n.n ?? "•"}</span>
-                      <span className="min-w-0 flex-1"><b>{n.label}</b><br /><span className="text-xs text-muted">{n.step ? (n.step.status === "skipped" ? t("agents.skipped") : `${n.step.ms} ms`) : ""} · {n.kind.toUpperCase()}</span></span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
-              {node && (
-                <div className="rise mt-4 rounded-lg border border-border bg-bg p-4" aria-live="polite" data-testid="node-detail">
-                  <p className="font-bold">{node.label} <span className="ml-2 rounded-full border border-border px-2 py-0.5 text-[11px] font-semibold uppercase text-muted">{node.kind}</span></p>
-                  <p className="mt-1 text-sm">{node.note}</p>
-                  <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-                    <dt className="text-muted">{t("agents.reads")}</dt><dd>{node.reads.join(", ") || "—"}</dd>
-                    <dt className="text-muted">{t("agents.writes")}</dt><dd>{node.writes.join(", ") || "—"}</dd>
-                    {node.step && <><dt className="text-muted">{t("agents.lastRun")}</dt><dd className="num">{node.step.run_id} · {node.step.summary}</dd></>}
-                  </dl>
-                  {node.id === "reader" && <p className="mt-2 text-sm font-semibold text-allow">{t("agents.reader.notools")}</p>}
-                </div>
-              )}
-            </Card>
+            <section className="mb-6" aria-labelledby="pipe">
+              <h2 id="pipe" className="mb-0.5 text-base font-semibold">{t("agents.pipeline")}</h2>
+              <p className="mb-3 text-[13px] text-muted">{t("agents.pipeline.sub")}</p>
+              <PipelineSteps nodes={d.nodes} />
+            </section>
 
             <div className="mb-4 grid gap-4 md:grid-cols-2">
               <Card data-testid="kill-card" className={cn(d.kill_switch && "border-deny")}>
@@ -87,7 +63,7 @@ function Agents() {
             <AuditSection rows={d.audit_rows} />
 
             <section className="mt-8" aria-labelledby="runlog">
-              <h2 id="runlog" className="mb-3 text-lg font-bold">{t("agents.runlog")}</h2>
+              <h2 id="runlog" className="mb-3 text-base font-semibold">{t("agents.runlog")}</h2>
               <Card className="overflow-hidden p-0">
                 <div className="max-h-96 overflow-auto" tabIndex={0} aria-label={t("agents.runlog")}>
                   <table className="w-full min-w-[640px] text-left text-sm">
@@ -109,7 +85,7 @@ function Agents() {
             </section>
 
             <section className="mt-8" aria-labelledby="ledger">
-              <h2 id="ledger" className="mb-1 flex items-center gap-2 text-lg font-bold"><Landmark aria-hidden className="size-5" />{t("agents.ledger")}</h2>
+              <h2 id="ledger" className="mb-1 flex items-center gap-2 text-base font-semibold"><Landmark aria-hidden className="size-5" />{t("agents.ledger")}</h2>
               <p className="mb-3 text-sm text-muted">{t("agents.ledger.sub")}</p>
               <Card className="overflow-hidden p-0">
                 {ledger.data && ledger.data.rows.length > 0 ? (
@@ -160,7 +136,7 @@ function AuditSection({ rows: total }: { rows: number }) {
     <section aria-labelledby="audit" className="mt-8">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 id="audit" className="text-lg font-bold">{t("agents.audit")}</h2>
+          <h2 id="audit" className="text-base font-semibold">{t("agents.audit")}</h2>
           <p className="text-sm text-muted">{t("agents.audit.sub", { n: total })}</p>
         </div>
         <Button onClick={() => verify.mutate()} disabled={verify.isPending} data-testid="verify-chain"><BadgeCheck aria-hidden className="size-4" />{verify.isPending ? t("agents.verifying") : t("agents.verify")}</Button>
@@ -186,7 +162,7 @@ function AuditSection({ rows: total }: { rows: number }) {
                       <td className="px-3 py-2 text-muted">{broken ? "✕ " : ""}{r.id}</td>
                       <td className="whitespace-nowrap px-3 py-2 text-muted">{r.ts.slice(11, 19)}</td>
                       <td className="px-3 py-2">{r.actor}</td>
-                      <td className="px-3 py-2 font-medium"><button className="inline-flex min-h-11 cursor-pointer items-center text-left" aria-expanded={open === r.id}>{r.event}</button></td>
+                      <td className="px-3 py-2 font-medium"><button className="inline-flex min-h-11 cursor-pointer items-center text-left md:min-h-0" aria-expanded={open === r.id}>{r.event}</button></td>
                       <td className="px-3 py-2 font-mono text-xs text-muted">{r.hash.slice(0, 10)}…</td>
                     </tr>
                     {open === r.id && (

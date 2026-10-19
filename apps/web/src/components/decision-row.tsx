@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
-import { useT } from "@/i18n";
+import { useT, type Key } from "@/i18n";
 import type { Row } from "@/lib/api";
 import { daysBetween, fdate, rm } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,7 @@ export function DecisionRow({ row, onOpen, compact }: { row: Row; onOpen: () => 
       >
         <span className="min-w-0">
           <span className="block truncate text-sm font-medium">{row.payee}</span>
-          <span className="num block truncate text-xs text-muted">{row.ref ?? row.label} · {t("decision.due", { date: fdate(row.due, lang) })}</span>
+          <span className="num block truncate text-xs text-muted">{t("decision.due", { date: fdate(row.due, lang) })}</span>
         </span>
         <span className="num order-2 text-right text-sm font-semibold md:order-4">{rm(row.amount)}</span>
         <span key={`${row.verdict}-${row.release_on}`} className={cn(flipped && "stamp", "order-3 inline-flex items-center justify-self-start md:order-2")}><VerdictBadge verdict={row.verdict} /></span>
@@ -54,9 +54,9 @@ export function DecisionRow({ row, onOpen, compact }: { row: Row; onOpen: () => 
           {row.quarantined && <span className="ml-2 rounded-md bg-deny/10 px-2 py-0.5 text-xs font-medium text-deny">{t("doc.quarantined")}</span>}
         </span>
         <span className="order-5 hidden items-center justify-end text-xs font-medium text-accent md:inline-flex">
-          {t("row.seeWorking")} <ChevronRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+          <span className="sr-only">{t("row.seeWorking")}</span><ChevronRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
         </span>
-        {!compact && row.verdict !== "ALLOW" && <span className="order-6 col-span-full line-clamp-1 text-[13px] text-muted">{lang === "ms" ? row.why_ms : row.why}</span>}
+        {!compact && row.verdict !== "ALLOW" && row.status === "queued" && <span className="order-6 col-span-full text-[13px] text-muted">{t(`row.why.${row.verdict}` as Key)}</span>}
       </button>
     </li>
   );

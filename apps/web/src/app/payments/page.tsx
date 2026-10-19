@@ -48,7 +48,7 @@ function Payments() {
             {sections.map((s) => (
               <section key={s.key} aria-labelledby={`g-${s.key}`} className="mb-8" data-testid={`group-${s.key}`}>
                 <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 id={`g-${s.key}`} className="text-base font-semibold">{t(s.title)} <span className="num text-sm font-normal text-muted">({s.rows.length})</span></h2>
+                  <h2 id={`g-${s.key}`} className="text-sm font-semibold">{t(s.title)} <span className="num text-[13px] font-normal text-muted">{s.rows.length}</span></h2>
                                   </div>
                 {s.rows.length === 0 ? (s.key === "paid" ? null : <EmptyState title={t("payments.none")} />) : (
                   <DecisionList>

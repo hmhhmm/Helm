@@ -54,7 +54,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh md:grid md:grid-cols-[232px_1fr]">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-[70] focus:rounded focus:bg-accent-solid focus:px-3 focus:py-2 focus:text-on-accent">{t("common.skip")}</a>
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-border bg-surface md:flex">
-        <div className="flex h-16 items-center px-5">
+        <div className="flex h-16 items-center px-6">
           <span className="text-[19px] font-bold tracking-[-0.03em]">Helm<span className="text-accent">.</span></span>
         </div>
         <nav aria-label={t("nav.label")} className="flex flex-1 flex-col gap-4 overflow-y-auto px-3 pb-4 pt-1">
@@ -120,7 +120,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {s?.demo_mode && <div className="border-b border-border bg-subtle px-4 py-1.5 text-center text-xs text-muted">{t("banner.demo")}</div>}
 
         <main id="main" className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 md:px-8">{children}</main>
-        <footer className="mx-auto w-full max-w-[1200px] px-4 pb-6 text-xs text-muted md:px-8">{t("synthetic")} · {t("bank.label")}</footer>
+        {!pathname.startsWith("/policy") && <footer className="mx-auto w-full max-w-[1200px] px-4 pb-6 text-xs text-muted md:px-8">{t("synthetic")} · {t("bank.label")}</footer>}
       </div>
 
       <nav aria-label={t("nav.label")} className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 border-t border-border bg-surface md:hidden">

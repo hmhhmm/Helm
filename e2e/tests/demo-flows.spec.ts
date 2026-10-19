@@ -90,7 +90,7 @@ test("tampering with the audit log is caught and shown; the kill switch stops mo
   await resetDemo(page);
   await page.goto("/agents");
   await page.getByTestId("kill-switch").click();
-  await expect(page.getByTestId("kill-state")).toContainText("ON");
+  await expect(page.getByTestId("kill-state")).toContainText("On.");
   await openSimulator(page);
   await page.getByTestId("sim-advance").click();
   await expect(page.getByTestId("sim-result")).toContainText("0 payment(s) sent");
