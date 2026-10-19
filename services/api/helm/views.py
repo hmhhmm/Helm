@@ -98,18 +98,15 @@ def today_view(session: Session) -> dict:
     low_date = date.fromisoformat(low["worst_date"])
     if p_un >= req:
         status = "ok"
-        head = _txt(f"You're in good shape. Helm sees little risk of dropping under {rm(B)} in the next 90 days.",
-                    f"Anda dalam keadaan baik. Helm nampak risiko kecil baki jatuh bawah {rm(B)} dalam 90 hari akan datang.")
+        head = _txt(f"Little risk of dropping under {rm(B)} in the next 90 days.", f"Risiko kecil jatuh bawah {rm(B)} dalam 90 hari akan datang.")
     elif p_man >= req:
         status = "watch"
-        head = _txt(f"You look fine today, but Helm sees a dip around {fdate(low_date)}: a {risk}% chance of falling under {rm(B)} if every bill is paid on its due date. "
-                    f"Helm is holding {len(holds)} payment{'s' if len(holds) != 1 else ''} so you stay above it.",
-                    f"Anda nampak baik hari ini, tetapi Helm nampak penurunan sekitar {fdate(low_date, 'ms')}: {risk}% risiko jatuh bawah {rm(B)} jika semua bil dibayar pada tarikh matang. "
-                    f"Helm menahan {len(holds)} bayaran supaya anda kekal di atas.")
+        head = _txt(f"Dip expected around {fdate(low_date)}: {risk}% risk of falling under {rm(B)}. Helm is holding {len(holds)} payment{'s' if len(holds) != 1 else ''}.",
+                    f"Penurunan dijangka sekitar {fdate(low_date, 'ms')}: {risk}% risiko jatuh bawah {rm(B)}. Helm menahan {len(holds)} bayaran.")
     else:
         status = "risk"
-        head = _txt(f"Cash is tight: even with holds, there is a {round((1 - p_man) * 100)}% chance of dropping under {rm(B)}. Consider a top-up from the reserve.",
-                    f"Tunai ketat: walaupun dengan penahanan, ada {round((1 - p_man) * 100)}% risiko jatuh bawah {rm(B)}. Pertimbangkan tambah baki daripada rizab.")
+        head = _txt(f"Even with holds, {round((1 - p_man) * 100)}% risk of dropping under {rm(B)}. Consider a top-up.",
+                    f"Walaupun ditahan, {round((1 - p_man) * 100)}% risiko jatuh bawah {rm(B)}. Pertimbangkan tambah baki.")
     needs: list[dict] = []
     for r in escal[:2]:
         needs.append({"kind": "approve", "title": _txt(f"Approve {r['payee']} {rm(r['amount'])}?", f"Lulus {r['payee']} {rm(r['amount'])}?"),
@@ -264,8 +261,8 @@ def payments_view(session: Session) -> dict:
     queue = [r for g in ("statutory", "due_soon", "can_wait") for r in groups[g]]
     counts = {v: sum(1 for r in queue if r["verdict"] == v) for v in ("ALLOW", "HOLD", "ESCALATE", "DENY")}
     sentence = _txt(
-        f"{counts['ALLOW']} released, {counts['HOLD']} waiting for cash, {counts['ESCALATE']} need you, {counts['DENY']} blocked.",
-        f"{counts['ALLOW']} dilepaskan, {counts['HOLD']} menunggu tunai, {counts['ESCALATE']} perlukan anda, {counts['DENY']} disekat.",
+        f"{counts['ALLOW']} released · {counts['HOLD']} waiting · {counts['ESCALATE']} need you · {counts['DENY']} blocked",
+        f"{counts['ALLOW']} dilepaskan · {counts['HOLD']} menunggu · {counts['ESCALATE']} perlukan anda · {counts['DENY']} disekat",
     )
     return {"today": today.isoformat(), "groups": groups, "counts": counts, "summary": sentence}
 
@@ -369,8 +366,7 @@ def collections_view(session: Session) -> dict:
     return {
         "today": today.isoformat(), "ageing": buckets, "ideas": ideas, "dso": {"series": series, "current": series[-1]["dso"] if series else None},
         "total_open": total_open, "assumption_days": 10,
-        "summary": _txt(f"{rm(total_open)} is waiting to be collected. Chase in this order to lift your low point the most.",
-                        f"{rm(total_open)} menunggu dikutip. Ingatkan mengikut susunan ini untuk menaikkan titik terendah anda paling banyak."),
+        "summary": _txt(f"{rm(total_open)} waiting to be collected.", f"{rm(total_open)} menunggu dikutip."),
     }
 
 
@@ -395,8 +391,8 @@ def cash_view(session: Session) -> dict:
         "ideas": ideas, "apy": RESERVE_APY, "apy_note": "Illustrative rate for an estimate only; not a quote from any bank.",
         "p_ok_unmanaged": rng["p_ok_unmanaged"], "p_ok_managed": rng["p_ok_managed"],
         "summary": _txt(
-            "Nothing to move right now." if not ideas else f"Helm has {len(ideas)} suggestion{'s' if len(ideas) != 1 else ''} for your cash.",
-            "Tiada apa perlu dipindahkan sekarang." if not ideas else f"Helm ada {len(ideas)} cadangan untuk tunai anda."),
+            "Nothing to move." if not ideas else f"{len(ideas)} suggestion{'s' if len(ideas) != 1 else ''}.",
+            "Tiada untuk dipindahkan." if not ideas else f"{len(ideas)} cadangan."),
     }
 
 

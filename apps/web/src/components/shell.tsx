@@ -23,6 +23,12 @@ const NAV: { href: string; key: Key; short: Key; Icon: typeof Home }[] = [
   { href: "/agents", key: "nav.agents", short: "nav.agents.short", Icon: Bot },
 ];
 
+const GROUPS: { label: Key; items: typeof NAV }[] = [
+  { label: "nav.group.overview", items: NAV.slice(0, 2) },
+  { label: "nav.group.money", items: NAV.slice(2, 5) },
+  { label: "nav.group.control", items: NAV.slice(5) },
+];
+
 export function Shell({ children }: { children: React.ReactNode }) {
   const { t, lang, setLang } = useT();
   const pathname = usePathname();
@@ -45,47 +51,51 @@ export function Shell({ children }: { children: React.ReactNode }) {
   if (pathname.startsWith("/approve/")) return <>{children}</>;
 
   return (
-    <div className="min-h-dvh md:grid md:grid-cols-[232px_1fr]">
+    <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-[70] focus:rounded focus:bg-accent-solid focus:px-3 focus:py-2 focus:text-on-accent">{t("common.skip")}</a>
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-border bg-surface md:flex">
-        <div className="flex h-14 items-center gap-2.5 px-5">
-          <span aria-hidden className="grid size-6 place-items-center rounded-md bg-accent-solid text-[13px] font-bold text-on-accent">H</span>
-          <span className="text-[15px] font-semibold tracking-tight">Helm</span>
+        <div className="flex h-16 items-center px-6">
+          <span className="text-lg font-semibold tracking-tight">Helm</span>
         </div>
-        <nav aria-label={t("nav.label")} className="flex flex-col gap-0.5 px-3 pt-1">
-          {NAV.map(({ href, key, Icon }) => (
-            <Link
-              key={href} href={href} aria-current={isActive(href) ? "page" : undefined}
-              className={cn("flex h-9 items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-colors duration-150",
-                isActive(href) ? "bg-subtle text-text" : "text-muted hover:bg-subtle hover:text-text")}
-            >
-              <Icon aria-hidden className={cn("size-4", isActive(href) && "text-accent")} />
-              {t(key)}
-            </Link>
+        <nav aria-label={t("nav.label")} className="flex flex-1 flex-col gap-5 overflow-y-auto px-3 pb-4 pt-2">
+          {GROUPS.map((g) => (
+            <div key={g.label}>
+              <p className="px-3 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-muted">{t(g.label)}</p>
+              <div className="flex flex-col gap-0.5">
+                {g.items.map(({ href, key, Icon }) => (
+                  <Link
+                    key={href} href={href} aria-current={isActive(href) ? "page" : undefined}
+                    className={cn("relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150",
+                      isActive(href) ? "bg-subtle text-text" : "text-muted hover:bg-subtle hover:text-text")}
+                  >
+                    {isActive(href) && <span aria-hidden className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-accent-solid" />}
+                    <Icon aria-hidden className={cn("size-[18px]", isActive(href) && "text-accent")} />
+                    {t(key)}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
-        <div className="mt-auto border-t border-border p-4 text-xs text-muted">
-          <p className="flex items-center gap-2 font-medium text-text"><span aria-hidden className="size-1.5 rounded-full bg-allow" />{t("bank.label")}</p>
-          <p className="mt-1">{t("bank.note")}</p>
+        <div className="border-t border-border p-3">
+          <div className="flex items-center gap-3 rounded-lg px-2 py-1.5">
+            <span aria-hidden className="grid size-8 place-items-center rounded-full bg-subtle text-xs font-semibold text-muted">WP</span>
+            <span className="min-w-0 text-[13px] font-medium leading-tight">Warisan Printing</span>
+          </div>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-col pb-16 md:pb-0">
-        <header className="sticky top-0 z-20 flex min-h-14 items-center gap-2 border-b border-border bg-bg px-4 py-2 md:px-8">
-          <span role="status" className="inline-flex h-6 min-w-0 shrink items-center gap-1.5 truncate rounded-md border border-border bg-surface px-2 text-[11px] font-medium text-muted md:text-xs">
-            <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-hold" />{t("synthetic")}
-          </span>
-          <span className="hidden h-6 items-center gap-1.5 rounded-md border border-border bg-surface px-2 text-xs font-medium text-muted sm:inline-flex">
-            <span aria-hidden className="size-1.5 rounded-full bg-allow" />{t("bank.label")}
-          </span>
+        <header className="sticky top-0 z-20 flex min-h-16 items-center gap-3 border-b border-border bg-bg px-4 py-2 md:px-8">
+          <span className="text-base font-semibold tracking-tight md:hidden">Helm</span>
+          <button onClick={openPalette} className="hidden h-10 w-full max-w-xl cursor-pointer items-center justify-between rounded-lg border border-border bg-surface px-3.5 text-sm text-muted hover:bg-subtle md:flex">
+            <span className="flex items-center gap-2.5"><Search aria-hidden className="size-4" />{t("palette.search")}</span>
+            <kbd className="rounded border border-border px-1.5 text-[11px]">⌘K</kbd>
+          </button>
           <div className="ml-auto flex items-center gap-2">
-            <button onClick={openPalette} className="hidden h-9 w-52 cursor-pointer items-center justify-between rounded-lg border border-border bg-surface px-3 text-[13px] text-muted hover:bg-subtle lg:flex">
-              <span className="flex items-center gap-2"><Search aria-hidden className="size-4" />{t("palette.search")}</span>
-              <kbd className="rounded border border-border px-1.5 text-[11px]">⌘K</kbd>
-            </button>
             <button
               onClick={openSimulator} data-testid="date-control" aria-label={`${s ? flong(s.today, lang) : ""}. ${t("sim.open")}`}
-              className="num inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg border border-border bg-surface px-3 text-[13px] font-medium hover:bg-subtle md:min-h-9"
+              className="num inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg border border-border bg-surface px-3 text-[13px] font-medium hover:bg-subtle md:min-h-10"
             >
               <SlidersHorizontal aria-hidden className="hidden size-4 text-muted sm:block" />
               <span className="hidden md:inline">{s ? flong(s.today, lang) : "…"}</span>
@@ -93,7 +103,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </button>
             <button
               onClick={() => setLang(lang === "en" ? "ms" : "en")} aria-label={`${lang === "en" ? "BM" : "EN"}: ${t("lang.switch")}`}
-              className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-xs font-semibold hover:bg-subtle md:min-h-9"
+              className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-xs font-semibold hover:bg-subtle md:min-h-10"
             >
               <Languages aria-hidden className="size-4 text-muted" />{lang === "en" ? "BM" : "EN"}
             </button>
@@ -114,6 +124,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {s?.demo_mode && <div className="border-b border-border bg-subtle px-4 py-1.5 text-center text-xs text-muted">{t("banner.demo")}</div>}
 
         <main id="main" className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 md:px-8">{children}</main>
+        <footer className="mx-auto w-full max-w-[1200px] px-4 pb-6 text-xs text-muted md:px-8">{t("synthetic")} · {t("bank.label")}</footer>
       </div>
 
       <nav aria-label={t("nav.label")} className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 border-t border-border bg-surface md:hidden">

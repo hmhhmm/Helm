@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useT } from "@/i18n";
 import { briefUrl } from "@/lib/api";
-import { fdate, pct, rm } from "@/lib/format";
+import { fdate, rm } from "@/lib/format";
 import { useForecast, useToday } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
@@ -52,14 +52,13 @@ export default function TodayPage() {
             <Card className={cn("mb-6 flex items-start gap-3 border-l-4 p-4", bar)} data-testid="headline">
               <StatusIcon aria-hidden className={cn("mt-0.5 size-5 shrink-0", tone)} />
               <div className="min-w-0">
-                <p className={cn("text-xs font-semibold uppercase tracking-wide", tone)}>{t(`today.status.${d.status}`)}</p>
-                <p className="mt-0.5 text-[15px] leading-relaxed">{txt(d.headline)}</p>
+                <p className="text-[15px] leading-relaxed"><span className={cn("font-semibold", tone)}>{t(`today.status.${d.status}`)}.</span> {txt(d.headline)}</p>
               </div>
             </Card>
 
             <div className="mb-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
               <Card className="p-4 md:p-5">
-                <div className="mb-2 flex items-center justify-between">
+                <div className="mb-3 flex items-center justify-between">
                   <h2 className="text-sm font-semibold">{t("today.next90")}</h2>
                   <Link href="/forecast" className="inline-flex min-h-11 items-center text-[13px] font-medium text-accent md:min-h-8">{t("today.openForecast")}</Link>
                 </div>
@@ -67,7 +66,6 @@ export default function TodayPage() {
                   {(fd) => (
                     <>
                       <ForecastChart data={fd} view="unmanaged" height={330} compact />
-                      <p className="num pt-2 text-xs text-muted">{t("today.mini.note", { p: pct(1 - d.low_point.chance_below_min), min: rm(d.min_balance) })}</p>
                     </>
                   )}
                 </Async>
@@ -88,7 +86,6 @@ export default function TodayPage() {
                             <Icon aria-hidden className={cn("mt-0.5 size-4 shrink-0", n.kind === "approve" ? "text-escalate" : n.kind === "alert" ? "text-deny" : "text-hold")} />
                             <span className="min-w-0 flex-1">
                               <span className="block text-sm font-medium leading-snug">{txt(n.title)}</span>
-                              <span className="mt-0.5 line-clamp-2 text-[13px] text-muted">{txt(n.detail)}</span>
                             </span>
                             {n.kind === "approve" ? <span className="shrink-0 self-center rounded-md bg-accent-solid px-2.5 py-1 text-xs font-medium text-on-accent" data-testid="review-approval">{t("today.review")}</span> : <ChevronRight aria-hidden className="size-4 shrink-0 self-center text-muted" />}
                           </>
@@ -96,9 +93,9 @@ export default function TodayPage() {
                         return (
                           <li key={i}>
                             {n.proposal_id && (n.kind === "approve" || n.kind === "hold") ? (
-                              <button onClick={go} className="flex w-full cursor-pointer items-start gap-3 px-4 py-3 text-left hover:bg-subtle">{inner}</button>
+                              <button onClick={go} className="flex min-h-11 w-full cursor-pointer items-start gap-3 px-4 py-3 text-left hover:bg-subtle">{inner}</button>
                             ) : (
-                              <Link href={n.href} className="flex items-start gap-3 px-4 py-3 hover:bg-subtle">{inner}</Link>
+                              <Link href={n.href} className="flex min-h-11 items-start gap-3 px-4 py-3 hover:bg-subtle">{inner}</Link>
                             )}
                           </li>
                         );
@@ -116,7 +113,7 @@ export default function TodayPage() {
               ) : (
                 <div data-testid="week-decisions">
                   <DecisionList>
-                    {d.week_decisions.map((r) => <DecisionRow key={r.proposal_id} row={r} onOpen={() => openDecision(r.proposal_id)} />)}
+                    {d.week_decisions.map((r) => <DecisionRow key={r.proposal_id} row={r} compact onOpen={() => openDecision(r.proposal_id)} />)}
                   </DecisionList>
                 </div>
               )}

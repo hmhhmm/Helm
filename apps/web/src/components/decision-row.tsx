@@ -40,23 +40,23 @@ export function DecisionRow({ row, onOpen, compact }: { row: Row; onOpen: () => 
     <li>
       <button
         onClick={onOpen}
-        className="group grid w-full cursor-pointer grid-cols-[1fr_auto] items-start gap-x-4 gap-y-1 px-4 py-3 text-left transition-colors duration-150 hover:bg-subtle"
+        className="group grid w-full cursor-pointer grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 px-4 py-3 text-left transition-colors duration-150 hover:bg-subtle md:grid-cols-[minmax(0,1.3fr)_auto_minmax(0,1fr)_auto_auto]"
       >
         <span className="min-w-0">
           <span className="block truncate text-sm font-medium">{row.payee}</span>
           <span className="num block truncate text-xs text-muted">{row.ref ?? row.label} · {t("decision.due", { date: fdate(row.due, lang) })}</span>
         </span>
-        <span className="num text-right text-sm font-semibold">{rm(row.amount)}</span>
-        <span className="col-span-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span key={`${row.verdict}-${row.release_on}`} className={cn(flipped && "stamp", "inline-block")}><VerdictBadge verdict={row.verdict} /></span>
-          <span className="num text-[13px]">{dateLine}</span>
-          {flipped && <span className="text-xs text-muted">{t("row.wasBefore", { was: t(`verdict.${row.previous_verdict!}`) })}</span>}
-          {row.quarantined && <span className="rounded-md bg-deny/10 px-2 py-0.5 text-xs font-medium text-deny">{t("doc.quarantined")}</span>}
-          <span className="ml-auto inline-flex items-center gap-0.5 text-xs font-medium text-accent">
-            {t("row.seeWorking")} <ChevronRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-          </span>
+        <span className="num order-2 text-right text-sm font-semibold md:order-4">{rm(row.amount)}</span>
+        <span key={`${row.verdict}-${row.release_on}`} className={cn(flipped && "stamp", "order-3 inline-flex items-center gap-2 md:order-2")}><VerdictBadge verdict={row.verdict} /></span>
+        <span className="num order-4 text-[13px] md:order-3">
+          {dateLine}
+          {flipped && <span className="ml-2 text-xs text-muted">{t("row.wasBefore", { was: t(`verdict.${row.previous_verdict!}`) })}</span>}
+          {row.quarantined && <span className="ml-2 rounded-md bg-deny/10 px-2 py-0.5 text-xs font-medium text-deny">{t("doc.quarantined")}</span>}
         </span>
-        {!compact && <span className="col-span-2 line-clamp-2 text-[13px] text-muted">{lang === "ms" ? row.why_ms : row.why}</span>}
+        <span className="order-5 hidden items-center text-xs font-medium text-accent md:inline-flex">
+          {t("row.seeWorking")} <ChevronRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+        </span>
+        {!compact && row.verdict !== "ALLOW" && <span className="order-6 col-span-full line-clamp-1 text-[13px] text-muted">{lang === "ms" ? row.why_ms : row.why}</span>}
       </button>
     </li>
   );

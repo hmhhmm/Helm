@@ -113,8 +113,7 @@ function IdeaCard({ idea }: { idea: Idea }) {
               <p className="num text-sm"><span className="text-muted">{t("collections.open")}</span> <b>{rm(idea.amount_open)}</b></p>
             </div>
             <p className="num mt-1 text-base font-semibold text-allow">{idea.effect_rm > 0 ? t("collections.effect", { rm: rm(idea.effect_rm) }) : t("collections.effect.none")}</p>
-            <p className="mt-1 text-sm text-muted">{idea.why}</p>
-            <p className="mt-1 text-xs text-muted">{idea.paid_count > 0 ? t("collections.avgDelay", { n: Math.round(idea.avg_delay), count: idea.paid_count }) : t("collections.noHistory")}</p>
+                        <p className="mt-0.5 text-xs text-muted">{idea.paid_count > 0 ? t("collections.avgDelay", { n: Math.round(idea.avg_delay), count: idea.paid_count }) : t("collections.noHistory")}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">

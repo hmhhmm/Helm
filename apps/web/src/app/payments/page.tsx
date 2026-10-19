@@ -49,9 +49,8 @@ function Payments() {
               <section key={s.key} aria-labelledby={`g-${s.key}`} className="mb-8" data-testid={`group-${s.key}`}>
                 <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
                   <h2 id={`g-${s.key}`} className="text-base font-semibold">{t(s.title)} <span className="num text-sm font-normal text-muted">({s.rows.length})</span></h2>
-                  <p className="text-sm text-muted">{t(s.help)}</p>
-                </div>
-                {s.rows.length === 0 ? <EmptyState title={t("payments.none")} /> : (
+                                  </div>
+                {s.rows.length === 0 ? (s.key === "paid" ? null : <EmptyState title={t("payments.none")} />) : (
                   <DecisionList>
                     {s.rows.map((r) => <DecisionRow key={r.proposal_id} row={r} onOpen={() => openDecision(r.proposal_id)} />)}
                   </DecisionList>

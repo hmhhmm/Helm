@@ -9,12 +9,12 @@ test("the 60-second story: today -> forecast -> payments -> decision trace", asy
   await page.goto("/");
   await expect(page.getByText("Synthetic demo data").first()).toBeVisible();
   await expect(page.getByText("Demo bank").first()).toBeVisible();
-  await expect(page.getByTestId("headline")).toContainText("dip around 28 Nov");
+  await expect(page.getByTestId("headline")).toContainText("Dip expected around 28 Nov");
   await expect(page.getByText("Syarikat Kertas Sdn Bhd RM 18,400 is on hold until 6 Dec")).toBeVisible();
 
   await page.getByRole("link", { name: "Forecast" }).first().click();
   await expect(page.getByRole("heading", { name: "Forecast", level: 1 })).toBeVisible();
-  await expect(page.getByText("What causes the dip")).toBeVisible();
+  await expect(page.getByText("Why the dip")).toBeVisible();
   await expect(page.getByText("Minimum RM 20,000")).toBeVisible();
 
   await page.getByRole("link", { name: "Payments" }).first().click();

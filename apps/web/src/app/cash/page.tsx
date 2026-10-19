@@ -70,8 +70,7 @@ export default function CashPage() {
                           <VerdictBadge verdict={i.verdict} />
                         </div>
                         <p className="text-[15px]">{lang === "ms" ? i.reason_ms : i.reason}</p>
-                        <p className="text-sm text-muted">{lang === "ms" ? i.why_ms : i.why}</p>
-                        {i.interest_estimate != null && (
+                                                {i.interest_estimate != null && (
                           <p className="num text-sm"><b>{t("cash.interest", { rm: rm(i.interest_estimate) })}</b> <span className="text-muted">{t("cash.interest.note")}</span></p>
                         )}
                         <div className="flex flex-wrap gap-2">
