@@ -32,7 +32,7 @@ function Marker(props: { cx?: number; cy?: number; payload?: { kind: string; ver
   const { cx = 0, cy = 0, payload } = props;
   if (!payload) return null;
   const up = payload.kind === "invoice";
-  const fill = up ? "var(--accent)" : payload.verdict ? VERDICT_FILL[payload.verdict] : "var(--muted)";
+  const fill = up ? "var(--chart-line)" : payload.verdict ? VERDICT_FILL[payload.verdict] : "var(--muted)";
   const d = up ? `M${cx},${cy - 6} L${cx + 5},${cy + 4} L${cx - 5},${cy + 4} Z` : `M${cx},${cy + 6} L${cx + 5},${cy - 4} L${cx - 5},${cy - 4} Z`;
   return <path d={d} fill={fill} stroke="var(--surface)" strokeWidth={1} />;
 }
@@ -103,9 +103,6 @@ export function ForecastChart({
     <div role="img" aria-label={summary} style={{ height }} className="w-full">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={rows} margin={{ top: 16, right: compact ? 8 : 20, bottom: 4, left: 0 }}>
-          <defs>
-            <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#9b6bff" /><stop offset="100%" stopColor="#22d3ee" /></linearGradient>
-          </defs>
           <XAxis
             type="number" dataKey="x" domain={[1, data.days.length]} ticks={compact ? ticks.filter((_, k) => k % 2 === 0) : ticks}
             tickFormatter={(x: number) => fdate(data.days[x - 1], lang)} stroke="var(--border)" tick={{ fill: "var(--muted)", fontSize: 12 }}
@@ -116,10 +113,10 @@ export function ForecastChart({
           />
           {/* ranges as a transparent base plus a visible width, stacked */}
           <Area dataKey="base80" stackId="r80" type="monotone" stroke="none" fill="transparent" isAnimationActive={false} activeDot={false} legendType="none" />
-          <Area dataKey="w80" stackId="r80" type="monotone" stroke="none" fill="var(--accent)" fillOpacity={0.12} isAnimationActive={!reduced} animationDuration={200} animationEasing="ease-out" activeDot={false} />
+          <Area dataKey="w80" stackId="r80" type="monotone" stroke="none" fill="var(--chart-band)" fillOpacity={0.1} isAnimationActive={!reduced} animationDuration={200} animationEasing="ease-out" activeDot={false} />
           <Area dataKey="base50" stackId="r50" type="monotone" stroke="none" fill="transparent" isAnimationActive={false} activeDot={false} legendType="none" />
-          <Area dataKey="w50" stackId="r50" type="monotone" stroke="none" fill="var(--accent)" fillOpacity={0.24} isAnimationActive={!reduced} animationDuration={200} animationEasing="ease-out" activeDot={false} />
-          <Line dataKey="p50" type="monotone" stroke="url(#lineGrad)" strokeWidth={3} dot={false} isAnimationActive={!reduced} animationDuration={200} animationEasing="ease-out" />
+          <Area dataKey="w50" stackId="r50" type="monotone" stroke="none" fill="var(--chart-band)" fillOpacity={0.2} isAnimationActive={!reduced} animationDuration={200} animationEasing="ease-out" activeDot={false} />
+          <Line dataKey="p50" type="monotone" stroke="var(--chart-line)" strokeWidth={2} dot={false} isAnimationActive={!reduced} animationDuration={200} animationEasing="ease-out" />
           <ReferenceLine y={B} stroke="var(--deny)" strokeDasharray="6 4" strokeWidth={1.5}
             label={{ value: `${t("chart.minimum")} ${rm(B)}`, position: "insideTopRight", fill: "var(--deny)", fontSize: 12, fontWeight: 600 }} />
           <ReferenceLine x={1} stroke="var(--muted)" strokeDasharray="2 3" label={{ value: t("chart.today"), position: "insideTopLeft", fill: "var(--muted)", fontSize: 11 }} />

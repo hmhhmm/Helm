@@ -37,7 +37,7 @@ export function ApprovalCard({ id, onDone }: { id: string; onDone?: () => void }
   return (
     <div className="space-y-2 rounded-card p-3" style={{ background: "var(--chat-bg)" }}>
       <div className="flex items-center gap-3 rounded-lg bg-surface/80 px-3 py-2">
-        <span aria-hidden className="grid size-9 place-items-center rounded-full bg-accent font-bold text-accent-contrast">H</span>
+        <span aria-hidden className="grid size-9 place-items-center rounded-full bg-accent-solid font-bold text-on-accent">H</span>
         <div className="leading-tight">
           <p className="font-semibold">Helm</p>
           <p className="text-xs text-muted">{t("approval.sub")}</p>

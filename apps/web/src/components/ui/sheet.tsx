@@ -38,7 +38,7 @@ export function Sheet({
             </div>
             <Dialog.Close
               aria-label={t("common.close")}
-              className="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-lg hover:bg-bg"
+              className="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-lg hover:bg-subtle"
             >
               <X className="size-5" />
             </Dialog.Close>

@@ -1,9 +1,9 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, Clock, Download, MailQuestion, PiggyBank, ShieldAlert, ShieldCheck, Timer, TrendingDown, UserCheck, Wallet } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronRight, Clock, Download, MailQuestion, PiggyBank, ShieldAlert, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { Async } from "@/components/async";
-import { DecisionRow } from "@/components/decision-row";
+import { DecisionList, DecisionRow } from "@/components/decision-row";
 import { ForecastChart } from "@/components/forecast-chart";
 import { useOverlays } from "@/components/overlays";
 import { BlockSkeleton, CardsSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
@@ -28,7 +28,7 @@ export default function TodayPage() {
       {(d) => {
         const StatusIcon = d.status === "ok" ? CheckCircle2 : d.status === "watch" ? Clock : AlertTriangle;
         const tone = d.status === "ok" ? "text-allow" : d.status === "watch" ? "text-hold" : "text-deny";
-        const tint = d.status === "ok" ? "var(--allow)" : d.status === "watch" ? "var(--hold)" : "var(--deny)";
+        const bar = d.status === "ok" ? "border-l-allow" : d.status === "watch" ? "border-l-hold" : "border-l-deny";
         return (
           <>
             <ScreenHeader title={t("today.title")} answer={t("today.strap", { min: rm(d.min_balance) })}>
@@ -37,90 +37,88 @@ export default function TodayPage() {
               </Button>
             </ScreenHeader>
 
-            <Card className="hero-glow mb-4 overflow-hidden p-0" data-testid="headline" style={{ ["--tint" as string]: tint, backgroundImage: `radial-gradient(120% 90% at 0% 0%, color-mix(in oklab, ${tint} 18%, transparent), transparent 60%)` }}>
-              <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-                <div className="flex flex-col justify-between gap-6 p-6 md:p-8">
-                  <div>
-                    <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider", tone)} style={{ borderColor: `color-mix(in oklab, ${tint} 45%, transparent)`, background: `color-mix(in oklab, ${tint} 12%, transparent)` }}>
-                      <StatusIcon aria-hidden className="size-3.5" />{t(`today.status.${d.status}`)}
-                    </span>
-                    <p className="mt-4 text-[22px] font-semibold leading-snug tracking-tight md:text-2xl">{txt(d.headline)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted">{t("today.cash")}</p>
-                    <p className="num text-grad text-5xl font-extrabold tracking-tight md:text-6xl">{rm(d.cash_now)}</p>
-                    <p className="mt-1 text-sm text-muted">{t("today.cash.sub", { reserve: rm(d.reserve) })}</p>
-                  </div>
-                </div>
-                <div className="border-t border-border p-3 lg:border-l lg:border-t-0 md:p-5">
-                  <div className="mb-1 flex items-center justify-between px-2">
-                    <h2 className="text-sm font-bold">{t("today.next90")}</h2>
-                    <Link href="/forecast" className="inline-flex min-h-11 items-center text-sm font-semibold text-accent">{t("today.openForecast")}</Link>
-                  </div>
-                  <Async q={f} skeleton={<BlockSkeleton h={230} />}>
-                    {(fd) => (
-                      <>
-                        <ForecastChart data={fd} view="unmanaged" height={250} compact />
-                        <p className="num px-2 pt-1 text-xs text-muted">{t("today.mini.note", { p: pct(1 - d.low_point.chance_below_min), min: rm(d.min_balance) })}</p>
-                      </>
-                    )}
-                  </Async>
-                </div>
+            <Card className="mb-4 overflow-hidden p-0">
+              <dl className="grid grid-cols-2 divide-x divide-y divide-border lg:grid-cols-4 lg:divide-y-0">
+                <Kpi label={t("today.cash")} value={rm(d.cash_now)} sub={t("today.cash.sub", { reserve: rm(d.reserve) })} big />
+                <Kpi label={t("today.buffer")} value={t("today.days", { n: Math.round(d.buffer_days) })} sub={t("today.buffer.sub", { min: rm(d.min_balance) })} />
+                <Kpi label={t("today.runway")} value={t("today.days", { n: Math.round(d.runway_days) })} sub={t("today.runway.sub", { burn: rm(d.daily_burn) })} />
+                <Kpi
+                  label={t("today.low")} value={rm(d.low_point.worst)} danger={d.low_point.worst < d.min_balance}
+                  sub={t("today.low.sub", { date: fdate(d.low_point.worst_date, lang), expected: rm(d.low_point.p50) })}
+                />
+              </dl>
+            </Card>
+
+            <Card className={cn("mb-6 flex items-start gap-3 border-l-4 p-4", bar)} data-testid="headline">
+              <StatusIcon aria-hidden className={cn("mt-0.5 size-5 shrink-0", tone)} />
+              <div className="min-w-0">
+                <p className={cn("text-xs font-semibold uppercase tracking-wide", tone)}>{t(`today.status.${d.status}`)}</p>
+                <p className="mt-0.5 text-[15px] leading-relaxed">{txt(d.headline)}</p>
               </div>
             </Card>
 
-            <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Metric icon={ShieldCheck} label={t("today.buffer")} value={t("today.days", { n: Math.round(d.buffer_days) })} sub={t("today.buffer.sub", { min: rm(d.min_balance) })} />
-              <Metric icon={Timer} label={t("today.runway")} value={t("today.days", { n: Math.round(d.runway_days) })} sub={t("today.runway.sub", { burn: rm(d.daily_burn) })} />
-              <Metric
-                icon={TrendingDown} label={t("today.low")} value={rm(d.low_point.worst)} danger={d.low_point.worst < d.min_balance}
-                sub={t("today.low.sub", { date: fdate(d.low_point.worst_date, lang), expected: rm(d.low_point.p50) })}
-              />
+            <div className="mb-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+              <Card className="p-4 md:p-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold">{t("today.next90")}</h2>
+                  <Link href="/forecast" className="inline-flex min-h-11 items-center text-[13px] font-medium text-accent md:min-h-8">{t("today.openForecast")}</Link>
+                </div>
+                <Async q={f} skeleton={<BlockSkeleton h={250} />}>
+                  {(fd) => (
+                    <>
+                      <ForecastChart data={fd} view="unmanaged" height={330} compact />
+                      <p className="num pt-2 text-xs text-muted">{t("today.mini.note", { p: pct(1 - d.low_point.chance_below_min), min: rm(d.min_balance) })}</p>
+                    </>
+                  )}
+                </Async>
+              </Card>
+
+              <section aria-labelledby="needs">
+                <h2 id="needs" className="mb-2 text-sm font-semibold">{t("today.needs")}</h2>
+                {d.needs_you.length === 0 ? (
+                  <EmptyState title={t("today.needs.none")} body={t("today.needs.none.body")} />
+                ) : (
+                  <Card className="overflow-hidden p-0">
+                    <ul className="divide-y divide-border">
+                      {d.needs_you.map((n, i) => {
+                        const Icon = KIND_ICON[n.kind];
+                        const go = () => (n.kind === "approve" && n.proposal_id ? openApproval(n.proposal_id) : n.kind === "hold" && n.proposal_id ? openDecision(n.proposal_id) : null);
+                        const inner = (
+                          <>
+                            <Icon aria-hidden className={cn("mt-0.5 size-4 shrink-0", n.kind === "approve" ? "text-escalate" : n.kind === "alert" ? "text-deny" : "text-hold")} />
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-sm font-medium leading-snug">{txt(n.title)}</span>
+                              <span className="mt-0.5 line-clamp-2 text-[13px] text-muted">{txt(n.detail)}</span>
+                            </span>
+                            {n.kind === "approve" ? <span className="shrink-0 self-center rounded-md bg-accent-solid px-2.5 py-1 text-xs font-medium text-on-accent" data-testid="review-approval">{t("today.review")}</span> : <ChevronRight aria-hidden className="size-4 shrink-0 self-center text-muted" />}
+                          </>
+                        );
+                        return (
+                          <li key={i}>
+                            {n.proposal_id && (n.kind === "approve" || n.kind === "hold") ? (
+                              <button onClick={go} className="flex w-full cursor-pointer items-start gap-3 px-4 py-3 text-left hover:bg-subtle">{inner}</button>
+                            ) : (
+                              <Link href={n.href} className="flex items-start gap-3 px-4 py-3 hover:bg-subtle">{inner}</Link>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </Card>
+                )}
+              </section>
             </div>
 
-            <section aria-labelledby="needs" className="mb-6">
-              <h2 id="needs" className="mb-3 text-lg font-bold">{t("today.needs")}</h2>
-              {d.needs_you.length === 0 ? (
-                <EmptyState title={t("today.needs.none")} body={t("today.needs.none.body")} />
-              ) : (
-                <ul className="grid gap-3 md:grid-cols-3">
-                  {d.needs_you.map((n, i) => {
-                    const Icon = KIND_ICON[n.kind];
-                    return (
-                      <li key={i}>
-                        <Card className="flex h-full flex-col gap-3">
-                          <div className="flex items-start gap-3">
-                            <Icon aria-hidden className={cn("mt-0.5 size-5 shrink-0", n.kind === "approve" ? "text-escalate" : n.kind === "alert" ? "text-deny" : "text-hold")} />
-                            <div className="min-w-0">
-                              <p className="font-semibold leading-snug">{txt(n.title)}</p>
-                              <p className="mt-1 line-clamp-3 text-sm text-muted">{txt(n.detail)}</p>
-                            </div>
-                          </div>
-                          <div className="mt-auto">
-                            {n.kind === "approve" && n.proposal_id ? (
-                              <Button size="sm" onClick={() => openApproval(n.proposal_id!)} data-testid="review-approval">{t("today.review")}</Button>
-                            ) : n.kind === "hold" && n.proposal_id ? (
-                              <Button size="sm" variant="secondary" onClick={() => openDecision(n.proposal_id!)}>{t("row.seeWorking")}</Button>
-                            ) : (
-                              <Button size="sm" variant="secondary" asChild><Link href={n.href}>{t("today.open")}</Link></Button>
-                            )}
-                          </div>
-                        </Card>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </section>
-
             <section aria-labelledby="week">
-              <h2 id="week" className="mb-3 text-lg font-bold">{t("today.week")}</h2>
+              <h2 id="week" className="mb-2 text-sm font-semibold">{t("today.week")}</h2>
               {d.week_decisions.length === 0 ? (
                 <EmptyState title={t("today.week.none")} />
               ) : (
-                <ul className="grid gap-3 md:grid-cols-2" data-testid="week-decisions">
-                  {d.week_decisions.map((r) => <DecisionRow key={r.proposal_id} row={r} onOpen={() => openDecision(r.proposal_id)} />)}
-                </ul>
+                <div data-testid="week-decisions">
+                  <DecisionList>
+                    {d.week_decisions.map((r) => <DecisionRow key={r.proposal_id} row={r} onOpen={() => openDecision(r.proposal_id)} />)}
+                  </DecisionList>
+                </div>
               )}
             </section>
           </>
@@ -130,15 +128,14 @@ export default function TodayPage() {
   );
 }
 
-function Metric({ icon: Icon, label, value, sub, hero, danger }: { icon: typeof Wallet; label: string; value: string; sub: string; hero?: boolean; danger?: boolean }) {
+function Kpi({ label, value, sub, big, danger }: { label: string; value: string; sub: string; big?: boolean; danger?: boolean }) {
   return (
-    <Card className="min-w-0">
-      <div className="flex items-center gap-2">
-        <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent/10 text-accent"><Icon className="size-4" /></span>
-        <p className="text-sm font-medium text-muted">{label}</p>
-      </div>
-      <p className={cn("num mt-3 font-bold tracking-tight", hero ? "text-grad text-3xl md:text-4xl" : "text-3xl font-extrabold md:text-4xl", danger && "text-deny")}>{value}</p>
-      <p className="mt-1 text-xs text-muted">{sub}</p>
-    </Card>
+    <div className="min-w-0 p-5">
+      <dt className="text-[13px] text-muted">{label}</dt>
+      <dd className="mt-1">
+        <span className={cn("num block font-semibold tracking-tight", big ? "text-3xl" : "text-2xl", danger && "text-deny")}>{value}</span>
+        <span className="mt-1 block text-xs text-muted">{sub}</span>
+      </dd>
+    </div>
   );
 }

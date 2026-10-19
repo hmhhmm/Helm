@@ -57,10 +57,10 @@ function ForecastScreen() {
             <ScreenHeader title={t("forecast.title")} answer={b.p_ok_unmanaged >= b.required ? t("forecast.answer.ok", { min: rm(b.min_balance) }) : lowTxt} />
 
             <div className="mb-4 flex flex-wrap items-center gap-3">
-              <div role="group" aria-label={t("forecast.view")} className="inline-flex rounded-lg border border-border bg-surface p-1">
+              <div role="group" aria-label={t("forecast.view")} className="inline-flex rounded-lg border border-border bg-subtle p-0.5">
                 {(["unmanaged", "managed"] as const).map((v) => (
                   <button key={v} onClick={() => setView(v)} aria-pressed={view === v} data-testid={`view-${v}`}
-                    className={cn("min-h-11 cursor-pointer rounded-md px-3 text-sm font-medium md:min-h-9", view === v ? "bg-grad text-on-grad shadow-glow" : "text-muted hover:text-text")}>
+                    className={cn("min-h-11 cursor-pointer rounded-md px-3 text-[13px] font-medium md:min-h-8", view === v ? "bg-surface text-text shadow-card" : "text-muted hover:text-text")}>
                     {t(v === "unmanaged" ? "forecast.view.unmanaged" : "forecast.view.managed")}
                   </button>
                 ))}

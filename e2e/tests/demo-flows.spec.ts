@@ -19,7 +19,7 @@ test("the 60-second story: today -> forecast -> payments -> decision trace", asy
 
   await page.getByRole("link", { name: "Payments" }).first().click();
   await expect(page.getByText("Waiting for cash").first()).toBeVisible();
-  await page.getByRole("button", { name: /Syarikat Kertas Sdn Bhd RM 18,400/ }).click();
+  await page.getByRole("button", { name: /Syarikat Kertas Sdn Bhd.*RM 18,400/ }).click();
   const dlg = page.getByRole("dialog");
   await expect(dlg).toContainText("Releasing on 6 Dec");
   await expect(dlg.getByText("Stays above your minimum")).toBeVisible();
@@ -32,7 +32,7 @@ test("the 60-second story: today -> forecast -> payments -> decision trace", asy
 
 test("customer pays late: the band widens and an ALLOW flips to HOLD", async ({ page }) => {
   await page.goto("/payments");
-  await expect(page.getByRole("button", { name: /Mesin Servis Teknik RM 12,000/ })).toContainText("Released");
+  await expect(page.getByRole("button", { name: /Mesin Servis Teknik.*RM 12,000/ })).toContainText("Released");
   await openSimulator(page);
   await page.getByTestId("sim-late").click();
   const result = page.getByTestId("sim-result");
@@ -41,7 +41,7 @@ test("customer pays late: the band widens and an ALLOW flips to HOLD", async ({ 
   await expect(result).toContainText("Mesin Servis Teknik");
   await page.keyboard.press("Escape");
   await page.goto("/payments");
-  const row = page.getByRole("button", { name: /Mesin Servis Teknik RM 12,000/ });
+  const row = page.getByRole("button", { name: /Mesin Servis Teknik.*RM 12,000/ });
   await expect(row).toContainText("Waiting for cash");
   await expect(row).toContainText("was: Released");
 });

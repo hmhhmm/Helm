@@ -1,117 +1,95 @@
 @import "tailwindcss";
 
-/* Design tokens. Light is default; dark via [data-theme="dark"]. */
+/*
+ * Design tokens. Flat surfaces, hairline borders, one restrained accent, neutral greys.
+ * (The same approach as Mercury, Ramp, Stripe and Linear: the numbers are the visual interest.)
+ * Light is the default for anyone without a system preference; dark via [data-theme="dark"].
+ */
 :root {
-  --bg: #f3f4fa;
-  --surface: rgb(255 255 255 / 0.82);
-  --border: rgb(30 30 80 / 0.09);
-  --text: #16181d;
-  --muted: #5b6170;
-  --accent: #6240d6;
-  --accent-contrast: #ffffff;
-  --on-grad: #ffffff;
-  --grad: linear-gradient(135deg, #6a47e0 0%, #4a64ea 55%, #2f7fe8 100%);
-  --glow: 0 6px 20px -6px rgb(88 72 230 / 0.55);
+  --bg: #f7f7f8;
+  --surface: #ffffff;
+  --subtle: #f3f4f6; /* hover and zebra fills */
+  --border: #e4e6eb;
+  --text: #14161a;
+  --muted: #5d6573;
+  --accent: #4338ca; /* links, focus, active text */
+  --accent-solid: #4f46e5; /* filled buttons */
+  --on-accent: #ffffff;
   --allow: #0b7a45;
   --hold: #9a5b00;
   --escalate: #2457d6;
   --deny: #c23b2e;
-  --shadow: 0 1px 2px rgb(30 30 80 / 0.05), 0 12px 32px -12px rgb(30 30 80 / 0.14);
-  --radius: 18px;
-  --blob1: rgb(106 71 224 / 0.16);
-  --blob2: rgb(34 190 220 / 0.14);
+  --shadow: 0 1px 2px rgb(16 24 40 / 0.04);
+  --radius: 10px;
+  --chart-line: #4f46e5;
+  --chart-band: #4f46e5;
+  --chat-bg: #eef0f4;
+  --n-agent: #fef6d6; --n-agent-b: #d9b84a;
+  --n-code: #eee9fb; --n-code-b: #a897e0;
+  --n-store: #f4e3e1; --n-store-b: #d7a09a;
+  --n-human: #def3d8; --n-human-b: #7cc26a;
 }
 
 :root[data-theme="dark"] {
-  --bg: #05060d;
-  --surface: rgb(255 255 255 / 0.05);
-  --border: rgb(255 255 255 / 0.1);
-  --text: #f2f4ff;
-  --muted: #9ba5c4;
-  --accent: #5ee0f7;
-  --accent-contrast: #05060d;
-  --on-grad: #05060d;
-  --grad: linear-gradient(135deg, #9b6bff 0%, #5b8cff 50%, #22d3ee 100%);
-  --allow: #3ee69a;
-  --hold: #ffc15a;
-  --escalate: #8db0ff;
-  --deny: #ff7f8f;
-  --glow: 0 0 0 1px rgb(155 107 255 / 0.5), 0 10px 36px -8px rgb(120 100 255 / 0.7);
-  --shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px -24px rgb(0 0 0 / 0.9);
-  --blob1: rgb(139 92 246 / 0.38);
-  --blob2: rgb(34 211 238 / 0.2);
-  --blob3: rgb(236 72 153 / 0.1);
+  --bg: #0c0d0f;
+  --surface: #141619;
+  --subtle: #1b1e22;
+  --border: #272a30;
+  --text: #ecedef;
+  --muted: #9aa0ab;
+  --accent: #a5b4fc;
+  --accent-solid: #818cf8;
+  --on-accent: #0c0d0f;
+  --allow: #4ade80;
+  --hold: #fbbf24;
+  --escalate: #93b4ff;
+  --deny: #ff8a8a;
+  --shadow: none;
+  --chart-line: #a5b4fc;
+  --chart-band: #818cf8;
+  --chat-bg: #191b1f;
+  --n-agent: #3a3213; --n-agent-b: #9a8227;
+  --n-code: #2c2748; --n-code-b: #7466b8;
+  --n-store: #3d2523; --n-store-b: #94534d;
+  --n-human: #1b3a24; --n-human-b: #4a8f3b;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-subtle: var(--subtle);
   --color-border: var(--border);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
-  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-solid: var(--accent-solid);
+  --color-on-accent: var(--on-accent);
   --color-allow: var(--allow);
   --color-hold: var(--hold);
   --color-escalate: var(--escalate);
   --color-deny: var(--deny);
   --radius-card: var(--radius);
   --shadow-card: var(--shadow);
-  --shadow-glow: var(--glow);
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
-html {
-  color-scheme: light;
-}
-html[data-theme="dark"] {
-  color-scheme: dark;
-}
+/* The accent fill is flat. These names are kept so components stay readable. */
+@utility bg-grad { background-color: var(--accent-solid); }
+@utility text-on-grad { color: var(--on-accent); }
+@utility shadow-glow { box-shadow: none; }
 
-@utility bg-grad { background-image: var(--grad); }
-@utility text-on-grad { color: var(--on-grad); }
-@utility text-grad {
-  background-image: linear-gradient(120deg, var(--text) 30%, var(--accent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* soft colour blooms behind everything */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(55% 45% at 8% -8%, var(--blob1), transparent 70%),
-    radial-gradient(45% 40% at 100% 0%, var(--blob2), transparent 70%),
-    radial-gradient(50% 35% at 55% 105%, var(--blob3, transparent), transparent 70%);
-}
-/* faint engineering grid, fading out toward the edges */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: linear-gradient(var(--gridline, transparent) 1px, transparent 1px), linear-gradient(90deg, var(--gridline, transparent) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(70% 60% at 50% 0%, #000 20%, transparent 80%);
-}
-:root[data-theme="dark"] { --gridline: rgb(255 255 255 / 0.05); }
-:root[data-theme="dark"] .recharts-line-curve { filter: drop-shadow(0 0 6px rgb(94 224 247 / 0.7)); }
-.hero-glow { box-shadow: var(--shadow), 0 0 80px -30px var(--tint, transparent); }
+html { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.5;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.003em;
 }
 
 :focus-visible {
@@ -120,44 +98,21 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-@keyframes shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .skeleton {
-  border-radius: 8px;
-  background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--subtle) 25%, var(--border) 50%, var(--subtle) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
 }
 
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes stamp { 0% { transform: scale(1.35); opacity: 0; } 60% { transform: scale(0.96); opacity: 1; } 100% { transform: scale(1); } }
-@keyframes rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes slide { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes stamp { 0% { transform: scale(1.25); opacity: 0; } 60% { transform: scale(0.97); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes rise { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
 .stamp { animation: stamp 200ms ease-out; }
 .rise { animation: rise 180ms ease-out both; }
 .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
-
-:root { --chat-bg: #ece8f4; }
-:root[data-theme="dark"] { --chat-bg: #1a1d27; }
-
-/* pipeline diagram node fills: same families as the architecture slide */
-:root {
-  --n-agent: #fff0b3; --n-agent-b: #e2b93b;
-  --n-code: #e9dafb; --n-code-b: #a67bd9;
-  --n-store: #fad1ce; --n-store-b: #e08a84;
-  --n-human: #c9f1bf; --n-human-b: #5fb84a;
-}
-:root[data-theme="dark"] {
-  --n-agent: #4a3f14; --n-agent-b: #b8962b;
-  --n-code: #3b2b5e; --n-code-b: #8a62c4;
-  --n-store: #5a2c2a; --n-store-b: #b3615b;
-  --n-human: #1f4d2b; --n-human-b: #4f9a3d;
-}

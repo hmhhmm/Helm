@@ -64,7 +64,7 @@ export default function CollectionsPage() {
                     <LineChart data={d.dso.series} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
                       <CartesianGrid stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="month" stroke="var(--border)" tick={{ fill: "var(--muted)", fontSize: 12 }} />
-                      <YAxis width={36} stroke="var(--border)" tick={{ fill: "var(--muted)", fontSize: 12 }} domain={["dataMin - 5", "dataMax + 5"]} />
+                      <YAxis width={36} stroke="var(--border)" tick={{ fill: "var(--muted)", fontSize: 12 }} domain={[(min: number) => Math.floor(min - 5), (max: number) => Math.ceil(max + 5)]} allowDecimals={false} />
                       <Tooltip formatter={(v) => [`${v} ${t("collections.days")}`, "DSO"]} contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }} />
                       <Line dataKey="dso" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                     </LineChart>
@@ -112,7 +112,7 @@ function IdeaCard({ idea }: { idea: Idea }) {
               <h3 className="font-bold">{idea.customer}</h3>
               <p className="num text-sm"><span className="text-muted">{t("collections.open")}</span> <b>{rm(idea.amount_open)}</b></p>
             </div>
-            <p className="num mt-1 text-xl font-bold text-allow">{idea.effect_rm > 0 ? t("collections.effect", { rm: rm(idea.effect_rm) }) : t("collections.effect.none")}</p>
+            <p className="num mt-1 text-base font-semibold text-allow">{idea.effect_rm > 0 ? t("collections.effect", { rm: rm(idea.effect_rm) }) : t("collections.effect.none")}</p>
             <p className="mt-1 text-sm text-muted">{idea.why}</p>
             <p className="mt-1 text-xs text-muted">{idea.paid_count > 0 ? t("collections.avgDelay", { n: Math.round(idea.avg_delay), count: idea.paid_count }) : t("collections.noHistory")}</p>
           </div>

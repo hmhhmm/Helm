@@ -182,7 +182,7 @@ function AuditSection({ rows: total }: { rows: number }) {
                 const broken = verifyResult && !verifyResult.ok && verifyResult.broken_at === r.id;
                 return (
                   <Fragment key={r.id}>
-                    <tr className={cn("cursor-pointer border-b border-border hover:bg-bg", broken && "bg-deny/10")} onClick={() => setOpen(open === r.id ? null : r.id)}>
+                    <tr className={cn("cursor-pointer border-b border-border hover:bg-subtle", broken && "bg-deny/10")} onClick={() => setOpen(open === r.id ? null : r.id)}>
                       <td className="px-3 py-2 text-muted">{broken ? "✕ " : ""}{r.id}</td>
                       <td className="whitespace-nowrap px-3 py-2 text-muted">{r.ts.slice(11, 19)}</td>
                       <td className="px-3 py-2">{r.actor}</td>

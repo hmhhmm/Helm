@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 import { Async } from "@/components/async";
-import { DecisionRow } from "@/components/decision-row";
+import { DecisionList, DecisionRow } from "@/components/decision-row";
 import { useOverlays } from "@/components/overlays";
 import { BlockSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
 import { Button } from "@/components/ui/button";
@@ -48,13 +48,13 @@ function Payments() {
             {sections.map((s) => (
               <section key={s.key} aria-labelledby={`g-${s.key}`} className="mb-8" data-testid={`group-${s.key}`}>
                 <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 id={`g-${s.key}`} className="text-lg font-bold">{t(s.title)} <span className="num text-sm font-normal text-muted">({s.rows.length})</span></h2>
+                  <h2 id={`g-${s.key}`} className="text-base font-semibold">{t(s.title)} <span className="num text-sm font-normal text-muted">({s.rows.length})</span></h2>
                   <p className="text-sm text-muted">{t(s.help)}</p>
                 </div>
                 {s.rows.length === 0 ? <EmptyState title={t("payments.none")} /> : (
-                  <ul className="grid gap-3 md:grid-cols-2">
+                  <DecisionList>
                     {s.rows.map((r) => <DecisionRow key={r.proposal_id} row={r} onOpen={() => openDecision(r.proposal_id)} />)}
-                  </ul>
+                  </DecisionList>
                 )}
               </section>
             ))}

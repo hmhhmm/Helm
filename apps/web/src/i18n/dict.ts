@@ -150,7 +150,7 @@ const en = {
   "sim.r.band": "Typical width of the 80% range", "sim.r.low": "Lowest expected balance", "sim.r.chance": "Chance of staying above the minimum",
   "sim.r.advance": "Balance {from} → {to}. {paid} payment(s) sent, {docs} new document(s).", "sim.r.moved": "Money moved: {amount}", "sim.r.openCard": "Open the approval card",
 
-  "palette.title": "Command palette", "palette.placeholder": "Try: pay Kertas · what if Lim Bros pays late · advance a week", "palette.none": "Nothing matches.",
+  "palette.title": "Command palette", "palette.search": "Search or jump to…", "palette.placeholder": "Try: pay Kertas · what if Lim Bros pays late · advance a week", "palette.none": "Nothing matches.",
   "palette.go": "Go to", "palette.nav": "Go to", "palette.bills": "Bills", "palette.whatifs": "What if", "palette.actions": "Actions", "palette.settings": "Settings",
   "palette.pay": "Pay {payee} {amount}: what would the gate say?", "palette.whatif": "What if {customer} pays {days} days late",
   "palette.openSim": "Open the simulator", "palette.verify": "Verify the audit chain", "palette.brief": "Download this week's CFO brief", "palette.killOn": "Turn the kill switch ON", "palette.killOff": "Turn the kill switch off",
@@ -307,7 +307,7 @@ const ms: Record<Key, string> = {
   "sim.r.band": "Lebar biasa julat 80%", "sim.r.low": "Baki terendah dijangka", "sim.r.chance": "Peluang kekal di atas minimum",
   "sim.r.advance": "Baki {from} → {to}. {paid} bayaran dihantar, {docs} dokumen baharu.", "sim.r.moved": "Wang dipindahkan: {amount}", "sim.r.openCard": "Buka kad kelulusan",
 
-  "palette.title": "Palet arahan", "palette.placeholder": "Cuba: bayar Kertas · bagaimana jika Lim Bros lewat · maju seminggu", "palette.none": "Tiada yang sepadan.",
+  "palette.title": "Palet arahan", "palette.search": "Cari atau pergi ke…", "palette.placeholder": "Cuba: bayar Kertas · bagaimana jika Lim Bros lewat · maju seminggu", "palette.none": "Tiada yang sepadan.",
   "palette.go": "Pergi ke", "palette.nav": "Pergi ke", "palette.bills": "Bil", "palette.whatifs": "Bagaimana jika", "palette.actions": "Tindakan", "palette.settings": "Tetapan",
   "palette.pay": "Bayar {payee} {amount}: apa kata pintu semakan?", "palette.whatif": "Bagaimana jika {customer} bayar lewat {days} hari",
   "palette.openSim": "Buka simulator", "palette.verify": "Sahkan rantaian audit", "palette.brief": "Muat turun ringkasan CFO minggu ini", "palette.killOn": "HIDUPKAN suis pemutus", "palette.killOff": "Matikan suis pemutus",

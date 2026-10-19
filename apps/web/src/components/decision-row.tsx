@@ -5,9 +5,19 @@ import { useT } from "@/i18n";
 import type { Row } from "@/lib/api";
 import { daysBetween, fdate, rm } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { Card } from "./ui/card";
 import { VerdictBadge } from "./ui/verdict-badge";
 
-/** One payment: verdict chip, release date, one-sentence why, and a 'see working' link. */
+/** A bordered list of payments: one dense row each, like a ledger. */
+export function DecisionList({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <Card className={cn("overflow-hidden p-0", className)}>
+      <ul className="divide-y divide-border">{children}</ul>
+    </Card>
+  );
+}
+
+/** One payment: payee and amount, verdict, release date, and a one-sentence reason. */
 export function DecisionRow({ row, onOpen, compact }: { row: Row; onOpen: () => void; compact?: boolean }) {
   const { t, lang } = useT();
   const late = row.release_on && row.due ? daysBetween(row.due, row.release_on) : 0;
@@ -30,25 +40,23 @@ export function DecisionRow({ row, onOpen, compact }: { row: Row; onOpen: () => 
     <li>
       <button
         onClick={onOpen}
-        className="group flex w-full cursor-pointer flex-col gap-2 rounded-card border border-border bg-surface p-4 text-left shadow-card transition-colors duration-150 hover:border-accent/60"
+        className="group grid w-full cursor-pointer grid-cols-[1fr_auto] items-start gap-x-4 gap-y-1 px-4 py-3 text-left transition-colors duration-150 hover:bg-subtle"
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="truncate font-semibold">{row.payee}</p>
-            <p className="num truncate text-xs text-muted">{row.ref ?? row.label} · {t("decision.due", { date: fdate(row.due, lang) })}</p>
-          </div>
-          <p className="num shrink-0 text-lg font-bold">{rm(row.amount)}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span key={`${row.verdict}-${row.release_on}`} className={cn(flipped && "stamp", "inline-block")}><VerdictBadge verdict={row.verdict} /></span>
-          <span className="num text-sm font-medium">{dateLine}</span>
-          {flipped && <span className="text-xs text-muted">{t("row.wasBefore", { was: t(`verdict.${row.previous_verdict!}`) })}</span>}
-          {row.quarantined && <span className="rounded-full border border-deny/40 bg-deny/10 px-2 py-0.5 text-xs font-semibold text-deny">{t("doc.quarantined")}</span>}
-        </div>
-        {!compact && <p className="line-clamp-2 text-sm text-muted">{lang === "ms" ? row.why_ms : row.why}</p>}
-        <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent">
-          {t("row.seeWorking")} <ChevronRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-medium">{row.payee}</span>
+          <span className="num block truncate text-xs text-muted">{row.ref ?? row.label} · {t("decision.due", { date: fdate(row.due, lang) })}</span>
         </span>
+        <span className="num text-right text-sm font-semibold">{rm(row.amount)}</span>
+        <span className="col-span-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span key={`${row.verdict}-${row.release_on}`} className={cn(flipped && "stamp", "inline-block")}><VerdictBadge verdict={row.verdict} /></span>
+          <span className="num text-[13px]">{dateLine}</span>
+          {flipped && <span className="text-xs text-muted">{t("row.wasBefore", { was: t(`verdict.${row.previous_verdict!}`) })}</span>}
+          {row.quarantined && <span className="rounded-md bg-deny/10 px-2 py-0.5 text-xs font-medium text-deny">{t("doc.quarantined")}</span>}
+          <span className="ml-auto inline-flex items-center gap-0.5 text-xs font-medium text-accent">
+            {t("row.seeWorking")} <ChevronRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </span>
+        {!compact && <span className="col-span-2 line-clamp-2 text-[13px] text-muted">{lang === "ms" ? row.why_ms : row.why}</span>}
       </button>
     </li>
   );

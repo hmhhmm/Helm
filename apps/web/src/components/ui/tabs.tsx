@@ -6,14 +6,14 @@ import { cn } from "@/lib/utils";
 export const Tabs = TabsPrimitive.Root;
 
 export function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
-  return <TabsPrimitive.List className={cn("inline-flex rounded-lg border border-border bg-surface p-1", className)} {...props} />;
+  return <TabsPrimitive.List className={cn("inline-flex rounded-lg border border-border bg-subtle p-0.5", className)} {...props} />;
 }
 
 export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        "min-h-9 cursor-pointer rounded-md px-3 text-sm font-medium text-muted transition-colors data-[state=active]:bg-grad data-[state=active]:text-on-grad md:min-h-9",
+        "min-h-9 cursor-pointer rounded-md px-3 text-[13px] font-medium text-muted transition-colors data-[state=active]:bg-surface data-[state=active]:text-text data-[state=active]:shadow-card md:min-h-9",
         "max-md:min-h-11",
         className,
       )}
