@@ -116,3 +116,5 @@ body {
 .stamp { animation: stamp 200ms ease-out; }
 .rise { animation: rise 180ms ease-out both; }
 .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+.recharts-wrapper, .recharts-surface { outline: none; }

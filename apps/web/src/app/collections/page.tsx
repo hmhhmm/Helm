@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 
 type Idea = Schemas["Idea"];
 
+const BUCKET = { not_due: "var(--chart-line)", d1_30: "var(--hold)", d31_60: "var(--deny)", d60: "var(--text)" } as const;
+
 export default function CollectionsPage() {
   const { t, lang, txt } = useT();
   const q = useCollections();
@@ -39,6 +41,20 @@ export default function CollectionsPage() {
 
           <section aria-labelledby="age" className="mb-8">
             <h2 id="age" className="mb-3 text-base font-semibold">{t("collections.ageing")}</h2>
+            <Card className="mb-3 p-4">
+              <h3 className="mb-2 text-[13px] font-semibold">{t("collections.statusbar")}</h3>
+              <div className="flex h-3 overflow-hidden rounded-full bg-subtle" role="img" aria-label={t("collections.statusbar")}>
+                {(["not_due", "d1_30", "d31_60", "d60"] as const).map((k) => {
+                  const tot = d.ageing[k].reduce((x, y) => x + y.amount, 0);
+                  return tot > 0 ? <div key={k} style={{ width: `${(tot / d.total_open) * 100}%`, background: BUCKET[k] }} className="border-r border-surface last:border-0" /> : null;
+                })}
+              </div>
+              <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted">
+                {(["not_due", "d1_30", "d31_60", "d60"] as const).map((k) => (
+                  <li key={k} className="flex items-center gap-1.5"><span aria-hidden className="size-2.5 rounded-sm" style={{ background: BUCKET[k] }} />{t(`age.${k}` as Key)} <span className="num font-medium text-text">{rm(d.ageing[k].reduce((x, y) => x + y.amount, 0))}</span></li>
+                ))}
+              </ul>
+            </Card>
             <div className="mb-3 grid grid-cols-2 gap-3 md:grid-cols-4">
               {(["not_due", "d1_30", "d31_60", "d60"] as const).map((k) => {
                 const list = d.ageing[k];

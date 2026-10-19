@@ -43,3 +43,9 @@ export function addDays(iso: string, n: number): string {
 export function daysBetween(a: string, b: string): number {
   return Math.round((parseDate(b).getTime() - parseDate(a).getTime()) / 86_400_000);
 }
+
+/** "2026-09" -> "Sep" */
+export function fmonth(ym: string, lang: Lang = "en"): string {
+  const m = Number(ym.split("-")[1]);
+  return (lang === "ms" ? MONTHS_MS : MONTHS_EN)[m - 1];
+}

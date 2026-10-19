@@ -2,6 +2,7 @@
 
 import { ArrowDownToLine, ArrowUpFromLine, Info } from "lucide-react";
 import { Async } from "@/components/async";
+import { FlowChart, FlowLegend } from "@/components/flow-chart";
 import { useOverlays } from "@/components/overlays";
 import { CardsSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 import { useT } from "@/i18n";
 import { api, unwrap } from "@/lib/api";
-import { fdate, pct, rm } from "@/lib/format";
+import { fdate, fmonth, pct, rm } from "@/lib/format";
 import { useAct, useCash } from "@/lib/hooks";
 
 export default function CashPage() {
@@ -51,7 +52,14 @@ export default function CashPage() {
               </Card>
             </div>
 
-            <h2 className="mb-3 text-lg font-bold">{t("cash.suggestions")}</h2>
+            <Card className="mb-6 p-4 md:p-5">
+              <h2 className="text-sm font-semibold">{t("cash.history")}</h2>
+              <p className="mb-3 text-xs text-muted">{t("cash.history.sub")}</p>
+              <FlowChart data={d.history.map((h) => ({ key: h.month, label: fmonth(h.month, lang), money_in: h.money_in, money_out: h.money_out }))} height={230} ariaLabel={t("cash.history")} />
+              <FlowLegend />
+            </Card>
+
+            <h2 className="mb-3 text-base font-semibold">{t("cash.suggestions")}</h2>
             {d.ideas.length === 0 ? <EmptyState title={t("cash.none")} body={t("cash.none.body")} /> : (
               <ul className="space-y-3" data-testid="cash-ideas">
                 {d.ideas.map((i) => {

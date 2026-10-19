@@ -386,7 +386,27 @@ def cash_view(session: Session) -> dict:
                   "interest_estimate": p.meta.get("interest_estimate"), "on": p.proposed_date.isoformat()})
         ideas.append(r)
     rng = latest_range(session)
+    months: list[str] = []
+    y, m = today.year, today.month
+    for _ in range(6):
+        months.append(f"{y}-{m:02d}")
+        m -= 1
+        if m == 0:
+            y, m = y - 1, 12
+    months.reverse()
+    money_in = {k: 0.0 for k in months}
+    money_out = {k: 0.0 for k in months}
+    for i in session.execute(select(Invoice).where(Invoice.paid_on.is_not(None))).scalars():
+        k = i.paid_on.strftime("%Y-%m")
+        if k in money_in and i.paid_on <= today:
+            money_in[k] += i.amount
+    for b in session.execute(select(Bill).where(Bill.paid_on.is_not(None))).scalars():
+        k = b.paid_on.strftime("%Y-%m")
+        if k in money_out and b.paid_on <= today:
+            money_out[k] += b.amount
+    history = [{"month": k, "money_in": round(money_in[k]), "money_out": round(money_out[k])} for k in months]
     return {
+        "history": history,
         "today": today.isoformat(), "operating": op, "reserve": res_bal, "min_balance": rules.min_balance, "comfort": rules.min_balance + 10_000,
         "ideas": ideas, "apy": RESERVE_APY, "apy_note": "Illustrative rate for an estimate only; not a quote from any bank.",
         "p_ok_unmanaged": rng["p_ok_unmanaged"], "p_ok_managed": rng["p_ok_managed"],

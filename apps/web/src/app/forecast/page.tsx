@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, FlaskConical, Info, TriangleAlert } from "lu
 import { useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 import { Async } from "@/components/async";
+import { FlowChart, FlowLegend, type FlowPoint } from "@/components/flow-chart";
 import { ForecastChart, type View } from "@/components/forecast-chart";
 import { useOverlays } from "@/components/overlays";
 import { BlockSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
@@ -77,6 +78,7 @@ function ForecastScreen() {
             <Tabs defaultValue="chart" className="mt-2">
               <TabsList aria-label={t("forecast.tabs")}>
                 <TabsTrigger value="chart">{t("forecast.tab.chart")}</TabsTrigger>
+                <TabsTrigger value="flow">{t("forecast.tab.flow")}</TabsTrigger>
                 <TabsTrigger value="calendar">{t("forecast.tab.calendar")}</TabsTrigger>
                 <TabsTrigger value="table">{t("forecast.tab.table")}</TabsTrigger>
               </TabsList>
@@ -87,6 +89,7 @@ function ForecastScreen() {
                 </Card>
                 <WhyDip data={b} />
               </TabsContent>
+              <TabsContent value="flow" className="mt-3"><CashFlowTab data={data} view={view} /></TabsContent>
               <TabsContent value="calendar" className="mt-3"><CalendarTab data={data} view={view} /></TabsContent>
               <TabsContent value="table" className="mt-3"><TableTab data={data} view={view} /></TabsContent>
             </Tabs>
@@ -370,3 +373,79 @@ function Assumptions({ data }: { data: ForecastOut }) {
   );
 }
 export { addDays, daysBetween };
+
+
+function CashFlowTab({ data, view }: { data: ForecastOut; view: View }) {
+  const { t, lang } = useT();
+  const { openDecision } = useOverlays();
+  const [sel, setSel] = useState<string | null>(null);
+  // Known invoices and bills only, in weeks from today. With Helm, held bills sit on their release date.
+  const items = useMemo(
+    () => data.events.map((e) => ({ ...e, on: view === "managed" && e.release_on ? e.release_on : e.date })),
+    [data.events, view],
+  );
+  const weeks = useMemo<FlowPoint[]>(() => {
+    const n = Math.ceil((data.days.length - 1) / 7);
+    const out: FlowPoint[] = Array.from({ length: n }, (_, w) => ({ key: String(w), label: fdate(addDays(data.today, w * 7), lang), money_in: 0, money_out: 0 }));
+    for (const e of items) {
+      const w = Math.floor(daysBetween(data.today, e.on) / 7);
+      if (w < 0 || w >= n) continue;
+      if (e.amount > 0) out[w].money_in += e.amount; else out[w].money_out += -e.amount;
+    }
+    return out;
+  }, [items, data.today, data.days.length, lang]);
+  const picked = sel === null ? [] : items.filter((e) => Math.floor(daysBetween(data.today, e.on) / 7) === Number(sel)).sort((a, b) => a.on.localeCompare(b.on));
+  const byType = useMemo(() => {
+    const m: Record<string, number> = { payroll: 0, statutory: 0, bill: 0 };
+    for (const e of items) if (e.amount < 0) m[e.kind] = (m[e.kind] ?? 0) - e.amount;
+    return m;
+  }, [items]);
+  const maxType = Math.max(...Object.values(byType), 1);
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <Card className="p-4 md:p-5">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-sm font-semibold">{t("flow.title")}</h2>
+          <p className="text-xs text-muted">{t("flow.note")}</p>
+        </div>
+        <FlowChart data={weeks} height={280} selected={sel} onSelect={(k) => setSel(sel === k ? null : k)} ariaLabel={t("flow.aria")} />
+        <FlowLegend />
+        <p className="mt-2 text-xs text-muted">{sel === null ? t("flow.hint") : ""}</p>
+        {sel !== null && (
+          <div className="rise mt-3 rounded-lg border border-border" aria-live="polite">
+            <p className="border-b border-border px-3 py-2 text-[13px] font-semibold">{t("flow.week", { date: weeks[Number(sel)].label })}</p>
+            <ul className="divide-y divide-border">
+              {picked.length === 0 && <li className="px-3 py-3 text-[13px] text-muted">{t("calendar.nothing")}</li>}
+              {picked.map((e) => (
+                <li key={e.id} className="flex items-center justify-between gap-3 px-3 py-2 text-[13px]">
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span aria-hidden>{e.amount > 0 ? "▲" : "▼"}</span>
+                    <span className="truncate font-medium">{e.label}</span>
+                    <span className="shrink-0 rounded bg-subtle px-1.5 py-0.5 text-[11px] text-muted">{e.kind === "invoice" ? t("flow.expected") : t("flow.due")} {fdate(e.on, lang)}</span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2">
+                    <span className={cn("num font-semibold", e.amount > 0 && "text-allow")}>{rm(e.amount)}</span>
+                    {e.proposal_id && <Button size="sm" variant="ghost" onClick={() => openDecision(e.proposal_id!)}>{t("row.seeWorking")}</Button>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </Card>
+      <Card className="p-4 md:p-5">
+        <h2 className="mb-3 text-sm font-semibold">{t("flow.byType")}</h2>
+        <ul className="space-y-3">
+          {(["payroll", "statutory", "bill"] as const).map((k) => (
+            <li key={k}>
+              <div className="mb-1 flex justify-between text-[13px]"><span>{t(`flow.type.${k}` as never)}</span><span className="num font-semibold">{rm(byType[k])}</span></div>
+              <div className="h-2 overflow-hidden rounded-full bg-subtle"><div className="h-full rounded-full" style={{ width: `${(byType[k] / maxType) * 100}%`, background: "var(--chart-line)" }} /></div>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-xs text-muted">{t("flow.byType.note")}</p>
+      </Card>
+    </div>
+  );
+}

@@ -332,7 +332,14 @@ class CashIdea(Row):
     on: str
 
 
+class HistPoint(BaseModel):
+    month: str
+    money_in: float
+    money_out: float
+
+
 class CashOut(BaseModel):
+    history: list[HistPoint]
     today: str
     operating: float
     reserve: float
