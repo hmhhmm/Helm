@@ -34,78 +34,93 @@ export function ApprovalCard({ id, onDone }: { id: string; onDone?: () => void }
   const waiting = d.row.verdict === "ESCALATE" && d.row.status === "queued" && phase === "ask";
   const failing = d.checks.filter((x) => x.result === "fail" || x.result === "flag");
 
+  const lowPoint = c.low_point_if_paid;
   return (
-    <div className="space-y-2 rounded-card p-3" style={{ background: "var(--chat-bg)" }}>
-      <div className="flex items-center gap-3 rounded-lg bg-surface/80 px-3 py-2">
-        <span aria-hidden className="grid size-9 place-items-center rounded-full bg-accent-solid font-bold text-on-accent">H</span>
-        <div className="leading-tight">
-          <p className="font-semibold">Helm</p>
-          <p className="text-xs text-muted">{t("approval.sub")}</p>
-        </div>
+    <div className="space-y-5">
+      <div>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-escalate/10 px-2.5 py-1 text-xs font-medium text-escalate"><ShieldAlert aria-hidden className="size-3.5" />{t("approval.needsOk")}</span>
+        <p className="num mt-3 text-4xl font-semibold tracking-tight">{rm(d.row.amount)}</p>
       </div>
 
-      <Bubble>
-        <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-escalate"><ShieldAlert aria-hidden className="size-4" />{t("approval.needsOk")}</p>
-        <p className="text-base font-bold">{t("approval.pay", { payee: d.row.payee, amount: rm(d.row.amount) })}</p>
-        <p className="text-sm text-muted">{[d.row.ref, d.row.due ? t("approval.due", { date: fdate(d.row.due, lang) }) : null].filter(Boolean).join(" · ")}</p>
-      </Bubble>
+      <dl className="divide-y divide-border rounded-lg border border-border bg-surface text-sm">
+        <Line label={t("approval.payee")} value={d.row.payee} />
+        {d.row.ref && <Line label={t("approval.reference")} value={d.row.ref} mono />}
+        {d.row.due && <Line label={t("approval.dueOn")} value={fdate(d.row.due, lang)} />}
+      </dl>
 
       {d.row.quarantined && (
-        <Bubble tone="warn">
-          <p className="text-sm"><b>{t("approval.warnTitle")}</b> {t("approval.warnBody")}</p>
-        </Bubble>
+        <div className="rounded-lg border border-deny/40 bg-deny/10 p-3 text-sm">
+          <b>{t("approval.warnTitle")}</b> {t("approval.warnBody")}
+        </div>
       )}
 
-      {d.row.kind === "pay_bill" && <Bubble>
-        <p className="text-sm">
-          <b>{t("approval.ifPaid")}</b>{" "}
-          {t("approval.chance", { p: pct(c.p_if_paid ?? 0), min: rm(d.min_balance) })}
-          {c.low_point_if_paid && " " + t("approval.lowest", { rm: rm(c.low_point_if_paid.rm), date: fdate(c.low_point_if_paid.date, lang) })}
-        </p>
-        <p className="mt-2 text-sm">
-          <b>{t("approval.ifHeld")}</b> {t("approval.chance", { p: pct(c.p_if_held ?? 0), min: rm(d.min_balance) })} {t("approval.nothingMoves")}
-        </p>
-        {c.safe_date && <p className="mt-2 text-sm text-muted">{t("approval.safeDate", { date: fdate(c.safe_date, lang) })}</p>}
-      </Bubble>}
+      {d.row.kind === "pay_bill" && (
+        <section aria-label={t("approval.check")}>
+          <h3 className="mb-2 text-sm font-semibold">{t("approval.check")}</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Tile label={t("approval.ifPaid")} value={pct(c.p_if_paid ?? 0)} note={t("approval.stay", { min: rm(d.min_balance) })} />
+            <Tile label={t("approval.ifHeld")} value={pct(c.p_if_held ?? 0)} note={t("approval.nothingMoves")} />
+          </div>
+          {lowPoint && <p className="num mt-2 text-[13px] text-muted">{t("approval.lowest", { rm: rm(lowPoint.rm), date: fdate(lowPoint.date, lang) })}</p>}
+          {c.safe_date && <p className="mt-1 text-[13px] text-muted">{t("approval.safeDate", { date: fdate(c.safe_date, lang) })}</p>}
+        </section>
+      )}
 
       {asked && (
-        <Bubble>
-          <p className="mb-1 text-sm font-semibold">{t("approval.whyTitle")}</p>
+        <section className="rounded-lg bg-subtle p-3">
+          <h3 className="mb-1 text-sm font-semibold">{t("approval.whyTitle")}</h3>
           <ul className="list-disc space-y-1 pl-5 text-sm">
             {failing.length ? failing.map((f) => <li key={f.rule}>{reasonFor(f.rule, t)}</li>) : <li>{d.row.why}</li>}
           </ul>
-          <p className="mt-2 text-sm text-muted">{lang === "ms" ? d.row.why_ms : d.row.why}</p>
-        </Bubble>
+          <p className="mt-2 text-[13px] text-muted">{lang === "ms" ? d.row.why_ms : d.row.why}</p>
+        </section>
       )}
 
       {phase !== "ask" && (
-        <>
-          <Bubble self>{phase === "approved" ? t("approval.youApprove") : t("approval.youHold")}</Bubble>
-          <Bubble tone={phase === "approved" ? "ok" : "plain"}>
-            <p className="text-sm">{phase === "approved" ? t("approval.approved") : t("approval.held")}</p>
-          </Bubble>
-        </>
+        <div role="status" className={`rounded-lg border p-3 text-sm ${phase === "approved" ? "border-allow/40 bg-allow/10" : "border-border bg-subtle"}`}>
+          <p className="mb-0.5 font-semibold">{phase === "approved" ? t("approval.youApprove") : t("approval.youHold")}</p>
+          <p>{phase === "approved" ? t("approval.approved") : t("approval.held")}</p>
+        </div>
       )}
 
-      {waiting && (
-        <div className="grid grid-cols-3 gap-2 pt-1">
-          <Button variant="success" disabled={act.isPending} onClick={() => (d.row.quarantined ? setConfirming(true) : act.mutate("approve"))}><Check aria-hidden className="size-4" />{t("approval.approve")}</Button>
-          <Button variant="secondary" disabled={act.isPending} onClick={() => act.mutate("hold")}><Pause aria-hidden className="size-4" />{t("approval.hold")}</Button>
-          <Button variant="ghost" className="bg-surface/70" onClick={() => setAsked(true)}><HelpCircle aria-hidden className="size-4" />{t("approval.ask")}</Button>
+      {waiting && !confirming && (
+        <div className="space-y-2">
+          <Button variant="success" className="w-full min-h-12 text-[15px]" disabled={act.isPending} onClick={() => (d.row.quarantined ? setConfirming(true) : act.mutate("approve"))}><Check aria-hidden className="size-4" />{t("approval.approve")}</Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="secondary" disabled={act.isPending} onClick={() => act.mutate("hold")}><Pause aria-hidden className="size-4" />{t("approval.hold")}</Button>
+            <Button variant="secondary" onClick={() => setAsked(true)}><HelpCircle aria-hidden className="size-4" />{t("approval.ask")}</Button>
+          </div>
         </div>
       )}
       {waiting && confirming && (
-        <Bubble tone="warn">
+        <div className="rounded-lg border border-deny/40 bg-deny/10 p-3">
           <p className="text-sm font-semibold">{t("approval.confirm")}</p>
-          <div className="mt-2 flex gap-2">
+          <div className="mt-3 flex gap-2">
             <Button size="sm" variant="danger" disabled={act.isPending} onClick={() => act.mutate("approve")} data-testid="approve-anyway">{t("approval.confirmYes")}</Button>
             <Button size="sm" variant="secondary" onClick={() => setConfirming(false)}>{t("approval.cancel")}</Button>
           </div>
-        </Bubble>
+        </div>
       )}
-      {!waiting && phase === "ask" && (
-        <Bubble><p className="text-sm text-muted">{t("approval.notWaiting")}</p></Bubble>
-      )}
+      {!waiting && phase === "ask" && <p className="text-sm text-muted">{t("approval.notWaiting")}</p>}
+    </div>
+  );
+}
+
+function Line({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-4 px-3.5 py-2.5">
+      <dt className="text-muted">{label}</dt>
+      <dd className={`min-w-0 truncate text-right font-medium ${mono ? "num" : ""}`}>{value}</dd>
+    </div>
+  );
+}
+
+function Tile({ label, value, note }: { label: string; value: string; note: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-surface p-3">
+      <p className="text-xs text-muted">{label}</p>
+      <p className="num mt-1 text-2xl font-semibold">{value}</p>
+      <p className="mt-0.5 text-xs text-muted">{note}</p>
     </div>
   );
 }
@@ -118,13 +133,4 @@ function reasonFor(rule: string, t: ReturnType<typeof useT>["t"]): string {
     case "min_balance_chance": return t("approval.reason.chance");
     default: return t("approval.reason.other");
   }
-}
-
-function Bubble({ children, self, tone = "plain" }: { children: React.ReactNode; self?: boolean; tone?: "plain" | "warn" | "ok" }) {
-  const toneCls = tone === "warn" ? "border-deny/40 bg-deny/10" : tone === "ok" ? "border-allow/40 bg-allow/10" : "border-transparent";
-  return (
-    <div className={`rise flex ${self ? "justify-end" : ""}`}>
-      <div className={`max-w-[92%] rounded-xl border px-3 py-2 shadow-sm ${self ? "bg-grad text-on-grad shadow-glow" : "bg-surface"} ${toneCls}`}>{children}</div>
-    </div>
-  );
 }

@@ -51,7 +51,8 @@ test("malicious invoice: ESCALATE on the approval card, hold it, no money moved,
   await page.getByTestId("sim-malicious").click();
   const card = page.getByRole("dialog", { name: "Approval card" });
   await expect(card).toBeVisible();
-  await expect(card).toContainText("Pay Nexus Trading Supplies RM 48,000?");
+  await expect(card).toContainText("RM 48,000");
+  await expect(card).toContainText("Nexus Trading Supplies");
   await expect(card).toContainText("Careful.");
   await card.getByRole("button", { name: "Ask why" }).click();
   await expect(card).toContainText("Why Helm stopped to ask");

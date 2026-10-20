@@ -37,7 +37,7 @@ export function OverlayProvider({ children }: { children: React.ReactNode }) {
     <Ctx.Provider value={value}>
       {children}
       <DecisionSheet id={decision?.id ?? null} tryToday={decision?.tryToday} onClose={() => setDecision(null)} />
-      <Sheet open={!!approval} onOpenChange={(o) => !o && setApproval(null)} title={t("approval.title")} side="center">
+      <Sheet open={!!approval} onOpenChange={(o) => !o && setApproval(null)} title={t("approval.title")} side="center" className="md:max-w-[520px]">
         {approval && <ApprovalCard id={approval} />}
       </Sheet>
       <SimulatorDrawer open={sim} onOpenChange={setSim} />
