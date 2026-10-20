@@ -1,6 +1,6 @@
 {
-  "produced_at": "2026-10-20T10:02:47.321812+00:00",
-  "git_commit": "cfa875e",
+  "produced_at": "2026-10-20T10:12:39.405158+00:00",
+  "git_commit": "8223a8c",
   "request": "https://api.frankfurter.dev/v1/latest?base=MYR&symbols=USD%2CSGD%2CCNY",
   "http_status": 200,
   "response": {

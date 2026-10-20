@@ -1,7 +1,7 @@
-produced 2026-10-20T10:01:24.889263+00:00 at commit cfa875e
+produced 2026-10-20T10:12:37.988731+00:00 at commit 8223a8c
 LOCAL TEST CHAIN (in process EVM, not a public network). chain id 131277322940537
 deploy tx  0xae646a33257514c302b0e8b41c485fdf19056df2921a1dbfa6a8d315320c6001  contract 0xF2E246BB76DF876Cef8b38ae84130F4F55De395b
-audit  anchor  seq/version 29   hash f503e1fe276a54bdfc74b50ad32f9082a5cfc6c8963d25ed1c4b5728ce4db7a4  tx 0xc0cb957c5ed73646dbdb3ae2fda3608f66d837ffc0ad22a8f7863a2f96b5fe14  block 2
+audit  anchor  seq/version 29   hash 8c55cb24900f5ee9511cf7e3e2d5bd35ddb2d8ca8c13497105fa4b50d4f33eb0  tx 0xf6d086b638cf672d0dcdac19022cea845799fc15fb675fafb0031924883bd7f0  block 2
 policy anchor  seq/version 0    hash 26ccbdec8b69a8e45c07bd1b5919bd26dc78e6f39c6e81e1ea5d6932f6e952a4  tx 0xe18a26467750b69215e9aa2af35b628946c49825102fc6bf7d232ecbb528cc43  block 3
 verify on untouched log   -> True
 verify after editing row 5 -> False  (on chain True, database matches False)

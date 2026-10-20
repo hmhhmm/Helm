@@ -36,12 +36,12 @@ docker compose up        # Postgres 16 + API + web  ->  http://localhost:3000
 ### Tests
 
 ```bash
-pnpm test:api            # 112 pytest tests (111 passed, 1 skipped on SQLite)
-DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres 16 (112 passed, adds the role grant test)
-pnpm --filter web build && pnpm test:e2e   # Playwright: demo flows, owner login, anchor card, mandate, axe accessibility in both themes, 375px phone checks
+pnpm test:api            # 119 pytest tests (117 passed, 2 skipped on SQLite)
+DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres 16 (118 passed, 1 skipped, adds the role grant test)
+pnpm --filter web build && pnpm test:e2e   # 32 Playwright tests: demo flows, owner login, anchor card, mandate, axe accessibility in both themes, 375px phone checks
 ```
 
-Last run on commit `cfa875e` plus the changes in this branch. Full output with dates and commit hashes is in [docs/evidence/](docs/evidence/).
+Last run on commit `8223a8c`. The two skipped tests on SQLite are the Postgres role grant test and the replay of recorded real model responses, which skips until `scripts/record_llm.py` has been run with a key. The Playwright suite was also run from a fresh clone of this branch (32 passed). Full output with dates and commit hashes is in [docs/evidence/](docs/evidence/).
 
 | Group | File | What it proves |
 |---|---|---|

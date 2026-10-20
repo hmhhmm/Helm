@@ -1,4 +1,4 @@
-pnpm audit. Produced 2026-10-20T10:01:30Z at commit cfa875e
+pnpm audit. Produced 2026-10-20T10:10:33Z at commit 8223a8c
 ┌─────────────────────┬────────────────────────────────────────────────────────────────────────────────────────┐
 │ high                │ braces vulnerable to stack-exhaustion denial of service through deeply nested patterns │
 ├─────────────────────┼────────────────────────────────────────────────────────────────────────────────────────┤
