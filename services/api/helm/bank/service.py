@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from helm.audit import now_iso
+from helm import config
 from helm.config import BANK_SIGNING_SECRET
 from helm.models import BankLedger
 
@@ -42,7 +43,7 @@ def _verify(key: str, now: float | None = None) -> tuple[dict | None, str | None
 
 
 def submit(session: Session, *, key: str, instruction_id: str, from_account: str, to_account: str,
-           amount: float, scope: str, now: float | None = None) -> dict:
+           amount: float, scope: str, now: float | None = None, payee: str = "", reference: str = "", external: bool = False) -> dict:
     claims, err = _verify(key, now)
     if err is None:
         if claims["scope"] != scope:
@@ -52,16 +53,26 @@ def submit(session: Session, *, key: str, instruction_id: str, from_account: str
         elif amount > claims["max"] + 0.005:
             err = "amount is above what the key covers"
         else:
-            used = session.execute(select(BankLedger).where(BankLedger.reason == f"nonce:{claims['nonce']}")).first()
+            used = session.execute(select(BankLedger).where(BankLedger.reason.like(f"nonce:{claims['nonce']}%"))).first()
             if used:
                 err = "key already used"
+    provider: dict = {}
+    if err is None and external and config.BANK_PROVIDER == "wise":
+        # The scoped key has already been checked. Only now does the real sandbox bank get called.
+        from helm.bank import wise
+
+        try:
+            provider = wise.pay(payee or to_account, to_account, amount, reference or instruction_id)
+        except wise.WiseError as exc:
+            err = str(exc)
     status = "rejected" if err else "accepted"
+    detail = err or f"nonce:{claims['nonce']}" + (f"|wise:{provider['transfer_id']}" if provider else "")
     session.add(BankLedger(
         instruction_id=instruction_id, ts=now_iso(), from_account=from_account, to_account=to_account,
-        amount=amount, status=status, reason=err or f"nonce:{claims['nonce']}",
+        amount=amount, status=status, reason=detail,
     ))
     session.flush()
     return {
         "receipt_id": "rcpt_" + uuid.uuid4().hex[:10], "instruction_id": instruction_id, "status": status,
-        "reason": err, "amount": amount, "to_account": to_account, "bank": "Demo bank",
+        "reason": err, "amount": amount, "to_account": to_account, "bank": config.BANK_LABEL, **({"provider_receipt": provider} if provider else {}),
     }

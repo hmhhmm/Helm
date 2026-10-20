@@ -42,3 +42,11 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER", "")  # gemini | anthropic | empty = pic
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 ANCHOR_FROM_BLOCK = int(os.getenv("ANCHOR_FROM_BLOCK", "0"))  # the block the contract was deployed in; logs are read from here
+
+# Bank. demo = the built in simulation. wise = the real Wise sandbox (test money, needs WISE_API_KEY).
+BANK_PROVIDER = os.getenv("BANK_PROVIDER", "demo")
+WISE_API_KEY = os.getenv("WISE_API_KEY", "")
+WISE_BASE_URL = os.getenv("WISE_BASE_URL", "https://api.wise-sandbox.com")
+WISE_PROFILE_ID = int(os.getenv("WISE_PROFILE_ID", "0") or 0)
+WISE_SOURCE_CURRENCY = os.getenv("WISE_SOURCE_CURRENCY", "GBP")  # the currency of the sandbox test balance
+BANK_LABEL = {"demo": "Demo bank", "wise": "Wise sandbox"}.get(BANK_PROVIDER, "Demo bank")

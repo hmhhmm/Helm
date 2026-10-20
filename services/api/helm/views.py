@@ -63,7 +63,7 @@ def state_view(session: Session) -> dict:
     return {
         "today": today.isoformat(), "synthetic": True, "kill_switch": rules.kill_switch, "min_balance": rules.min_balance,
         "operating": balance_on(session, today), "reserve": balance_on(session, today, "reserve"),
-        "last_run_id": last.id if last else None, "demo_mode": DEMO_MODE, "llm_mode": LLM_MODE,
+        "last_run_id": last.id if last else None, "demo_mode": DEMO_MODE, "bank_label": __import__("helm.config", fromlist=["BANK_LABEL"]).BANK_LABEL, "llm_mode": LLM_MODE,
         "escalations": escalated,
         "alerts": [{"id": a.id, "level": a.level, "message": a.message, "ts": a.ts} for a in alerts],
     }

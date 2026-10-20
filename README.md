@@ -125,7 +125,7 @@ Security basics you can check rather than take on trust: secrets only in `.env`;
 - Helm is not licensed, holds no funds, and is live with no bank. Mentions of EPF, SOCSO, EIS, LHDN, BNM are context, not compliance claims.
 - Competitor comparisons use only the vendor pages listed in the build brief.
 - The live model path (`LLM_MODE=live`) uses Gemini through its REST API (`helm/llm.py`), with Anthropic as an alternative. The Reader and the Explainer are the only agents that may call a model, and every answer still goes through the schema check or the number guard. Real recorded Gemini responses, including two poisoned invoices, are in `services/api/tests/fixtures/llm/recorded.json` and are replayed by `tests/test_llm.py`. A failed call falls back to the fixture parser.
-- The bank is simulated. A real sandbox bank needs an account and keys from the owner and is not connected.
+- The default bank is the built in Demo bank. Set BANK_PROVIDER=wise and WISE_API_KEY to pay through the real Wise sandbox instead. It uses test money, the payee bank numbers are synthetic, and because a personal token cannot fund a transfer by API the sandbox simulation steps move each transfer to sent. The log of a live run is in docs/evidence/sandbox-bank-log.txt.
 - Docker is not installed on the machine this was built on, so `docker compose up` is written to spec but was not run there. The API and the full test suite were run against a local Postgres 16.
 
 ## Deploying a public demo

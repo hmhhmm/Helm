@@ -9,6 +9,7 @@ from datetime import date
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from helm import config
 from helm.audit import append, now_iso
 from helm.bank import service as bank
 from helm.forecast.service import balance_on
@@ -50,7 +51,8 @@ def execute_one(session: Session, proposal: Proposal, decision: Decision, today:
     key = bank.mint_key(to_account=proposal.account_ref, max_amount=proposal.amount, scope=proposal.id)
     from_acct = "reserve" if proposal.kind == "top_up" else "operating"
     result = bank.submit(session, key=key, instruction_id=ins_id, from_account=from_acct,
-                         to_account=proposal.account_ref, amount=proposal.amount, scope=proposal.id)
+                         to_account=proposal.account_ref, amount=proposal.amount, scope=proposal.id,
+                         payee=proposal.payee, reference=(session.get(Bill, proposal.bill_id).ref if proposal.bill_id and session.get(Bill, proposal.bill_id) else proposal.id), external=proposal.kind == "pay_bill")
     rcpt = Receipt(
         id=result["receipt_id"], instruction_id=ins_id, proposal_id=proposal.id, status=result["status"],
         payload=result, sim_date=today, created_at=now_iso(),
@@ -71,7 +73,7 @@ def execute_one(session: Session, proposal: Proposal, decision: Decision, today:
         proposal.status = "executed"
     append(session, "executor", "payment.sent" if result["status"] == "accepted" else "payment.rejected", {
         "proposal_id": proposal.id, "instruction_id": ins_id, "receipt_id": rcpt.id, "payee": proposal.payee,
-        "amount": proposal.amount, "bank": "Demo bank", "status": result["status"], "reason": result["reason"],
+        "amount": proposal.amount, "bank": config.BANK_LABEL, "status": result["status"], "reason": result["reason"],
     })
     session.flush()
     return rcpt

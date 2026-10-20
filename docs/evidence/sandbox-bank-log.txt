@@ -1,0 +1,98 @@
+Helm to Wise sandbox, 2026-10-20T11:12:47.694232+00:00
+Wise sandbox, test money only. Payee bank details are synthetic test numbers. A personal token cannot fund a transfer by API, so the sandbox simulation steps move each transfer to outgoing_payment_sent.
+
+2026-10-20T11:11:36.497854+00:00  GET  /v2/profiles  HTTP 200  id=None  status=None  find profile
+2026-10-20T11:11:37.014605+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=5c18e153-4e9f-4e2d-b952-71894ba4ffce  status=PENDING  quote
+2026-10-20T11:11:37.497642+00:00  POST /v1/accounts  HTTP 200  id=703092172  status=None  recipient for Kimia Cuci Pantas
+2026-10-20T11:11:38.542436+00:00  POST /v1/transfers  HTTP 200  id=2149573212  status=incoming_payment_waiting  transfer to Kimia Cuci Pantas
+2026-10-20T11:11:39.442063+00:00  GET  /v1/simulation/transfers/2149573212/processing  HTTP 200  id=2149573212  status=processing  sandbox simulation processing
+2026-10-20T11:11:40.508668+00:00  GET  /v1/simulation/transfers/2149573212/funds_converted  HTTP 200  id=2149573212  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:11:41.869142+00:00  GET  /v1/simulation/transfers/2149573212/outgoing_payment_sent  HTTP 200  id=2149573212  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:11:42.246679+00:00  GET  /v1/transfers/2149573212  HTTP 200  id=2149573212  status=outgoing_payment_sent  read back status
+2026-10-20T11:11:42.975934+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=4ff86597-6f13-4704-bac4-9a8e3f24e213  status=PENDING  quote
+2026-10-20T11:11:43.499264+00:00  POST /v1/accounts  HTTP 200  id=703092176  status=None  recipient for Syarikat Kertas Sdn Bhd
+2026-10-20T11:11:44.414351+00:00  POST /v1/transfers  HTTP 200  id=2149573216  status=incoming_payment_waiting  transfer to Syarikat Kertas Sdn Bhd
+2026-10-20T11:11:45.572301+00:00  GET  /v1/simulation/transfers/2149573216/processing  HTTP 200  id=2149573216  status=processing  sandbox simulation processing
+2026-10-20T11:11:46.626019+00:00  GET  /v1/simulation/transfers/2149573216/funds_converted  HTTP 200  id=2149573216  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:11:47.569886+00:00  GET  /v1/simulation/transfers/2149573216/outgoing_payment_sent  HTTP 200  id=2149573216  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:11:47.887331+00:00  GET  /v1/transfers/2149573216  HTTP 200  id=2149573216  status=outgoing_payment_sent  read back status
+2026-10-20T11:11:48.409240+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=91f7421e-545b-4b42-8aaa-b254250e7406  status=PENDING  quote
+2026-10-20T11:11:48.907982+00:00  POST /v1/accounts  HTTP 200  id=703092178  status=None  recipient for Pengangkutan Laju
+2026-10-20T11:11:49.755362+00:00  POST /v1/transfers  HTTP 200  id=2149573217  status=incoming_payment_waiting  transfer to Pengangkutan Laju
+2026-10-20T11:11:50.704788+00:00  GET  /v1/simulation/transfers/2149573217/processing  HTTP 200  id=2149573217  status=processing  sandbox simulation processing
+2026-10-20T11:11:51.820255+00:00  GET  /v1/simulation/transfers/2149573217/funds_converted  HTTP 200  id=2149573217  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:11:52.713637+00:00  GET  /v1/simulation/transfers/2149573217/outgoing_payment_sent  HTTP 200  id=2149573217  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:11:53.071248+00:00  GET  /v1/transfers/2149573217  HTTP 200  id=2149573217  status=outgoing_payment_sent  read back status
+2026-10-20T11:11:54.378151+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=88c00887-4a22-4f32-ad97-c63345d40150  status=PENDING  quote
+2026-10-20T11:11:54.921926+00:00  POST /v1/accounts  HTTP 200  id=703092182  status=None  recipient for Bekalan Elektrik Demo
+2026-10-20T11:11:55.827546+00:00  POST /v1/transfers  HTTP 200  id=2149573221  status=incoming_payment_waiting  transfer to Bekalan Elektrik Demo
+2026-10-20T11:11:56.696341+00:00  GET  /v1/simulation/transfers/2149573221/processing  HTTP 200  id=2149573221  status=processing  sandbox simulation processing
+2026-10-20T11:11:57.711458+00:00  GET  /v1/simulation/transfers/2149573221/funds_converted  HTTP 200  id=2149573221  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:11:58.663994+00:00  GET  /v1/simulation/transfers/2149573221/outgoing_payment_sent  HTTP 200  id=2149573221  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:11:58.986863+00:00  GET  /v1/transfers/2149573221  HTTP 200  id=2149573221  status=outgoing_payment_sent  read back status
+2026-10-20T11:11:59.790277+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=fbecfa5b-02e8-42a4-8f9e-bc779b115832  status=PENDING  quote
+2026-10-20T11:12:00.549784+00:00  POST /v1/accounts  HTTP 200  id=703092185  status=None  recipient for Warisan payroll run
+2026-10-20T11:12:01.427683+00:00  POST /v1/transfers  HTTP 200  id=2149573223  status=incoming_payment_waiting  transfer to Warisan payroll run
+2026-10-20T11:12:02.302093+00:00  GET  /v1/simulation/transfers/2149573223/processing  HTTP 200  id=2149573223  status=processing  sandbox simulation processing
+2026-10-20T11:12:03.374394+00:00  GET  /v1/simulation/transfers/2149573223/funds_converted  HTTP 200  id=2149573223  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:04.295600+00:00  GET  /v1/simulation/transfers/2149573223/outgoing_payment_sent  HTTP 200  id=2149573223  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:04.617346+00:00  GET  /v1/transfers/2149573223  HTTP 200  id=2149573223  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:05.422404+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=102c744d-748f-4f68-89f2-a9e2e2c2bc00  status=PENDING  quote
+2026-10-20T11:12:05.943694+00:00  POST /v1/accounts  HTTP 200  id=703092192  status=None  recipient for Sewa Premis Klang
+2026-10-20T11:12:06.838305+00:00  POST /v1/transfers  HTTP 200  id=2149573225  status=incoming_payment_waiting  transfer to Sewa Premis Klang
+2026-10-20T11:12:07.691820+00:00  GET  /v1/simulation/transfers/2149573225/processing  HTTP 200  id=2149573225  status=processing  sandbox simulation processing
+2026-10-20T11:12:08.781137+00:00  GET  /v1/simulation/transfers/2149573225/funds_converted  HTTP 200  id=2149573225  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:09.704518+00:00  GET  /v1/simulation/transfers/2149573225/outgoing_payment_sent  HTTP 200  id=2149573225  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:10.350614+00:00  GET  /v1/transfers/2149573225  HTTP 200  id=2149573225  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:11.378090+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=5e1511c7-31d4-46ee-aa1e-b40c94553841  status=PENDING  quote
+2026-10-20T11:12:11.868495+00:00  POST /v1/accounts  HTTP 200  id=703092196  status=None  recipient for Kilang Kadbod Sdn Bhd
+2026-10-20T11:12:12.716781+00:00  POST /v1/transfers  HTTP 200  id=2149573227  status=incoming_payment_waiting  transfer to Kilang Kadbod Sdn Bhd
+2026-10-20T11:12:13.662688+00:00  GET  /v1/simulation/transfers/2149573227/processing  HTTP 200  id=2149573227  status=processing  sandbox simulation processing
+2026-10-20T11:12:14.750355+00:00  GET  /v1/simulation/transfers/2149573227/funds_converted  HTTP 200  id=2149573227  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:15.625060+00:00  GET  /v1/simulation/transfers/2149573227/outgoing_payment_sent  HTTP 200  id=2149573227  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:15.935283+00:00  GET  /v1/transfers/2149573227  HTTP 200  id=2149573227  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:16.674231+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=6b1f22fe-f2d9-4cc4-acee-dab016ba978e  status=PENDING  quote
+2026-10-20T11:12:17.180046+00:00  POST /v1/accounts  HTTP 200  id=703092198  status=None  recipient for Tinta Utama Supplies
+2026-10-20T11:12:18.062809+00:00  POST /v1/transfers  HTTP 200  id=2149573230  status=incoming_payment_waiting  transfer to Tinta Utama Supplies
+2026-10-20T11:12:19.007274+00:00  GET  /v1/simulation/transfers/2149573230/processing  HTTP 200  id=2149573230  status=processing  sandbox simulation processing
+2026-10-20T11:12:20.075730+00:00  GET  /v1/simulation/transfers/2149573230/funds_converted  HTTP 200  id=2149573230  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:20.976392+00:00  GET  /v1/simulation/transfers/2149573230/outgoing_payment_sent  HTTP 200  id=2149573230  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:21.297656+00:00  GET  /v1/transfers/2149573230  HTTP 200  id=2149573230  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:22.266537+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=79d1b2c9-c809-47be-bfe6-31a30ca3b306  status=PENDING  quote
+2026-10-20T11:12:22.688177+00:00  POST /v1/accounts  HTTP 200  id=703092124  status=None  recipient for EPF (statutory)
+2026-10-20T11:12:23.543399+00:00  POST /v1/transfers  HTTP 200  id=2149573234  status=incoming_payment_waiting  transfer to EPF (statutory)
+2026-10-20T11:12:24.389105+00:00  GET  /v1/simulation/transfers/2149573234/processing  HTTP 200  id=2149573234  status=processing  sandbox simulation processing
+2026-10-20T11:12:25.430953+00:00  GET  /v1/simulation/transfers/2149573234/funds_converted  HTTP 200  id=2149573234  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:26.351856+00:00  GET  /v1/simulation/transfers/2149573234/outgoing_payment_sent  HTTP 200  id=2149573234  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:26.696903+00:00  GET  /v1/transfers/2149573234  HTTP 200  id=2149573234  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:27.288519+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=19c99f05-19f7-4261-98e8-c14c6b9cdd64  status=PENDING  quote
+2026-10-20T11:12:27.683306+00:00  POST /v1/accounts  HTTP 200  id=703092126  status=None  recipient for SOCSO (statutory)
+2026-10-20T11:12:28.602234+00:00  POST /v1/transfers  HTTP 200  id=2149573238  status=incoming_payment_waiting  transfer to SOCSO (statutory)
+2026-10-20T11:12:29.486972+00:00  GET  /v1/simulation/transfers/2149573238/processing  HTTP 200  id=2149573238  status=processing  sandbox simulation processing
+2026-10-20T11:12:30.542291+00:00  GET  /v1/simulation/transfers/2149573238/funds_converted  HTTP 200  id=2149573238  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:31.477243+00:00  GET  /v1/simulation/transfers/2149573238/outgoing_payment_sent  HTTP 200  id=2149573238  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:31.797089+00:00  GET  /v1/transfers/2149573238  HTTP 200  id=2149573238  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:32.340440+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=75a18166-de8b-48e3-bac4-a1b3c4fe8f99  status=PENDING  quote
+2026-10-20T11:12:32.730636+00:00  POST /v1/accounts  HTTP 200  id=703092133  status=None  recipient for EIS (statutory)
+2026-10-20T11:12:33.583271+00:00  POST /v1/transfers  HTTP 200  id=2149573241  status=incoming_payment_waiting  transfer to EIS (statutory)
+2026-10-20T11:12:34.500090+00:00  GET  /v1/simulation/transfers/2149573241/processing  HTTP 200  id=2149573241  status=processing  sandbox simulation processing
+2026-10-20T11:12:35.512328+00:00  GET  /v1/simulation/transfers/2149573241/funds_converted  HTTP 200  id=2149573241  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:36.489909+00:00  GET  /v1/simulation/transfers/2149573241/outgoing_payment_sent  HTTP 200  id=2149573241  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:36.843334+00:00  GET  /v1/transfers/2149573241  HTTP 200  id=2149573241  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:37.393521+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=34c7bc53-77fd-4fe2-bb35-e6401fa537e9  status=PENDING  quote
+2026-10-20T11:12:37.801287+00:00  POST /v1/accounts  HTTP 200  id=703092142  status=None  recipient for LHDN PCB (statutory)
+2026-10-20T11:12:38.720916+00:00  POST /v1/transfers  HTTP 200  id=2149573246  status=incoming_payment_waiting  transfer to LHDN PCB (statutory)
+2026-10-20T11:12:39.635989+00:00  GET  /v1/simulation/transfers/2149573246/processing  HTTP 200  id=2149573246  status=processing  sandbox simulation processing
+2026-10-20T11:12:40.752250+00:00  GET  /v1/simulation/transfers/2149573246/funds_converted  HTTP 200  id=2149573246  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:41.707294+00:00  GET  /v1/simulation/transfers/2149573246/outgoing_payment_sent  HTTP 200  id=2149573246  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:42.039114+00:00  GET  /v1/transfers/2149573246  HTTP 200  id=2149573246  status=outgoing_payment_sent  read back status
+2026-10-20T11:12:42.605035+00:00  POST /v3/profiles/31033951/quotes  HTTP 200  id=16ca6ba6-d88f-4fae-9b85-b46f1d3b5c47  status=PENDING  quote
+2026-10-20T11:12:43.126514+00:00  POST /v1/accounts  HTTP 200  id=703092212  status=None  recipient for Mesin Servis Teknik
+2026-10-20T11:12:43.954019+00:00  POST /v1/transfers  HTTP 200  id=2149573252  status=incoming_payment_waiting  transfer to Mesin Servis Teknik
+2026-10-20T11:12:44.911960+00:00  GET  /v1/simulation/transfers/2149573252/processing  HTTP 200  id=2149573252  status=processing  sandbox simulation processing
+2026-10-20T11:12:45.931196+00:00  GET  /v1/simulation/transfers/2149573252/funds_converted  HTTP 200  id=2149573252  status=funds_converted  sandbox simulation funds_converted
+2026-10-20T11:12:46.969021+00:00  GET  /v1/simulation/transfers/2149573252/outgoing_payment_sent  HTTP 200  id=2149573252  status=outgoing_payment_sent  sandbox simulation outgoing_payment_sent
+2026-10-20T11:12:47.321966+00:00  GET  /v1/transfers/2149573252  HTTP 200  id=2149573252  status=outgoing_payment_sent  read back status
+
+Helm ledger:
+{'bank': 'Wise sandbox', 'rows': [{'id': 13, 'ts': '2026-10-20T11:12:47.322464Z', 'from': 'operating', 'to': 'DEMO-4471-0004', 'amount': 12000.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573252'}, {'id': 12, 'ts': '2026-10-20T11:12:42.039812Z', 'from': 'operating', 'to': 'GOV-DEMO-PCB', 'amount': 1640.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573246'}, {'id': 11, 'ts': '2026-10-20T11:12:36.843998Z', 'from': 'operating', 'to': 'GOV-DEMO-EIS', 'amount': 176.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573241'}, {'id': 10, 'ts': '2026-10-20T11:12:31.797682Z', 'from': 'operating', 'to': 'GOV-DEMO-SOCSO', 'amount': 880.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573238'}, {'id': 9, 'ts': '2026-10-20T11:12:26.697379Z', 'from': 'operating', 'to': 'GOV-DEMO-EPF', 'amount': 5420.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573234'}, {'id': 8, 'ts': '2026-10-20T11:12:21.298542Z', 'from': 'operating', 'to': 'DEMO-4471-0002', 'amount': 7480.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573230'}, {'id': 7, 'ts': '2026-10-20T11:12:15.935784Z', 'from': 'operating', 'to': 'DEMO-4471-0005', 'amount': 13500.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573227'}, {'id': 6, 'ts': '2026-10-20T11:12:10.351246Z', 'from': 'operating', 'to': 'DEMO-4471-0008', 'amount': 7000.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573225'}, {'id': 5, 'ts': '2026-10-20T11:12:04.617874Z', 'from': 'operating', 'to': 'PAYROLL-DEMO-01', 'amount': 41500.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573223'}, {'id': 4, 'ts': '2026-10-20T11:11:58.987977Z', 'from': 'operating', 'to': 'DEMO-4471-0007', 'amount': 5360.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573221'}, {'id': 3, 'ts': '2026-10-20T11:11:53.071557Z', 'from': 'operating', 'to': 'DEMO-4471-0006', 'amount': 2830.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573217'}, {'id': 2, 'ts': '2026-10-20T11:11:47.888119Z', 'from': 'operating', 'to': 'DEMO-4471-0001', 'amount': 16950.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573216'}, {'id': 1, 'ts': '2026-10-20T11:11:42.247452Z', 'from': 'operating', 'to': 'DEMO-4471-0012', 'amount': 1850.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573212'}]}
