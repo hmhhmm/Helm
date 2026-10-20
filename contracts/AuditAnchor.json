@@ -1,0 +1,93 @@
+{
+  "contractName": "AuditAnchor",
+  "solc": "0.8.26+commit.8a97fa7a.Emscripten.clang",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "seq",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "headHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "by",
+          "type": "address"
+        }
+      ],
+      "name": "Anchored",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "version",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "policyHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "by",
+          "type": "address"
+        }
+      ],
+      "name": "PolicyAnchored",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "seq",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "headHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "anchor",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "version",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "policyHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "anchorPolicy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600e575f80fd5b506101188061001c5f395ff3fe6080604052348015600e575f80fd5b50600436106030575f3560e01c80630950a531146034578063a0ca2d08146045575b5f80fd5b6043603f36600460c3565b6054565b005b6043605036600460c3565b6090565b604051818152339083907fd88b23bfe05f4f9b50cca0900398cbfa7a18048b814413b8bc33d4886d8eca8c906020015b60405180910390a35050565b604051818152339083907f9f06cd45b64d81fe5ae9ae2005fe2df791dadadd915cd2e4f1c5b60525fd4234906020016084565b5f806040838503121560d3575f80fd5b5050803592602090910135915056fea2646970667358221220480cbe416221ec2dcd208d3a22e1b7d4398a4399f23994539eca7cabd07900fb64736f6c634300081a0033"
+}

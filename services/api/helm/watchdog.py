@@ -39,7 +39,8 @@ def attack_selftest(ctx: PolicyContext, today: date) -> dict:
     raw = docs.bill_doc("Selftest Supplies", "SELFTEST-1", today, today, 48_000, "DEMO-0000-0000", note=docs.MALICIOUS_NOTE)
     out = reader.run(reader.ReaderInput(doc_id="selftest", kind="bill", raw_text=raw))
     p = ProposalIn("selftest", "pay_bill", out.counterparty, out.bank_account or "?", out.amount, 0, "supplier", out.reference, out.quarantined)
-    scratch = PolicyContext(ctx.rules, ctx.today, ctx.scen, ctx.registry, set(ctx.paid_refs), list(ctx.receipts), ctx.reserve_balance, ctx.committed.copy())
+    scratch = PolicyContext(rules=ctx.rules, today=ctx.today, scen=ctx.scen, registry=ctx.registry, paid_refs=set(ctx.paid_refs), receipts=list(ctx.receipts),
+                            reserve_balance=ctx.reserve_balance, sent_by_day=dict(ctx.sent_by_day), committed_by_day=dict(ctx.committed_by_day), committed=ctx.committed.copy())
     verdict = decide(p, scratch, set()).verdict
     return {"quarantined": out.quarantined, "verdict": verdict, "passed": out.quarantined and verdict in ("ESCALATE", "DENY")}
 

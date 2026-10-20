@@ -10,7 +10,7 @@ sim_*:      the simulated world (hidden truth). Agents never read these tables.
 """
 from datetime import date, datetime
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text
+from sqlalchemy import JSON, BigInteger, Boolean, Date, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from helm.db import Base
@@ -101,6 +101,10 @@ class Rules(Base):
     protected_payees: Mapped[list] = mapped_column(JSON, default=list)
     kill_switch: Mapped[bool] = mapped_column(Boolean, default=False)
     horizon_days: Mapped[int] = mapped_column(Integer, default=90)
+    # mandate: how much Helm may pay on its own, and until when
+    daily_cap: Mapped[float | None] = mapped_column(Float, nullable=True)
+    monthly_cap: Mapped[float | None] = mapped_column(Float, nullable=True)
+    mandate_expires: Mapped[date | None] = mapped_column(Date, nullable=True)
 
 
 class SimState(Base):
@@ -270,3 +274,20 @@ class AuditLog(Base):
     payload: Mapped[dict] = mapped_column(JSON)
     prev_hash: Mapped[str] = mapped_column(String(64))
     hash: Mapped[str] = mapped_column(String(64))
+
+
+class Anchor(Base):
+    """A hash of the audit log (kind 'audit') or of the owner's cash policy (kind 'policy') written to a public chain.
+    Only hashes leave the system. status: confirmed | failed."""
+    __tablename__ = "anchors"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    kind: Mapped[str] = mapped_column(String(12))
+    seq: Mapped[int] = mapped_column(Integer)  # last audit row id (audit) or policy version (policy)
+    hash: Mapped[str] = mapped_column(String(64))
+    tx_hash: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    block_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    chain_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    contract: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    sender: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(12), default="confirmed")
+    created_at: Mapped[str] = mapped_column(String(32))

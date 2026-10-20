@@ -62,6 +62,8 @@ class PolicyContext:
     paid_refs: set[tuple[str, str]] = field(default_factory=set)  # (payee, ref) already paid
     receipts: list[Receipt] = field(default_factory=list)
     reserve_balance: float = 0.0
+    sent_by_day: dict = field(default_factory=dict)  # money already sent through the bank, by date
+    committed_by_day: dict = field(default_factory=dict)  # money released in this pass, by date
     committed: np.ndarray | None = None  # cumulative outflow by day, grows as decisions land
 
     def __post_init__(self):
@@ -192,6 +194,36 @@ def decide(p: ProposalIn, ctx: PolicyContext, seen_in_pass: set[tuple[str, str]]
                        **({"detail": "Exempt: recurring statutory/payroll"} if exempt else {}),
                        **({"detail": "Approved by the owner"} if over and p.owner_approved else {})})
 
+    # 5b. mandate: expiry, daily cap, monthly cap ------------------------------------------
+    if p.kind == "pay_bill":
+        rel_date = scen.day(p.proposed_idx)
+        reasons: list[tuple[str, str]] = []
+        detail: dict = {}
+        if rules.mandate_expires and rel_date > rules.mandate_expires:
+            reasons.append((f"your mandate ended on {fdate(rules.mandate_expires)}, so nothing is automatic any more",
+                            f"mandat anda tamat pada {fdate(rules.mandate_expires, 'ms')}, jadi tiada yang automatik lagi"))
+            detail["expired_on"] = rules.mandate_expires.isoformat()
+        if not exempt:
+            day_total = ctx.sent_by_day.get(rel_date, 0.0) + ctx.committed_by_day.get(rel_date, 0.0) + p.amount
+            if rules.daily_cap is not None and day_total > rules.daily_cap:
+                reasons.append((f"it would take {fdate(rel_date)} to {rm(day_total)}, above your daily cap of {rm(rules.daily_cap)}",
+                                f"ia menjadikan {fdate(rel_date, 'ms')} {rm(day_total)}, melebihi had harian {rm(rules.daily_cap)}"))
+                detail.update(daily_cap=rules.daily_cap, day_total=round(day_total))
+            sent_m = sum(v for d_, v in ctx.sent_by_day.items() if (d_.year, d_.month) == (rel_date.year, rel_date.month))
+            comm_m = sum(v for d_, v in ctx.committed_by_day.items() if (d_.year, d_.month) == (rel_date.year, rel_date.month))
+            month_total = sent_m + comm_m + p.amount
+            if rules.monthly_cap is not None and month_total > rules.monthly_cap:
+                reasons.append((f"it would take the month to {rm(month_total)}, above your monthly cap of {rm(rules.monthly_cap)}",
+                                f"ia menjadikan bulan ini {rm(month_total)}, melebihi had bulanan {rm(rules.monthly_cap)}"))
+                detail.update(monthly_cap=rules.monthly_cap, month_total=round(month_total))
+        if reasons and not p.owner_approved:
+            soft.extend(reasons)
+            checks.append({"rule": "mandate", "result": "fail", **detail})
+        else:
+            checks.append({"rule": "mandate", "result": "pass", **({"detail": "Approved by the owner"} if reasons else {})})
+    else:
+        checks.append({"rule": "mandate", "result": "pass", "detail": "Internal transfer"})
+
     # 6. chance constraint -------------------------------------------------------------
     baseline_p = scen.p_ok(ctx.committed, B)
     if p.kind == "top_up":
@@ -277,6 +309,9 @@ def decide(p: ProposalIn, ctx: PolicyContext, seen_in_pass: set[tuple[str, str]]
                   f"Kutip bayaran atau tambah baki dahulu.")
 
     # commit only what will really be released; escalations wait for the owner
+    if verdict in ("ALLOW", "HOLD") and rel is not None and p.kind == "pay_bill":
+        rd = scen.day(rel)
+        ctx.committed_by_day[rd] = ctx.committed_by_day.get(rd, 0.0) + p.amount
     if verdict in ("ALLOW", "HOLD") and rel is not None and not exempt:
         ctx.committed = ctx.committed + _outflow(H, rel, p.amount)
     if p.ref and verdict in ("ALLOW", "HOLD"):

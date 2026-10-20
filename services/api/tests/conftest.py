@@ -29,3 +29,13 @@ def session():
     with SessionLocal() as s:
         yield s
         s.rollback()
+
+
+def owner_client():
+    """A test client that is logged in as the owner (state changing routes need a token)."""
+    from fastapi.testclient import TestClient
+
+    from helm.auth import issue_token
+    from helm.main import app
+
+    return TestClient(app, headers={"Authorization": "Bearer " + issue_token()["token"]})

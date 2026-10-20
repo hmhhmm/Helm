@@ -123,9 +123,13 @@ def _policy_inputs(session: Session, today: date, rules: RulesView, res: Forecas
         if i.paid_on is None and ex and ex["median"]:
             receipts.append(PReceipt((ex["median"] - today).days, cust.get(i.customer_id, i.customer_id), i.amount))
     paid = {(b.payee, b.ref) for b in session.execute(select(Bill).where(Bill.paid_on.is_not(None))).scalars()}
+    sent: dict = {}
+    for r, pr in session.execute(select(Receipt, Proposal).join(Proposal, Proposal.id == Receipt.proposal_id)
+                                 .where(Receipt.status == "accepted", Proposal.kind == "pay_bill")).all():
+        sent[r.sim_date] = sent.get(r.sim_date, 0.0) + pr.amount
     ctx = PolicyContext(
         rules=rules, today=today, scen=res.scen, registry=_registry(session), paid_refs=paid, receipts=receipts,
-        reserve_balance=balance_on(session, today, "reserve"),
+        reserve_balance=balance_on(session, today, "reserve"), sent_by_day=sent,
     )
     return ctx, cust
 
@@ -428,4 +432,7 @@ def run_pipeline(session: Session, *, mode: str = "full", trigger: str = "manual
         "p_ok_managed": summary["p_ok_managed"], "p_ok_unmanaged": summary["p_ok_unmanaged"],
     })
     session.flush()
+    from helm import anchor as _anchor
+
+    _anchor.auto_anchor(session)
     return run_id

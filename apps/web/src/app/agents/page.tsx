@@ -5,6 +5,7 @@ import { BadgeCheck, Landmark, OctagonAlert, ShieldAlert, ShieldCheck } from "lu
 import { useSearchParams } from "next/navigation";
 import { Fragment, Suspense, useEffect, useState } from "react";
 import { Async } from "@/components/async";
+import { AnchorCard } from "@/components/anchor-card";
 import { PipelineSteps } from "@/components/pipeline-steps";
 import { BlockSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
 import { Button } from "@/components/ui/button";
@@ -148,6 +149,7 @@ function AuditSection({ rows: total }: { rows: number }) {
             : <p className="flex items-center gap-2 font-semibold text-deny"><ShieldAlert aria-hidden className="size-5" />{t("agents.verify.bad", { row: verifyResult.broken_at ?? "?", reason: verifyResult.reason ?? "" })}</p>}
         </Card>
       )}
+      <AnchorCard />
       <Card className="overflow-hidden p-0">
         <div className="max-h-[28rem] overflow-auto" tabIndex={0} aria-label={t("agents.audit")}>
           <table className="w-full min-w-[720px] text-left text-sm" data-testid="audit-table">

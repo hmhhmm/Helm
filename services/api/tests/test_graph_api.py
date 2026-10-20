@@ -1,7 +1,6 @@
-from fastapi.testclient import TestClient
 
+from tests.conftest import owner_client
 from helm import graph
-from helm.main import app
 
 
 def test_graph_matches_the_architecture():
@@ -11,7 +10,7 @@ def test_graph_matches_the_architecture():
 
 
 def test_api_contract_smoke(fresh):
-    with TestClient(app) as c:
+    with owner_client() as c:
         for path in ["/state", "/today", "/forecast", "/payments", "/collections", "/cash", "/policy", "/agents", "/agents/graph", "/audit", "/bank/ledger"]:
             r = c.get(path)
             assert r.status_code == 200, path
@@ -28,7 +27,7 @@ def test_api_contract_smoke(fresh):
 
 
 def test_policy_change_is_audited_and_changes_decisions(fresh):
-    with TestClient(app) as c:
+    with owner_client() as c:
         p = c.get("/policy").json()
         body = {"min_balance": p["min_balance"], "risk_tolerance": 0.01, "approval_limit": p["approval_limit"], "protected_payees": p["protected_payees"]}
         prev = c.post("/policy/preview", json=body).json()

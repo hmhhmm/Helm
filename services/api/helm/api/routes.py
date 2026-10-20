@@ -1,10 +1,11 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from helm import audit, brief, executor, pipeline, simulator, views
+from helm.auth import check_passcode, issue_token, require_owner
 from helm.api import schemas as S
 from helm.audit import append
 from helm.db import get_session
@@ -66,7 +67,7 @@ def decision_try(proposal_id: str, on: date | None = None, session: Session = De
     return d
 
 
-@router.post("/decisions/{proposal_id}/owner", response_model=S.Row, tags=["decisions"])
+@router.post("/decisions/{proposal_id}/owner", dependencies=[Depends(require_owner)], response_model=S.Row, tags=["decisions"])
 def owner_choice(proposal_id: str, body: S.OwnerIn, session: Session = Depends(get_session)):
     p = session.get(Proposal, proposal_id)
     d = executor.latest_decision(session, proposal_id)
@@ -93,7 +94,7 @@ def collections(session: Session = Depends(get_session)):
     return views.collections_view(session)
 
 
-@router.put("/collections/{customer_id}/tone", tags=["collections"])
+@router.put("/collections/{customer_id}/tone", tags=["collections"], dependencies=[Depends(require_owner)])
 def set_tone(customer_id: str, body: S.ToneIn, session: Session = Depends(get_session)):
     c = session.get(Customer, customer_id)
     if c is None:
@@ -114,7 +115,7 @@ def set_tone(customer_id: str, body: S.ToneIn, session: Session = Depends(get_se
     return {"ok": True}
 
 
-@router.post("/collections/{customer_id}/chase", response_model=S.SimOut, tags=["collections"])
+@router.post("/collections/{customer_id}/chase", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["collections"])
 def chase(customer_id: str, session: Session = Depends(get_session)):
     c = session.get(Customer, customer_id)
     if c is None:
@@ -137,7 +138,7 @@ def cash(session: Session = Depends(get_session)):
     return views.cash_view(session)
 
 
-@router.post("/cash/{proposal_id}/execute", response_model=S.SimOut, tags=["cash"])
+@router.post("/cash/{proposal_id}/execute", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["cash"])
 def cash_execute(proposal_id: str, session: Session = Depends(get_session)):
     p = session.get(Proposal, proposal_id)
     d = executor.latest_decision(session, proposal_id)
@@ -167,15 +168,22 @@ def _validate(body: S.PolicyIn) -> None:
         raise HTTPException(422, "Risk tolerance must be between 0.1% and 50%")
     if not (0 < body.approval_limit <= 10_000_000):
         raise HTTPException(422, "Approval limit must be above RM 0")
+    for name, v in (("daily cap", body.daily_cap), ("monthly cap", body.monthly_cap)):
+        if v is not None and not (0 < v <= 100_000_000):
+            raise HTTPException(422, f"The {name} must be above RM 0, or left empty for no cap")
+    if body.daily_cap is not None and body.monthly_cap is not None and body.monthly_cap < body.daily_cap:
+        raise HTTPException(422, "The monthly cap cannot be below the daily cap")
 
 
-@router.put("/policy", response_model=S.PolicyOut, tags=["screens"])
+@router.put("/policy", response_model=S.PolicyOut, tags=["screens"], dependencies=[Depends(require_owner)])
 def policy_put(body: S.PolicyIn, session: Session = Depends(get_session)):
     _validate(body)
     r = session.get(Rules, 1)
-    before = {"min_balance": r.min_balance, "risk_tolerance": r.risk_tolerance, "approval_limit": r.approval_limit, "protected_payees": list(r.protected_payees)}
+    before = {"min_balance": r.min_balance, "risk_tolerance": r.risk_tolerance, "approval_limit": r.approval_limit, "protected_payees": list(r.protected_payees),
+              "daily_cap": r.daily_cap, "monthly_cap": r.monthly_cap, "mandate_expires": r.mandate_expires.isoformat() if r.mandate_expires else None}
     r.min_balance, r.risk_tolerance, r.approval_limit = body.min_balance, body.risk_tolerance, body.approval_limit
     r.protected_payees = body.protected_payees
+    r.daily_cap, r.monthly_cap, r.mandate_expires = body.daily_cap, body.monthly_cap, body.mandate_expires
     append(session, "owner", "rules.changed", {"before": before, "after": body.model_dump()})
     pipeline.run_pipeline(session, mode="full", trigger="rules changed")
     session.commit()
@@ -188,7 +196,8 @@ def policy_preview(body: S.PolicyIn, session: Session = Depends(get_session)):
     _validate(body)
     today = sim_today(session)
     cur = load_rules(session)
-    new = RulesView(body.min_balance, body.risk_tolerance, body.approval_limit, tuple(body.protected_payees), cur.kill_switch, cur.horizon_days)
+    new = RulesView(body.min_balance, body.risk_tolerance, body.approval_limit, tuple(body.protected_payees), cur.kill_switch, cur.horizon_days,
+                    body.daily_cap, body.monthly_cap, body.mandate_expires)
     inp = build_input(session, today, cur.horizon_days)
     res = forecast(inp)
     from helm.models import BillPlan
@@ -212,7 +221,7 @@ def policy_preview(body: S.PolicyIn, session: Session = Depends(get_session)):
     return {"counts": count(dec), "baseline": count(base_dec), "changes": changes}
 
 
-@router.post("/kill-switch", response_model=S.SimOut, tags=["safety"])
+@router.post("/kill-switch", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["safety"])
 def kill_switch(body: S.KillIn, session: Session = Depends(get_session)):
     r = session.get(Rules, 1)
     r.kill_switch = body.on
@@ -267,37 +276,89 @@ def brief_pdf(session: Session = Depends(get_session)):
 
 
 # ---- simulator ----------------------------------------------------------------------------
-@router.post("/sim/advance-week", response_model=S.SimOut, tags=["simulator"])
+@router.post("/sim/advance-week", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["simulator"])
 def sim_advance(session: Session = Depends(get_session)):
     r = simulator.advance_week(session)
     session.commit()
     return {"ok": True, "message": r["message"], "data": r}
 
 
-@router.post("/sim/customer-late", response_model=S.SimOut, tags=["simulator"])
+@router.post("/sim/customer-late", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["simulator"])
 def sim_late(session: Session = Depends(get_session)):
     r = simulator.customer_late(session)
     session.commit()
     return {"ok": r.get("applied", False), "message": r["message"], "data": r}
 
 
-@router.post("/sim/malicious-invoice", response_model=S.SimOut, tags=["simulator"])
+@router.post("/sim/malicious-invoice", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["simulator"])
 def sim_malicious(session: Session = Depends(get_session)):
     r = simulator.inject_malicious(session)
     session.commit()
     return {"ok": r.get("injected", False), "message": r["message"], "data": r}
 
 
-@router.post("/sim/reset", response_model=S.SimOut, tags=["simulator"])
+@router.post("/sim/reset", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["simulator"])
 def sim_reset():
     from helm.bootstrap import reset_demo
     reset_demo()
     return {"ok": True, "message": "Demo reset to the seeded start (19 Oct 2026).", "data": {}}
 
 
-@router.post("/sim/tamper", response_model=S.SimOut, tags=["simulator"])
+@router.post("/sim/tamper", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["simulator"])
 def sim_tamper(session: Session = Depends(get_session)):
     """Demo only: edit one audit row the way someone with database admin rights could."""
     session.commit()
     r = audit.tamper_for_demo()
     return {"ok": True, "message": f"Audit row {r['tampered']} was edited directly in the database. Press Verify chain.", "data": r}
+
+
+# --- owner login ----------------------------------------------------------------------------
+@router.get("/auth/config", tags=["auth"])
+def auth_config():
+    """Tells the web app whether to show the demo passcode hint (only while the default passcode is in use)."""
+    from helm import config
+    return {"demo_hint": config.OWNER_PASSCODE if config.OWNER_PASSCODE == "helm-demo" else None}
+
+
+@router.post("/auth/login", tags=["auth"])
+def auth_login(body: dict, request: Request):
+    who = request.client.host if request.client else "local"
+    if not check_passcode(str(body.get("passcode", "")), who):
+        raise HTTPException(401, "Wrong passcode")
+    return issue_token()
+
+
+# --- on-chain anchor (hashes only) -------------------------------------------------------
+@router.get("/anchor", tags=["anchor"])
+def anchor_status(session: Session = Depends(get_session)):
+    from sqlalchemy import select as _s
+    from helm import config
+    from helm.models import Anchor
+    rows = session.execute(_s(Anchor).order_by(Anchor.id.desc()).limit(20)).scalars().all()
+    return {
+        "enabled": bool(config.ANCHOR_RPC_URL and config.ANCHOR_PRIVATE_KEY and config.ANCHOR_CONTRACT),
+        "contract": config.ANCHOR_CONTRACT or None,
+        "explorer_tx": config.ANCHOR_EXPLORER_TX,
+        "anchors": [{"kind": a.kind, "seq": a.seq, "hash": a.hash, "tx_hash": a.tx_hash, "block": a.block_number,
+                     "chain_id": a.chain_id, "status": a.status, "at": a.created_at} for a in rows],
+    }
+
+
+@router.post("/anchor/run", tags=["anchor"], dependencies=[Depends(require_owner)])
+def anchor_run(session: Session = Depends(get_session)):
+    from helm import anchor as _a
+    chain = _a.ChainClient.from_env()
+    if chain is None:
+        raise HTTPException(409, "On-chain anchoring is not configured. Set ANCHOR_RPC_URL, ANCHOR_PRIVATE_KEY and ANCHOR_CONTRACT.")
+    rows = _a.anchor_now(session, chain)
+    session.commit()
+    return {"anchored": [{"kind": r.kind, "seq": r.seq, "hash": r.hash, "tx_hash": r.tx_hash, "status": r.status} for r in rows]}
+
+
+@router.post("/anchor/verify", tags=["anchor"])
+def anchor_verify(session: Session = Depends(get_session)):
+    from helm import anchor as _a
+    chain = _a.ChainClient.from_env()
+    if chain is None:
+        raise HTTPException(409, "On-chain anchoring is not configured.")
+    return _a.verify_anchors(session, chain)

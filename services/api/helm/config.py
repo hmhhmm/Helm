@@ -26,3 +26,13 @@ SEED = 2026
 LLM_MODEL = os.getenv("LLM_MODEL", "claude-haiku-5-5")
 DEMO_RESET_MINUTES = int(os.getenv("DEMO_RESET_MINUTES", "20"))
 RESERVE_APY = 0.025  # illustrative, used only for the "estimated interest" label
+
+# On-chain audit anchor (optional). All three must be set to anchor to a real network.
+ANCHOR_RPC_URL = os.getenv("ANCHOR_RPC_URL", "")
+ANCHOR_PRIVATE_KEY = os.getenv("ANCHOR_PRIVATE_KEY", "")  # a throwaway test network key; never a real wallet
+ANCHOR_CONTRACT = os.getenv("ANCHOR_CONTRACT", "")
+ANCHOR_EXPLORER_TX = os.getenv("ANCHOR_EXPLORER_TX", "https://sepolia.etherscan.io/tx/")
+
+# Owner login. The default passcode is for the public synthetic demo only; set your own anywhere else.
+OWNER_PASSCODE = os.getenv("OWNER_PASSCODE", "helm-demo")
+OWNER_TOKEN_SECRET = os.getenv("OWNER_TOKEN_SECRET", BANK_SIGNING_SECRET + "-owner")

@@ -127,10 +127,9 @@ def test_a_payment_is_rechecked_on_the_day_it_would_go(fresh, session):
 
 
 def test_owner_approval_is_the_only_way_a_flagged_invoice_gets_paid(fresh, session):
-    from fastapi.testclient import TestClient
-    from helm.main import app
+    from tests.conftest import owner_client
     session.close()
-    with TestClient(app) as c:
+    with owner_client() as c:
         m = c.post("/sim/malicious-invoice").json()["data"]
         pid = m["proposal_id"]
         assert c.get("/bank/ledger").json()["rows"] == []                   # nothing moved before the owner acts
@@ -142,10 +141,9 @@ def test_owner_approval_is_the_only_way_a_flagged_invoice_gets_paid(fresh, sessi
 
 
 def test_holding_a_flagged_invoice_keeps_it_out_of_the_queue_for_good(fresh, session):
-    from fastapi.testclient import TestClient
-    from helm.main import app
+    from tests.conftest import owner_client
     session.close()
-    with TestClient(app) as c:
+    with owner_client() as c:
         pid = c.post("/sim/malicious-invoice").json()["data"]["proposal_id"]
         assert c.post(f"/decisions/{pid}/owner", json={"choice": "hold"}).json()["status"] == "held_by_owner"
         c.post("/sim/advance-week")

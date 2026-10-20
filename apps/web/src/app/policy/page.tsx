@@ -30,9 +30,13 @@ function PolicyForm({ p }: { p: Schemas["PolicyOut"] }) {
   const [tol, setTol] = useState(p.risk_tolerance);
   const [limit, setLimit] = useState(p.approval_limit);
   const [prot, setProt] = useState<string[]>(p.protected_payees);
+  const [dayCap, setDayCap] = useState<number | null>(p.daily_cap ?? null);
+  const [monCap, setMonCap] = useState<number | null>(p.monthly_cap ?? null);
+  const [ends, setEnds] = useState<string>(p.mandate_expires ?? "");
   const stop = Math.max(0, p.risk_options.findIndex((o) => Math.abs(1 - o - tol) < 1e-6));
-  const dirty = min !== p.min_balance || tol !== p.risk_tolerance || limit !== p.approval_limit || prot.join("|") !== p.protected_payees.join("|");
-  const body = useMemo(() => ({ min_balance: min, risk_tolerance: tol, approval_limit: limit, protected_payees: prot }), [min, tol, limit, prot]);
+  const dirty = min !== p.min_balance || tol !== p.risk_tolerance || limit !== p.approval_limit || prot.join("|") !== p.protected_payees.join("|") ||
+    dayCap !== (p.daily_cap ?? null) || monCap !== (p.monthly_cap ?? null) || ends !== (p.mandate_expires ?? "");
+  const body = useMemo(() => ({ min_balance: min, risk_tolerance: tol, approval_limit: limit, protected_payees: prot, daily_cap: dayCap, monthly_cap: monCap, mandate_expires: ends || null }), [min, tol, limit, prot, dayCap, monCap, ends]);
 
   const [debounced, setDebounced] = useState(body);
   useEffect(() => { const h = setTimeout(() => setDebounced(body), 350); return () => clearTimeout(h); }, [body]);
@@ -47,7 +51,7 @@ function PolicyForm({ p }: { p: Schemas["PolicyOut"] }) {
     <>
       <ScreenHeader title={t("policy.title")} answer={t("policy.answer", { min: rm(p.min_balance), sure: Math.round(p.required_confidence * 100), limit: rm(p.approval_limit) })}>
         <div className="flex gap-2">
-          <Button variant="secondary" disabled={!dirty} onClick={() => { setMin(p.min_balance); setTol(p.risk_tolerance); setLimit(p.approval_limit); setProt(p.protected_payees); }}>{t("policy.reset")}</Button>
+          <Button variant="secondary" disabled={!dirty} onClick={() => { setMin(p.min_balance); setTol(p.risk_tolerance); setLimit(p.approval_limit); setProt(p.protected_payees); setDayCap(p.daily_cap ?? null); setMonCap(p.monthly_cap ?? null); setEnds(p.mandate_expires ?? ""); }}>{t("policy.reset")}</Button>
           <Button disabled={!dirty || !valid || save.isPending} onClick={() => save.mutate()} data-testid="save-policy">{save.isPending ? t("policy.saving") : t("policy.save")}</Button>
         </div>
       </ScreenHeader>
@@ -92,6 +96,16 @@ function PolicyForm({ p }: { p: Schemas["PolicyOut"] }) {
 
         <Rule title={t("policy.limit")} example={txt(p.examples.approval)}>
           <NumberField label={t("policy.limit")} value={limit} onChange={setLimit} step={1000} />
+        </Rule>
+
+        <Rule title={t("policy.mandate")} example={txt(p.examples.mandate)}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block text-[13px] text-muted">{t("policy.cap.day")}<OptionalMoney value={dayCap} onChange={setDayCap} placeholder={t("policy.cap.none")} label={t("policy.cap.day")} /></label>
+            <label className="block text-[13px] text-muted">{t("policy.cap.month")}<OptionalMoney value={monCap} onChange={setMonCap} placeholder={t("policy.cap.none")} label={t("policy.cap.month")} /></label>
+          </div>
+          <label className="block text-[13px] text-muted">{t("policy.expires")}
+            <input type="date" value={ends} onChange={(e) => setEnds(e.target.value)} className="num mt-1 block min-h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm text-text md:min-h-10" data-testid="mandate-ends" />
+          </label>
         </Rule>
 
         <Rule title={t("policy.protected")} example={txt(p.examples.protected)}>
@@ -141,5 +155,15 @@ function NumberField({ label, value, onChange, step }: { label: string; value: n
           onChange={(e) => onChange(e.target.value === "" ? NaN : Number(e.target.value))} className="num w-full bg-transparent py-2 text-xl font-bold outline-none" />
       </span>
     </label>
+  );
+}
+
+function OptionalMoney({ value, onChange, placeholder, label }: { value: number | null; onChange: (n: number | null) => void; placeholder: string; label: string }) {
+  return (
+    <span className="mt-1 flex min-h-11 items-center rounded-lg border border-border bg-surface px-3 focus-within:outline focus-within:outline-2 focus-within:outline-accent md:min-h-10">
+      <span className="mr-2 text-muted">RM</span>
+      <input type="number" inputMode="numeric" min={0} step={1000} value={value ?? ""} aria-label={label} placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))} className="num w-full bg-transparent py-1.5 text-sm font-semibold text-text outline-none" />
+    </span>
   );
 }

@@ -23,6 +23,7 @@ const TITLE: Record<string, Key> = {
   protected_payee: "trace.protected_payee",
   duplicate_or_anomaly: "trace.duplicate_or_anomaly",
   approval_limit: "trace.approval_limit",
+  mandate: "trace.mandate",
   min_balance_chance: "trace.min_balance_chance",
   reserve_covers: "trace.reserve_covers",
 };
@@ -46,6 +47,8 @@ export function Trace({ checks, minBalance }: { checks: Check[]; minBalance: num
         if (an.length) return an.map((a) => t(`trace.anomaly.${a}` as Key)).join("; ");
         return t("trace.duplicate.pass");
       }
+      case "mandate":
+        return c.result === "fail" ? t("trace.mandate.fail") : t("trace.mandate.pass");
       case "approval_limit":
         return c.result === "fail"
           ? t("trace.approval_limit.fail", { amount: rm(num("amount")), limit: rm(num("limit")) })

@@ -233,6 +233,7 @@ def seed_database(session: Session) -> dict:
         id=1, min_balance=20_000, risk_tolerance=0.10, approval_limit=25_000,
         protected_payees=["Sewa Premis Klang", "Bekalan Elektrik Demo", "Insurans Perniagaan Selamat"],
         kill_switch=False, horizon_days=90,
+        daily_cap=60_000, monthly_cap=200_000, mandate_expires=date(2027, 6, 30),
     ))
     session.add(SimState(id=1, today=TODAY, flags={}))
     append(session, "system", "seed.created", {

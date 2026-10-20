@@ -66,7 +66,7 @@ def test_allow_when_chance_is_high():
 
 def test_every_check_is_in_the_trace_in_rule_order():
     d = verdict(bill())
-    assert [c["rule"] for c in d.checks] == ["kill_switch", "statutory_first", "protected_payee", "duplicate_or_anomaly", "approval_limit", "min_balance_chance"]
+    assert [c["rule"] for c in d.checks] == ["kill_switch", "statutory_first", "protected_payee", "duplicate_or_anomaly", "approval_limit", "mandate", "min_balance_chance"]
 
 
 # ---- HOLD ----------------------------------------------------------------------------

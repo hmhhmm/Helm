@@ -1,9 +1,23 @@
 import createClient from "openapi-fetch";
+import { getToken, LOGIN_EVENT } from "./auth";
 import type { components, paths } from "./api-schema";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export const api = createClient<paths>({ baseUrl: API_URL });
+
+// State changing calls need an owner token. If the server says 401, ask the person to log in.
+api.use({
+  onRequest({ request }) {
+    const t = getToken();
+    if (t) request.headers.set("Authorization", `Bearer ${t}`);
+    return request;
+  },
+  onResponse({ response }) {
+    if (response.status === 401 && typeof window !== "undefined") window.dispatchEvent(new Event(LOGIN_EVENT));
+    return response;
+  },
+});
 
 export type Schemas = components["schemas"];
 export type Row = Schemas["Row"];

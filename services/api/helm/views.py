@@ -439,6 +439,11 @@ def policy_view(session: Session) -> dict:
                          f"Contoh: invois RM 48,000 daripada pembekal yang tidak pernah dibayar akan menunggu kelulusan anda, kerana melebihi {rm(r.approval_limit)}."),
         "protected": _txt("Example: if the bank account on a bill from a protected payee differs from the one on file, the payment is blocked, not just flagged. Helm also delays protected payees last.",
                           "Contoh: jika akaun bank pada bil penerima dilindungi berbeza daripada rekod, bayaran disekat. Helm juga menangguhkan penerima dilindungi paling akhir."),
+        "mandate": _txt(
+            f"Example: Helm sends on its own up to {rm(r.daily_cap) if r.daily_cap else 'any amount'} a day and {rm(r.monthly_cap) if r.monthly_cap else 'any amount'} a month"
+            + (f", until {fdate(r.mandate_expires)}" if r.mandate_expires else "") + ". Beyond that, or after that date, every payment waits for you.",
+            f"Contoh: Helm menghantar sendiri sehingga {rm(r.daily_cap) if r.daily_cap else 'sebarang jumlah'} sehari dan {rm(r.monthly_cap) if r.monthly_cap else 'sebarang jumlah'} sebulan"
+            + (f", sehingga {fdate(r.mandate_expires, 'ms')}" if r.mandate_expires else "") + ". Selepas itu, atau selepas tarikh itu, setiap bayaran menunggu anda."),
         "statutory": _txt("EPF, SOCSO, EIS, PCB, SST and payroll are scheduled first and never delayed by the optimiser. (Context only, not a compliance claim.)",
                           "EPF, SOCSO, EIS, PCB, SST dan gaji dijadualkan dahulu dan tidak pernah ditangguhkan. (Konteks sahaja, bukan tuntutan pematuhan.)"),
     }
@@ -446,6 +451,8 @@ def policy_view(session: Session) -> dict:
         "today": today.isoformat(), "min_balance": r.min_balance, "risk_tolerance": r.risk_tolerance,
         "required_confidence": round(1 - r.risk_tolerance, 4), "approval_limit": r.approval_limit,
         "protected_payees": r.protected_payees, "kill_switch": r.kill_switch, "suppliers": suppliers,
+        "daily_cap": r.daily_cap, "monthly_cap": r.monthly_cap,
+        "mandate_expires": r.mandate_expires.isoformat() if r.mandate_expires else None,
         "risk_options": [0.80, 0.85, 0.90, 0.95, 0.99], "examples": examples,
     }
 

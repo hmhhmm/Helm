@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { API, openSimulator, resetDemo } from "./helpers";
+import { API, asOwner, openSimulator, resetDemo } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
-test.beforeEach(async ({ page }) => { await resetDemo(page); });
+test.beforeEach(async ({ page }) => { await resetDemo(page); await asOwner(page); });
 
 test("the 60-second story: today -> forecast -> payments -> decision trace", async ({ page }) => {
   await page.goto("/");
@@ -121,6 +121,43 @@ test("policy: change the risk slider, see a live preview, save", async ({ page }
   await expect(page.getByTestId("policy-preview")).toBeVisible();
   await page.getByTestId("save-policy").click();
   await expect(page.getByText("Rules saved")).toBeVisible();
+});
+
+test("the simulator asks for an owner login first, then works", async ({ browser }) => {
+  const ctx = await browser.newContext();            // a visitor who is not logged in
+  const page = await ctx.newPage();
+  await page.goto("/");
+  await openSimulator(page);
+  await page.getByTestId("sim-late").click();
+  const dlg = page.getByRole("dialog", { name: "Owner login" });
+  await expect(dlg).toBeVisible();
+  await dlg.getByLabel("Passcode").fill("wrong");
+  await dlg.getByTestId("login-submit").click();
+  await expect(dlg.getByRole("alert")).toContainText("Wrong passcode");
+  await dlg.getByTestId("login-demo").click();
+  await expect(dlg).toBeHidden();
+  if (!(await page.getByRole("dialog", { name: "Simulator" }).isVisible())) await openSimulator(page);
+  await page.getByTestId("sim-late").click();
+  await expect(page.getByTestId("sim-result")).toContainText("20 days late");
+  await ctx.close();
+});
+
+test("the audit page shows the on-chain anchor card (not configured here, so the buttons are off)", async ({ page }) => {
+  await page.goto("/agents");
+  const card = page.getByTestId("anchor-card");
+  await expect(card).toContainText("On-chain anchor");
+  await expect(card).toContainText("Not configured");
+  await expect(page.getByTestId("anchor-run")).toBeDisabled();
+});
+
+test("policy: the mandate (caps and end date) can be changed and previewed", async ({ page }) => {
+  await page.goto("/policy");
+  await page.getByLabel("Daily cap").fill("1000");
+  await expect(page.getByTestId("policy-preview")).toBeVisible();
+  await page.getByTestId("save-policy").click();
+  await expect(page.getByText("Rules saved")).toBeVisible();
+  await page.goto("/payments");
+  await expect(page.getByText("Needs your approval").first()).toBeVisible();
 });
 
 test("bahasa malaysia toggle and the command palette", async ({ page }) => {

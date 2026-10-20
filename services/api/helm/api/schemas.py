@@ -1,4 +1,5 @@
 """Response models. They exist so the web client is generated from the OpenAPI spec and typed end to end."""
+from datetime import date
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -365,6 +366,9 @@ class PolicyOut(BaseModel):
     required_confidence: float
     approval_limit: float
     protected_payees: list[str]
+    daily_cap: float | None = None
+    monthly_cap: float | None = None
+    mandate_expires: str | None = None
     kill_switch: bool
     suppliers: list[SupplierOut]
     risk_options: list[float]
@@ -376,6 +380,9 @@ class PolicyIn(BaseModel):
     risk_tolerance: float
     approval_limit: float
     protected_payees: list[str]
+    daily_cap: float | None = None
+    monthly_cap: float | None = None
+    mandate_expires: date | None = None
 
 
 class PolicyPreview(BaseModel):

@@ -78,12 +78,25 @@ def install_pg_roles(conn) -> None:
         conn.execute(text(stmt))
 
 
+def _add_missing_columns(conn) -> None:
+    """Tiny forward-only migration: add columns introduced after a database was first created."""
+    from sqlalchemy import inspect
+
+    insp = inspect(conn)
+    if insp.has_table("rules"):
+        have = {c["name"] for c in insp.get_columns("rules")}
+        for col, ddl in (("daily_cap", "FLOAT"), ("monthly_cap", "FLOAT"), ("mandate_expires", "DATE")):
+            if col not in have:
+                conn.execute(text(f"ALTER TABLE rules ADD COLUMN {col} {ddl}"))
+
+
 def init_db() -> None:
     """Idempotent: creates missing tables, installs the append-only triggers and the agent role."""
     from helm import models  # noqa: F401  (registers tables)
 
     Base.metadata.create_all(engine)
     with engine.begin() as conn:
+        _add_missing_columns(conn)
         install_audit_triggers(conn)
         install_pg_roles(conn)
 

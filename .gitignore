@@ -13,3 +13,5 @@ e2e/test-results/
 e2e/playwright-report/
 services/api/*.db*
 e2e/*.png
+contracts/node_modules/
+*.egg-info/

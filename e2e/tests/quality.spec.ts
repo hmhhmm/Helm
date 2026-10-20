@@ -1,10 +1,13 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { resetDemo } from "./helpers";
+import { asOwner, ownerToken, resetDemo } from "./helpers";
 
 const PAGES = ["/", "/forecast", "/payments", "/collections", "/cash", "/policy", "/agents"];
 
-test.beforeAll(async ({ request }) => { await request.post("http://localhost:8000/sim/reset"); });
+test.beforeAll(async ({ request }) => {
+  const token = await ownerToken(request);
+  await request.post("http://localhost:8000/sim/reset", { headers: { Authorization: `Bearer ${token}` } });
+});
 
 for (const theme of ["light", "dark"] as const) {
   for (const path of PAGES) {
@@ -49,7 +52,9 @@ test.describe("phone width (375px)", () => {
 
   test("approval page works on a phone", async ({ page, request }) => {
     await resetDemo(page);
-    const r = await (await request.post("http://localhost:8000/sim/malicious-invoice")).json();
+    const token = await ownerToken(request);
+    const r = await (await request.post("http://localhost:8000/sim/malicious-invoice", { headers: { Authorization: `Bearer ${token}` } })).json();
+    await asOwner(page);
     await page.goto(`/approve/${r.data.proposal_id}`);
     await expect(page.getByRole("button", { name: "Approve" })).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

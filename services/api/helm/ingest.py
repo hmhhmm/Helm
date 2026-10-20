@@ -11,7 +11,7 @@ def ingest_document(
     session: Session, *, doc_id: str, kind: str, received_on, raw_text: str, source: str,
     record_id: str, audit: bool = True,
 ) -> Document:
-    out = reader.run(reader.ReaderInput(doc_id=doc_id, kind=kind, raw_text=raw_text))
+    out, raw_text = reader.safe_run(doc_id, kind, raw_text)
     doc = Document(
         id=doc_id, kind=kind, received_on=received_on, source=source, raw_text=raw_text,
         reader_json=out.model_dump(mode="json"), quarantined=out.quarantined, flags=list(out.flags),

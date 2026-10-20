@@ -15,6 +15,9 @@ class RulesView:
     protected_payees: tuple[str, ...]
     kill_switch: bool
     horizon_days: int
+    daily_cap: float | None = None  # most Helm may send on one day without asking (None = no cap)
+    monthly_cap: float | None = None
+    mandate_expires: date | None = None  # after this date nothing is automatic
 
     @property
     def required_confidence(self) -> float:
@@ -30,6 +33,9 @@ def load_rules(session: Session) -> RulesView:
         protected_payees=tuple(r.protected_payees or ()),
         kill_switch=r.kill_switch,
         horizon_days=r.horizon_days,
+        daily_cap=r.daily_cap,
+        monthly_cap=r.monthly_cap,
+        mandate_expires=r.mandate_expires,
     )
 
 
