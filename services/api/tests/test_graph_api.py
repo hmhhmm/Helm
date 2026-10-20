@@ -36,3 +36,19 @@ def test_policy_change_is_audited_and_changes_decisions(fresh):
         events = [r["event"] for r in c.get("/audit?limit=200").json()["rows"]]
         assert "rules.changed" in events
         assert c.get("/policy").json()["required_confidence"] == 0.99
+
+
+def test_a_database_missing_its_state_row_is_rebuilt_instead_of_failing():
+    from fastapi.testclient import TestClient
+    from helm import bootstrap
+    from helm.db import SessionLocal
+    from helm.main import app
+    from helm.models import SimState
+
+    with TestClient(app) as c:
+        with SessionLocal() as s:
+            s.delete(s.get(SimState, 1))
+            s.commit()
+        bootstrap._ready = False
+        assert c.get("/today").status_code == 200
+        assert c.get("/state").status_code == 200

@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from helm.api.routes import router
 from helm.bank.router import router as bank_router
-from helm.bootstrap import ensure_seeded, reset_demo
+from helm.bootstrap import ensure_seeded, is_ready, reset_demo
 from helm.config import DEMO_MODE, DEMO_RESET_MINUTES, LLM_MODE
 
 
@@ -33,10 +33,20 @@ app.add_middleware(
     allow_origin_regex=r"https://.*\.(vercel\.app|onrender\.com|fly\.dev)",
     allow_methods=["*"], allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def wait_for_a_complete_database(request, call_next):
+    """Never answer from a half built database. Normally this check costs nothing."""
+    if not is_ready() and request.url.path != "/health":
+        await asyncio.to_thread(ensure_seeded)
+    return await call_next(request)
+
+
 app.include_router(router)
 app.include_router(bank_router)
 
 
 @app.get("/health", tags=["state"])
 def health():
-    return {"status": "ok", "llm_mode": LLM_MODE, "demo_mode": DEMO_MODE, "data": "synthetic demo data"}
+    return {"status": "ok", "llm_mode": LLM_MODE, "demo_mode": DEMO_MODE, "data": "synthetic"}
