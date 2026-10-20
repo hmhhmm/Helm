@@ -36,3 +36,8 @@ ANCHOR_EXPLORER_TX = os.getenv("ANCHOR_EXPLORER_TX", "https://sepolia.etherscan.
 # Owner login. The default passcode is for the public synthetic demo only; set your own anywhere else.
 OWNER_PASSCODE = os.getenv("OWNER_PASSCODE", "helm-demo")
 OWNER_TOKEN_SECRET = os.getenv("OWNER_TOKEN_SECRET", BANK_SIGNING_SECRET + "-owner")
+
+# Language model (optional, used only with LLM_MODE=live). Gemini is the default provider when its key is set.
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "")  # gemini | anthropic | empty = pick from the keys that exist
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")

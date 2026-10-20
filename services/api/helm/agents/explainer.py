@@ -51,15 +51,13 @@ def numbers_preserved(original: str, reworded: str) -> bool:
 
 
 def _live_reword(text: str) -> str | None:
-    try:
-        import anthropic  # type: ignore
+    from helm import llm
 
-        msg = anthropic.Anthropic().messages.create(
-            model=config.LLM_MODEL, max_tokens=300,
-            system="Rewrite this payment explanation in plain, friendly English. Keep every number and date exactly as written. Reply with the rewritten text only.",
-            messages=[{"role": "user", "content": text}],
+    try:
+        return llm.complete(
+            "Rewrite this payment explanation in plain, friendly English. Keep every number and date exactly as written. Reply with the rewritten text only.",
+            text,
         )
-        return msg.content[0].text.strip()
     except Exception:
         return None
 

@@ -47,7 +47,7 @@ A finding from the red team suite itself was that the first version of the injec
 | R4 | The mandate caps are checked at the payment's own date and do not yet look at the whole plan beyond the same pass | Low | Add a rolling window check |
 | R5 | The forecast can be too confident on short histories. On the seeded data the 80 percent range covered 77 percent of outcomes | Medium | Validate on real business data |
 | R6 | The self assessment was done by the builders and there was no independent penetration test | Medium | Commission an independent test |
-| R7 | The live language model path is covered by stub tests and by replay tests for recorded responses, but real recorded responses are only present once `scripts/record_llm.py` has been run with a key | Medium | Run the recorder and commit the fixture |
+| R7 | The live language model path is tested with recorded real Gemini responses on four documents and with stub tests, but not on a wide range of documents or models | Medium | Record more documents and add a model based injection check |
 | R8 | The on-chain anchor depends on a public test network that may be paused or retired | Low | A failed anchor is logged and retried on the next run. A second test network is a settings change |
 | R9 | A person with database admin rights can edit rows. The hash chain and the anchor reveal this after the fact but do not prevent it | Medium | Separation of duties and access reviews in production |
 | R10 | The anchor runs after every pipeline run when it is configured, and by hand otherwise. Rows written after the latest anchor are protected only by the hash chain | Low | Anchor on a schedule as well |

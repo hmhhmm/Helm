@@ -51,7 +51,7 @@ Last run on commit `8223a8c`. The two skipped tests on SQLite are the Postgres r
 | Red team | `tests/test_redteam.py` | RT1 to RT10, four extra attacks in the style of AgentDojo and InjecAgent, and permission tier tests. Every case checks that no money moves without ALLOW and that the audit chain still verifies |
 | On-chain | `tests/test_onchain.py` | The contract cannot receive funds. Anchoring writes the audit head and the policy hash. Only hashes reach the chain. Verification passes on an untouched log, fails after an edit, and ignores events from any other address. A network failure does not break the app. Runs the real contract bytecode on an in process EVM |
 | Auth and mandate | `tests/test_mandate_auth.py` | State changing routes refuse requests without an owner token, tokens expire and cannot be forged, login is rate limited, the daily cap, monthly cap and mandate expiry behave as written and are audited |
-| Live model | `tests/test_llm.py` | A model that obeys an injection cannot get past the schema check, a model that changes a number is not used, and recorded real responses replay through the same check once they exist |
+| Live model | `tests/test_llm.py` | A model that obeys an injection cannot get past the schema check, a model that changes a number is not used, the Gemini request keeps its key in a header and never in the URL, a rejected key gives a clean error, and the recorded real Gemini responses replay through the same check |
 | FX | `tests/test_fx.py` | Conversion, caching and outage behaviour, and one live call to the real Frankfurter API that skips itself when offline |
 | API | `tests/test_graph_api.py` | Every screen endpoint answers, owner actions are refused when nothing is waiting, a policy change is audited |
 
@@ -66,6 +66,7 @@ Everything below was produced by running this code. Each file carries its date a
 | Unit, red team, on-chain, login and mandate test output | `pytest -v` on SQLite and on Postgres 16 | `docs/evidence/pytest-sqlite.txt`, `docs/evidence/pytest-postgres.txt` |
 | Operation log against the running API | `python scripts/run_evidence.py` drives the demo flows over HTTP, including an unauthenticated request that is refused | `docs/evidence/run-log.txt`, `run-log.json` |
 | Local chain rehearsal | `python scripts/local_chain_demo.py` deploys the contract to an in process EVM, anchors, verifies, tampers and fails verification | `docs/evidence/local-chain.txt` |
+| Real model responses | `python scripts/record_llm.py` calls Gemini on seeded and poisoned documents | `services/api/tests/fixtures/llm/recorded.json` |
 | Real exchange rates | `python scripts/record_fx.py` calls Frankfurter | `docs/evidence/fx-frankfurter.json` |
 | Dependency audits | `pip-audit` and `pnpm audit` | `docs/evidence/pip-audit.txt`, `docs/evidence/pnpm-audit.txt` |
 | Public test network transaction hashes | `python scripts/deploy_anchor.py` with a funded throwaway key | `docs/evidence/onchain.json`. **Not produced yet.** No public network hash is claimed anywhere until this file exists |
@@ -121,7 +122,7 @@ Security basics you can check rather than take on trust: secrets only in `.env`;
 - Targets and methods are not results. Every number on screen comes from the seeded simulation and is labelled synthetic. The forecast track record is a back-test on synthetic history and is shown as computed (the 80% range covered the real balance **77%** of the time in the seeded data, against a stated 80%).
 - Helm is not licensed, holds no funds, and is live with no bank. Mentions of EPF, SOCSO, EIS, LHDN, BNM are context, not compliance claims.
 - Competitor comparisons use only the vendor pages listed in the build brief.
-- The live model path (`LLM_MODE=live`, Reader extraction and Explainer wording) is written and has stub tests. Real recorded responses exist only after `scripts/record_llm.py` has been run with a key, and none are claimed here.
+- The live model path (`LLM_MODE=live`) uses Gemini through its REST API (`helm/llm.py`), with Anthropic as an alternative. The Reader and the Explainer are the only agents that may call a model, and every answer still goes through the schema check or the number guard. Real recorded Gemini responses, including two poisoned invoices, are in `services/api/tests/fixtures/llm/recorded.json` and are replayed by `tests/test_llm.py`. A failed call falls back to the fixture parser.
 - The bank is simulated. A real sandbox bank needs an account and keys from the owner and is not connected.
 - Docker is not installed on the machine this was built on, so `docker compose up` is written to spec but was not run there. The API and the full test suite were run against a local Postgres 16.
 

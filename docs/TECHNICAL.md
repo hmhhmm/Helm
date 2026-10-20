@@ -108,5 +108,5 @@ The permission tiers, the threat table with tests, and the known risk list are i
 | Public test network deployment | Needs a funded throwaway key. The wallet exists in `.env` on the build machine and has no test ETH yet, so no public transaction hash is claimed anywhere |
 | Frankfurter exchange rates | Real calls, saved in `docs/evidence/fx-frankfurter.json` |
 | Bank | Simulated (the Demo bank). A real sandbox needs an account and keys from the owner |
-| Language model | Fixture mode by default. The live path and its recorder are written. Real recorded responses exist only after the recorder is run with a key |
+| Language model | Fixture mode by default. With `LLM_MODE=live` the Reader and Explainer call Gemini (`helm/llm.py`). Real responses for four documents are recorded in `services/api/tests/fixtures/llm/recorded.json` and replayed in the tests |
 | Business data | Synthetic and labelled so |
