@@ -2,147 +2,206 @@
 
 **An agentic CFO that checks before it pays.** Helm releases a payment only if the forecast says the business stays above its minimum cash balance, and it can show its working.
 
-> Everything in this repo is **synthetic demo data**. Warisan Printing Sdn Bhd is fictional. The bank is a mock **Demo bank**. Helm is a non-custodial decision layer: it does not hold funds, is not licensed, and is not connected to any real bank, payment rail or LHDN service.
+[GitHub repository](https://github.com/hmhhmm/Helm) · [Technical documentation](docs/TECHNICAL.md) · [Security self-assessment](docs/SECURITY.md) · [Demo script](docs/demo-script.md)
+
+> All business data is **synthetic**. Warisan Printing Sdn Bhd is fictional. Helm is a non-custodial decision layer. It holds no funds, is not licensed, and is not connected to any real bank, payment rail or LHDN service. The default bank is a built in **Demo bank**, and the real **Wise sandbox** (test money) is available as an option.
 
 ```
 P( min over the next H days of balance  >=  B  |  we pay )   >=   1 - alpha
 ```
-`B` is the owner's minimum balance, `H` the horizon (90 days), `alpha` the owner's risk tolerance. Statutory payments (EPF, SOCSO, EIS, PCB, SST) and payroll are scheduled first and never delayed by the optimiser.
 
-**In three lines.** Helm forecasts a small business's cash for 90 days and releases a payment only when the chance of staying above the owner's minimum balance is high enough. Rules are code with a visible trace, so a poisoned invoice can never move money, and an audit log with a hash chain and an on-chain anchor shows that history was not changed. The bank, the data and the business are simulated and labelled as such.
+`B` is the owner's minimum balance, `H` the horizon (90 days) and `alpha` the owner's risk tolerance. Statutory payments (EPF, SOCSO, EIS, PCB, SST) and payroll are scheduled first and never delayed by the optimiser.
 
-**Live demo:** not deployed yet. Deploying needs a Vercel account and an API host (see [Deploying a public demo](#deploying-a-public-demo)). **Owner login for the demo:** the passcode is shown on the login dialog (`helm-demo` by default).
+![Today screen](docs/screenshots/ui-today.png)
+
+## Contents
+
+1. [What Helm does](#what-helm-does)
+2. [Run it locally](#run-it-locally)
+3. [Deploy a public demo](#deploy-a-public-demo)
+4. [Test cases and results](#test-cases-and-results)
+5. [Execution evidence](#execution-evidence)
+6. [On-chain audit anchor](#on-chain-audit-anchor)
+7. [Bank, e-invoice and live model options](#bank-e-invoice-and-live-model-options)
+8. [How it is built](#how-it-is-built)
+9. [Honesty notes](#honesty-notes)
+
+## What Helm does
+
+Helm forecasts a small business's cash for 90 days and releases a payment only when the chance of staying above the owner's minimum balance is high enough. Rules are code with a visible trace, so a poisoned invoice can never move money. A hash chained audit log with an on-chain anchor shows that history was not changed.
+
+| Screen | What the owner gets |
+|---|---|
+| **Today** | One sentence on whether the business is okay, and what needs the owner |
+| **Forecast** | The next 90 days as a band (median, 50% and 80% ranges), the minimum line, the lowest point and what causes it. What-ifs re-run the gate live |
+| **Payments** | The queue. Each row has a verdict (ALLOW, HOLD, ESCALATE, DENY), a release date and one reason. "See working" opens the decision trace |
+| **Collections** | Who to chase, ranked by effect on the low point, and a generated MyInvois e-invoice per invoice |
+| **Cash** and **Policy** | Where to park spare cash, and the owner's rules and mandate in plain words |
+| **Audit** | The pipeline, the hash chained log with **Verify chain**, the on-chain anchor, the kill switch and the bank statement |
+
+The **Simulator** (click the date, top right) has three demo buttons: *Advance 1 week*, *Customer pays late* and *Inject malicious invoice*.
 
 ![Architecture](docs/Helm_Architecture.png)
 
-## Run it (about 3 minutes)
+## Run it locally
 
-Needs Node 20+, pnpm (`corepack enable`), and Python 3.11+.
-
-```bash
-cp .env.example .env     # optional: defaults already work
-pnpm bootstrap           # installs web deps and creates services/api/.venv
-pnpm dev                 # API http://localhost:8000/docs  +  web http://localhost:3000
-```
-
-The first start seeds the database (seed = 2026, idempotent) and runs the pipeline once. No LLM and no network are needed: `LLM_MODE=fixtures` is the default.
-
-### Docker
+Needs Node 20+, pnpm (`corepack enable`) and Python 3.11+.
 
 ```bash
-docker compose up        # Postgres 16 + API + web  ->  http://localhost:3000
+git clone https://github.com/hmhhmm/Helm.git && cd Helm
+cp .env.example .env     # optional, the defaults already work
+pnpm bootstrap           # installs web dependencies and creates services/api/.venv
+pnpm dev                 # API http://localhost:8000/docs and web http://localhost:3000
 ```
 
-### Tests
+The first start seeds the database (seed 2026) and runs the pipeline once. No model and no network are needed, because `LLM_MODE=fixtures` is the default. Mutating actions ask for the owner passcode, which is `helm-demo` by default and is shown on the login dialog.
+
+With Docker, `docker compose up` starts Postgres 16, the API and the web app on http://localhost:3000. It is written to spec but was not run on the build machine, which has no Docker.
+
+### Settings
+
+| Setting | Default | Purpose |
+|---|---|---|
+| `DATABASE_URL` | SQLite file | Use a Postgres URL for the hardened role setup |
+| `LLM_MODE`, `LLM_PROVIDER`, `GEMINI_API_KEY` | `fixtures` | `live` makes the Reader and Explainer call Gemini |
+| `BANK_PROVIDER`, `WISE_API_KEY` | `demo` | `wise` pays through the Wise sandbox |
+| `ANCHOR_RPC_URL`, `ANCHOR_PRIVATE_KEY`, `ANCHOR_CONTRACT` | empty | Turn on the on-chain anchor |
+| `OWNER_PASSCODE`, `OWNER_TOKEN_SECRET` | demo values | Set both anywhere outside the demo |
+| `DEMO_MODE` | off | Resets the database on a timer for a public demo |
+
+## Deploy a public demo
+
+1. **API and database.** Create a Render Blueprint from `render.yaml`. It builds `services/api/Dockerfile` from the repository root and creates a Postgres database. Set `DEMO_MODE=true`, `OWNER_PASSCODE` and `OWNER_TOKEN_SECRET`. Add the Gemini, Wise and anchor keys only if you want those options live.
+2. **Web.** Import the repository into Vercel with root directory `apps/web`, and set `NEXT_PUBLIC_API_URL` to the API address from step 1.
+3. **Check.** Open the web address, run the Simulator's *Inject malicious invoice*, then press **Verify chain** on the Audit screen.
+
+No public deployment has been made from this repository yet.
+
+## Test cases and results
 
 ```bash
-pnpm test:api            # 124 pytest tests (123 passed, 1 skipped on SQLite)
-DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres 16 (124 passed, adds the role grant test)
-pnpm --filter web build && pnpm test:e2e   # 32 Playwright tests: demo flows, owner login, anchor card, mandate, axe accessibility in both themes, 375px phone checks
+pnpm test:api                              # 129 passed, 1 skipped on SQLite
+DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres 16, adds the role grant test
+pnpm --filter web build && pnpm test:e2e   # 32 Playwright tests passed
 ```
 
-Last run on the commit named in each evidence file. The one skipped test on SQLite is the Postgres role grant test. The Playwright suite was also run from a fresh clone of this branch (32 passed). Full output with dates and commit hashes is in [docs/evidence/](docs/evidence/).
+The skipped test is the Postgres role grant test. The Playwright suite covers the demo flows, owner login, the anchor card, the mandate, axe accessibility checks in both themes, and 375px phone checks. Full output is in [docs/evidence/pytest-sqlite.txt](docs/evidence/pytest-sqlite.txt) and [docs/evidence/pytest-postgres.txt](docs/evidence/pytest-postgres.txt). Each file carries its date and commit hash.
+
+### Red team suite (29 passed)
+
+Prompt injection, hidden characters, changed bank details, replay, tampering, the kill switch and oversized documents. Every case checks that no money moves without ALLOW and that the audit chain still verifies.
+
+![Red team test output](docs/screenshots/tests-redteam.png)
+
+### Policy engine (all verdicts and rules)
+
+![Policy engine test output](docs/screenshots/tests-policy.png)
+
+### On-chain anchor (runs the real contract bytecode)
+
+![On-chain test output](docs/screenshots/tests-onchain.png)
+
+### Wise adapter, e-invoice, login and mandate
+
+![Wise, e-invoice, auth and mandate test output](docs/screenshots/tests-more.png)
+
+The images above are real `pytest -v` output rendered to PNG. Re-create the text with `cd services/api && . .venv/bin/activate && pytest -v`.
 
 | Group | File | What it proves |
 |---|---|---|
-| Policy engine | `tests/test_policy_engine.py` | Every rule and every verdict. ALLOW when the chance is high, HOLD with an earliest safe date, ESCALATE (limit, new payee, quarantined document, changed bank account, unusual amount), DENY (kill switch, protected payee with changed details, duplicate, reserve too small). Statutory and payroll are never delayed. Paying later is never less safe. Each released payment is committed before the next is judged |
-| Audit and bank | `tests/test_audit_bank.py` | The hash chain verifies, the app cannot update or delete audit rows, and an edited or deleted row is detected and named. The bank accepts only what a scoped, expiring, single use key covers. On Postgres the agent role cannot write the rules or the audit log |
-| Flows | `tests/test_world_and_flows.py` | The seeded cash crunch is real and Helm resolves it. A late customer flips ALLOW to HOLD. A poisoned invoice ends in ESCALATE with no money moved. Owner approval is the only way a flagged invoice is paid. A payment is rechecked on the day it would go |
-| Red team | `tests/test_redteam.py` | RT1 to RT10, four extra attacks in the style of AgentDojo and InjecAgent, and permission tier tests. Every case checks that no money moves without ALLOW and that the audit chain still verifies |
-| On-chain | `tests/test_onchain.py` | The contract cannot receive funds. Anchoring writes the audit head and the policy hash. Only hashes reach the chain. Verification passes on an untouched log, fails after an edit, and ignores events from any other address. A network failure does not break the app. Runs the real contract bytecode on an in process EVM |
-| Auth and mandate | `tests/test_mandate_auth.py` | State changing routes refuse requests without an owner token, tokens expire and cannot be forged, login is rate limited, the daily cap, monthly cap and mandate expiry behave as written and are audited |
-| Live model | `tests/test_llm.py` | A model that obeys an injection cannot get past the schema check, a model that changes a number is not used, the Gemini request keeps its key in a header and never in the URL, a rejected key gives a clean error, and the recorded real Gemini responses replay through the same check |
-| FX | `tests/test_fx.py` | Conversion, caching and outage behaviour, and one live call to the real Frankfurter API that skips itself when offline |
-| API | `tests/test_graph_api.py` | Every screen endpoint answers, owner actions are refused when nothing is waiting, a policy change is audited |
-
-To run one group, use `cd services/api && . .venv/bin/activate && pytest tests/test_redteam.py -v`.
+| Policy engine | `test_policy_engine.py` | Every rule and verdict. ALLOW when the chance is high, HOLD with an earliest safe date, ESCALATE (limit, new payee, quarantined document, changed account, unusual amount), DENY (kill switch, protected payee, duplicate, reserve too small). Statutory and payroll are never delayed |
+| Audit and bank | `test_audit_bank.py` | The chain verifies, the app cannot edit audit rows, an edited row is named. The bank accepts only a scoped, expiring, single use key |
+| Flows | `test_world_and_flows.py` | The seeded cash crunch is real and Helm resolves it. A late customer flips ALLOW to HOLD. A poisoned invoice moves no money. Payments are rechecked on the day they would go |
+| Red team | `test_redteam.py` | RT1 to RT10, four more injection attacks and permission tier tests |
+| On-chain | `test_onchain.py` | Only hashes reach the chain. Verification passes on an untouched log, fails after an edit and ignores events from other addresses. Log reads work across block windows |
+| Auth and mandate | `test_mandate_auth.py` | Mutating routes refuse requests without an owner token. Tokens expire. Login is rate limited. Daily cap, monthly cap and mandate expiry are enforced and audited |
+| Wise sandbox | `test_wise.py` | Quote, recipient, transfer and sandbox steps on a mocked transport. The bank key is checked before Wise is called. The key never reaches the call log |
+| E-invoice | `test_einvoice.py` | The document matches the ledger and is never marked as submitted |
+| Live model | `test_llm.py` | A model that obeys an injection cannot pass the schema check. A model that changes a number is not used. Recorded real Gemini responses replay through the same checks |
+| FX and API | `test_fx.py`, `test_graph_api.py` | Conversion, caching, outage behaviour, and every screen endpoint |
 
 ## Execution evidence
 
-Everything below was produced by running this code. Each file carries its date and commit hash.
+Produced by running this code. Each file carries its date and commit hash.
 
-| Evidence | How it was produced | Where |
-|---|---|---|
-| Unit, red team, on-chain, login and mandate test output | `pytest -v` on SQLite and on Postgres 16 | `docs/evidence/pytest-sqlite.txt`, `docs/evidence/pytest-postgres.txt` |
-| Operation log against the running API | `python scripts/run_evidence.py` drives the demo flows over HTTP, including an unauthenticated request that is refused | `docs/evidence/run-log.txt`, `run-log.json` |
-| Local chain rehearsal | `python scripts/local_chain_demo.py` deploys the contract to an in process EVM, anchors, verifies, tampers and fails verification | `docs/evidence/local-chain.txt` |
-| Real model responses | `python scripts/record_llm.py` calls Gemini on seeded and poisoned documents | `services/api/tests/fixtures/llm/recorded.json` |
-| Real exchange rates | `python scripts/record_fx.py` calls Frankfurter | `docs/evidence/fx-frankfurter.json` |
-| Dependency audits | `pip-audit` and `pnpm audit` | `docs/evidence/pip-audit.txt`, `docs/evidence/pnpm-audit.txt` |
-| Public test network transaction hashes | `python scripts/deploy_anchor.py` with a funded throwaway key | `docs/evidence/onchain.json`. Real, on Ethereum Sepolia (chain 11155111). Contract [`0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f`](https://sepolia.etherscan.io/address/0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f), deployment [`0x68c7cae0e683…`](https://sepolia.etherscan.io/tx/0x68c7cae0e68385d6a2d3678d45aa038f46bc9505276592e23e542631299996a5), audit anchor [`0x55ce561154d3…`](https://sepolia.etherscan.io/tx/0x55ce561154d3cb244b732b5827c0e0c4f48c90d5d14437ad2b98a8ad00e702b7), policy anchor [`0x8f0fcfb759f3…`](https://sepolia.etherscan.io/tx/0x8f0fcfb759f3acd67498c710081d2826c61eb0fbf3c2c967edd9477d60800adf). Also confirmed through a second, unrelated RPC provider |
+| Evidence | Where |
+|---|---|
+| Test output on SQLite and Postgres 16 | `docs/evidence/pytest-sqlite.txt`, `pytest-postgres.txt` |
+| Operation log against the running API, including a refused unauthenticated request | `docs/evidence/run-log.txt`, `run-log.json` |
+| Local chain rehearsal (anchor, tamper, fail) | `docs/evidence/local-chain.txt` |
+| Real payments through the Wise sandbox, with Wise's own transfer ids | `docs/evidence/sandbox-bank-log.txt` |
+| Real Gemini responses on seeded and poisoned documents | `services/api/tests/fixtures/llm/recorded.json` |
+| Real exchange rates from Frankfurter | `docs/evidence/fx-frankfurter.json` |
+| Dependency audits | `docs/evidence/pip-audit.txt`, `pnpm-audit.txt` |
+| Public test network transactions | `docs/evidence/onchain.json` |
+
+### Screens
+
+| Forecast | Payments |
+|---|---|
+| ![Forecast](docs/screenshots/ui-forecast.png) | ![Payments](docs/screenshots/ui-payments.png) |
+| **Collections** | **Audit** |
+| ![Collections](docs/screenshots/ui-collections.png) | ![Audit](docs/screenshots/ui-audit.png) |
 
 ## On-chain audit anchor
 
-Helm writes two kinds of hash to a public test network. One is the hash of the latest audit log row, which commits to every earlier row. The other is the hash of the owner's cash policy and mandate. Only hashes are written. The contract in `contracts/AuditAnchor.sol` stores nothing, holds no funds and only emits events. Anyone can call it, so verification counts only events from the Helm anchor address and compares them with a hash recomputed from the database. After each pipeline run Helm anchors automatically when the three settings below are present.
+Helm writes two hashes to a public test network. One is the hash of the latest audit row, which commits to every earlier row. The other is the hash of the owner's cash policy and mandate. Only hashes are written. The contract in `contracts/AuditAnchor.sol` stores nothing, holds no funds and only emits events. Anyone can call it, so verification counts only events from the Helm anchor address and compares them with a hash recomputed from the database.
+
+Live on Ethereum Sepolia:
+
+- Contract [`0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f`](https://sepolia.etherscan.io/address/0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f)
+- Deployment [`0x68c7cae0e683…`](https://sepolia.etherscan.io/tx/0x68c7cae0e68385d6a2d3678d45aa038f46bc9505276592e23e542631299996a5)
+- Audit anchor [`0x55ce561154d3…`](https://sepolia.etherscan.io/tx/0x55ce561154d3cb244b732b5827c0e0c4f48c90d5d14437ad2b98a8ad00e702b7)
+- Policy anchor [`0x8f0fcfb759f3…`](https://sepolia.etherscan.io/tx/0x8f0fcfb759f3acd67498c710081d2826c61eb0fbf3c2c967edd9477d60800adf)
+
+The sending wallet is `0x860F433F8144f8CE80c49F62705F66ef5119DD67` and holds only test ETH. Some extra anchors from it were sent while tests ran against the live settings, before the tests were isolated from `.env`. The verifier ignores anything not recorded in the database.
 
 ```bash
-python scripts/new_anchor_wallet.py      # creates a throwaway wallet, saves its key in .env, prints only the address
-# fund that address with Sepolia test ETH from a faucet, then
-python scripts/deploy_anchor.py          # deploys, anchors, verifies, writes docs/evidence/onchain.json
+python scripts/new_anchor_wallet.py   # throwaway wallet, key saved in .env, prints only the address
+# fund the address with Sepolia test ETH, then
+python scripts/deploy_anchor.py       # deploys, anchors, verifies, writes docs/evidence/onchain.json
 ```
 
-Then put the printed contract address in `.env` as `ANCHOR_CONTRACT`, and the deploy block as `ANCHOR_FROM_BLOCK`. Running the script again reuses an existing contract. The Audit screen has **Anchor now** and **Verify on-chain** buttons, and the API has `GET /anchor`, `POST /anchor/run` and `POST /anchor/verify`. To rebuild the contract artifact, run `cd contracts && npm i && npm run compile`.
+Put the printed contract address in `.env` as `ANCHOR_CONTRACT` and the deploy block as `ANCHOR_FROM_BLOCK`. The Audit screen has **Anchor now** and **Verify on-chain**, and the API has `GET /anchor`, `POST /anchor/run` and `POST /anchor/verify`. To check one anchor by hand, find the `Anchored` event on the explorer. Its `headHash` must equal the `hash` in `onchain.json`.
 
-The contract is live on Ethereum Sepolia at `0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f`. The wallet that sent the anchors is `0x860F433F8144f8CE80c49F62705F66ef5119DD67` and it only ever holds test ETH. Note that this wallet also sent some extra anchors automatically while the tests were running against the live settings, before the tests were isolated from `.env`. Those events are on the contract but are not referenced by the evidence file, and the verifier ignores anything that is not recorded in the database.
+The anchor proves the log has not changed since it was anchored. It does not prove the original events were true.
 
-To verify one anchor by hand, open `docs/evidence/onchain.json`. Open the contract link on the block explorer and look at the Events tab. Find the `Anchored` event with the row number from the file. Its `headHash` must equal the `hash` in the file, and its `by` address must be the sender in the file. Then run the verify button in the app. It recomputes the hash from the database and compares it with the one on chain.
+## Bank, e-invoice and live model options
 
-What the anchor proves is that the log has not changed since it was anchored. It does not prove that the original events were true.
-
-## Owner login
-
-Every route that changes state needs an owner token (`helm/auth.py`). Reading the screens stays open. The web app shows a login dialog when a protected action is refused. The default passcode is `helm-demo` and the dialog shows it, because the demo data is synthetic. Set `OWNER_PASSCODE` and `OWNER_TOKEN_SECRET` anywhere else.
-
-## The 60-second idea
-
-1. **Today** tells the owner, in one sentence, whether they are okay and what needs them.
-2. **Forecast** shows the next 90 days as a calibrated band (median, 50% and 80% ranges), the minimum-balance line, the lowest point, and the bill and invoice that cause it. What-ifs re-run the gate live.
-3. **Payments** is the queue. Every row has a verdict (`ALLOW`, `HOLD`, `ESCALATE`, `DENY`), a release date and a one-sentence reason. "See working" opens the decision trace.
-4. **Collections**, **Cash** and **Policy** act on the same numbers: who to chase (ranked by effect on the low point), where to park spare cash, and the owner's rules in plain words.
-5. **Audit** shows the pipeline, the run log, the hash-chained audit log with a **Verify chain** button, the kill switch, and the Demo bank statement.
-
-The **Simulator** (click the date, top right) has the three demo buttons: *Advance 1 week*, *Customer pays late*, *Inject malicious invoice*. See [docs/demo-script.md](docs/demo-script.md) for the 3-minute walkthrough.
+- **Wise sandbox.** Set `BANK_PROVIDER=wise` and `WISE_API_KEY`. Each released bill goes through a real quote, recipient and transfer on `api.wise-sandbox.com`. Helm's scoped bank key is checked first. Test money only, payee bank numbers are synthetic, and a personal token cannot fund a transfer by API, so the sandbox's own simulation steps move it to sent.
+- **LHDN MyInvois.** Each invoice on the Collections page has a generated e-invoice document (UBL JSON, type 01, version 1.1) to view and download. Helm does not submit it, because that needs the owner's own MyInvois account. The tax numbers in it are placeholders for the fictional business.
+- **Live model.** `LLM_MODE=live` uses Gemini through its REST API (`helm/llm.py`), with Anthropic as an alternative. Only the Reader and the Explainer may call a model, and every answer passes the schema check or the number guard. A failed call falls back to the fixture parser.
 
 ## How it is built
 
 | Layer | Choice |
 |---|---|
-| Web | Next.js (App Router), TypeScript strict, Tailwind, Radix primitives, TanStack Query, Recharts. API client generated from OpenAPI (`pnpm gen:api`). English + Bahasa Malaysia from one file (`apps/web/src/i18n/dict.ts`). |
-| API | FastAPI, Pydantic v2, SQLAlchemy. One service, one database, separate tables. |
-| Agents | Python modules behind one interface, `run(input) -> typed output`, in `services/api/helm/agents/`. Fixture mode by default. |
-| Orchestration | Plain Python pipeline (`helm/pipeline.py`) with a LangGraph wrapper (`helm/graph.py`) that declares the same topology for the agent view. |
-| Forecast | Monte Carlo over invoice-payment and bill-timing distributions learned from the seeded history (`helm/forecast/montecarlo.py`), behind a `Forecaster` interface. |
-| Optimiser | OR-Tools CP-SAT chooses bill-release dates with the chance constraint as a scenario constraint (`helm/optimiser/scheduler.py`). |
-| Policy | Pure functions (`helm/engine/policy.py`). Rule order: kill switch, statutory first, protected payee, duplicate or anomaly, approval limit, chance constraint, verdict. |
-| Money | Executor (`helm/executor.py`) sends only `ALLOW` decisions to the mock bank (`helm/bank/`) with a scoped, expiring, single-use key. |
-| Safety | Append-only audit log with DB triggers and a sha256 hash chain. On Postgres, the agent role can read but not write the rules (`helm_agent`). Kill switch. Watchdog self-test with a poisoned invoice after every run. |
+| Web | Next.js (App Router), TypeScript, Tailwind, Radix, TanStack Query, Recharts. Typed client generated from OpenAPI. English and Bahasa Malaysia from one file |
+| API | FastAPI, Pydantic v2, SQLAlchemy. SQLite by default, Postgres 16 supported |
+| Agents | Reader, Forecaster, Collections, Scheduler, Treasury and Explainer in `services/api/helm/agents/`, with a LangGraph wrapper (`helm/graph.py`) over the plain pipeline (`helm/pipeline.py`) |
+| Forecast | Monte Carlo over payment and bill timing learned from history (`helm/forecast/montecarlo.py`) |
+| Optimiser | OR-Tools CP-SAT with the chance constraint as a scenario constraint (`helm/optimiser/scheduler.py`) |
+| Policy | Pure functions (`helm/engine/policy.py`). Order: kill switch, statutory first, protected payee, duplicate or anomaly, approval limit, mandate, chance constraint |
+| Money | Only the Executor sends ALLOW decisions to the bank, each with a scoped, expiring, single use key |
+| Safety | Append only audit log with database triggers and a sha256 chain, owner token auth, kill switch, and a Watchdog self test after every run |
 
-Security basics you can check rather than take on trust: secrets only in `.env`; the Reader returns schema-checked JSON only and has no tools, so text inside a document can never move money; tampering with any audit row makes **Verify chain** fail and shows a banner; the kill switch makes the Executor refuse everything within one request.
+Repository layout:
+
+```
+apps/web/        Next.js app
+services/api/    FastAPI app and tests
+contracts/       AuditAnchor.sol and its compiled artifact
+e2e/             Playwright tests
+scripts/         evidence, deployment and client generation scripts
+docs/            technical documentation, security assessment, demo script, evidence, screenshots
+DECISIONS.md     every judgement call where the brief was silent
+```
+
+Read next: [Technical documentation](docs/TECHNICAL.md) for the architecture, algorithms and security design, and the [Security self-assessment](docs/SECURITY.md) for the permission tiers, threat table and known risk list.
 
 ## Honesty notes
 
-- Targets and methods are not results. Every number on screen comes from the seeded simulation and is labelled synthetic. The forecast track record is a back-test on synthetic history and is shown as computed (the 80% range covered the real balance **77%** of the time in the seeded data, against a stated 80%).
-- Helm is not licensed, holds no funds, and is live with no bank. Mentions of EPF, SOCSO, EIS, LHDN, BNM are context, not compliance claims.
-- Competitor comparisons use only the vendor pages listed in the build brief.
-- The live model path (`LLM_MODE=live`) uses Gemini through its REST API (`helm/llm.py`), with Anthropic as an alternative. The Reader and the Explainer are the only agents that may call a model, and every answer still goes through the schema check or the number guard. Real recorded Gemini responses, including two poisoned invoices, are in `services/api/tests/fixtures/llm/recorded.json` and are replayed by `tests/test_llm.py`. A failed call falls back to the fixture parser.
-- The default bank is the built in Demo bank. Set BANK_PROVIDER=wise and WISE_API_KEY to pay through the real Wise sandbox instead. It uses test money, the payee bank numbers are synthetic, and because a personal token cannot fund a transfer by API the sandbox simulation steps move each transfer to sent. The log of a live run is in docs/evidence/sandbox-bank-log.txt.
-- Docker is not installed on the machine this was built on, so `docker compose up` is written to spec but was not run there. The API and the full test suite were run against a local Postgres 16.
-
-## Deploying a public demo
-
-Set `DEMO_MODE=true` on the API (it resets the database every `DEMO_RESET_MINUTES`) and point the web build at it with `NEXT_PUBLIC_API_URL`. Web: Vercel with root directory `apps/web`. API: any container host using `services/api/Dockerfile` plus a Postgres URL. No deploy has been done from this repo yet. `render.yaml` describes the API and its Postgres database for Render, and the web app goes on Vercel with root directory `apps/web` and `NEXT_PUBLIC_API_URL` set to the API address.
-
-## Layout
-
-```
-apps/web/        Next.js app (screens, overlays, i18n, typed client)
-services/api/    FastAPI app: helm/{agents,engine,forecast,optimiser,bank,seed,api}, tests/
-e2e/             Playwright tests
-docs/            architecture image, demo script
-scripts/         gen-api.sh (regenerates the typed client)
-DECISIONS.md     every judgement call made where the brief was silent
-```
-
-## LHDN MyInvois
-
-Each invoice on the Collections page has a generated MyInvois e-invoice document (UBL JSON, type 01, version 1.1) that can be viewed and downloaded. Helm does not submit it. Submitting needs your own MyInvois taxpayer account, which was not available in time, and the company tax numbers in the document are placeholders for the fictional business. The status is shown as ready to submit.
+- Targets and methods are not results. Every number on screen comes from the seeded simulation and is labelled synthetic. The forecast back-test on synthetic history is shown as computed (the 80% range covered the outcome 77% of the time).
+- Helm is not licensed and holds no funds. Mentions of EPF, SOCSO, EIS, LHDN and BNM are context, not compliance claims.
+- The Wise sandbox uses test money. The Demo bank is a simulation.
+- The security assessment was done by the builders, with no independent penetration test.
