@@ -97,3 +97,19 @@ def test_a_wise_start_has_one_payment_waiting_for_the_owner(monkeypatch):
         assert len(rows) == 1 and rows[0]["verdict"] == "ESCALATE" and rows[0]["status"] == "queued"
     monkeypatch.setattr(config, "BANK_PROVIDER", "demo")
     reset_demo()
+
+
+def test_owner_can_reconsider_a_payment_they_held(monkeypatch):
+    from tests.conftest import owner_client
+
+    monkeypatch.setattr(config, "BANK_PROVIDER", "wise")
+    sent = []
+    monkeypatch.setattr(wise, "pay", lambda payee, acct, amt, ref, client=None: sent.append(1) or {"provider": "wise_sandbox", "transfer_id": 7, "status": "outgoing_payment_sent"})
+    with owner_client() as c:
+        c.post("/sim/reset")
+        pid = c.post("/payments/new", json={"payee": "Second Thoughts Co", "amount": 300}).json()["data"]["proposal_id"]
+        assert c.post(f"/decisions/{pid}/owner", json={"choice": "hold"}).json()["status"] == "held_by_owner"
+        assert not sent
+        assert c.post(f"/decisions/{pid}/owner", json={"choice": "approve"}).json()["status"] == "sent"
+        assert sent == [1]
+        c.post("/sim/reset")

@@ -73,9 +73,10 @@ def owner_choice(proposal_id: str, body: S.OwnerIn, session: Session = Depends(g
     d = executor.latest_decision(session, proposal_id)
     if p is None or d is None:
         raise HTTPException(404, "Unknown proposal")
-    if p.status != "open" or d.verdict != "ESCALATE":
+    if p.status not in ("open", "held_by_owner") or d.verdict != "ESCALATE":
         raise HTTPException(409, "This payment is not waiting for you")
     if body.choice == "approve":
+        p.status = "open"  # the owner may change their mind after holding
         d.owner_choice = "approved"
         append(session, "human", "owner.approved", {"proposal_id": p.id, "payee": p.payee, "amount": p.amount})
         pipeline.run_pipeline(session, mode="gate", trigger=f"owner approved {p.id}")
