@@ -94,6 +94,17 @@ def collections(session: Session = Depends(get_session)):
     return views.collections_view(session)
 
 
+@router.get("/invoices/{invoice_id}/einvoice", tags=["collections"])
+def einvoice(invoice_id: str, session: Session = Depends(get_session)):
+    """The MyInvois e-invoice document for one invoice. It is generated, not submitted."""
+    from helm import einvoice as ei
+
+    inv = session.get(Invoice, invoice_id)
+    if not inv:
+        raise HTTPException(404, "invoice not found")
+    return {"invoice_id": inv.id, "number": inv.number, "status": ei.status(inv), "submitted": False, "document": ei.build(inv, session.get(Customer, inv.customer_id))}
+
+
 @router.put("/collections/{customer_id}/tone", tags=["collections"], dependencies=[Depends(require_owner)])
 def set_tone(customer_id: str, body: S.ToneIn, session: Session = Depends(get_session)):
     c = session.get(Customer, customer_id)
