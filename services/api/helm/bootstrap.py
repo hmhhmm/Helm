@@ -27,7 +27,7 @@ def reset_demo() -> None:
             run_pipeline(s, trigger="seed")
             if config.BANK_PROVIDER == "wise":
                 # With a real bank connected, start with one payment waiting for the owner, ready to approve and send.
-                live.enter_payment(s, "Ladang Kertas Utama", 1_200, "INV-2610-0088")
+                live.enter_payment(s, "Ladang Kertas Utama", 985, "INV-2610-0088")
             s.commit()
         _ready = True
 
