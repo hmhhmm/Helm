@@ -2,7 +2,7 @@
 
 These steps need an account, a key or a person, so they cannot be done from the repository alone.
 
-1. Fund the anchor wallet. The address printed by `python scripts/new_anchor_wallet.py` holds no test ETH. Send Sepolia test ETH to it from any faucet, then run `python scripts/deploy_anchor.py` and commit `docs/evidence/onchain.json`. Put the contract address in `.env` as `ANCHOR_CONTRACT`.
+1. Anchor on a public test network. Done. See `docs/evidence/onchain.json`.
 2. Model key. Done for Gemini. Keep `GEMINI_API_KEY` only in `.env`. To refresh the recording, run `python scripts/record_llm.py`.
 3. Connect a real sandbox bank. Create a free sandbox account with a payments provider, put its keys in `.env`, and add an adapter behind `helm/bank/service.py`. The Executor does not change.
 4. Register for the MyInvois pre production environment through the LHDN portal if a real e invoice call is wanted.

@@ -1,0 +1,54 @@
+{
+  "produced_at": "2026-10-20T10:49:02.012083+00:00",
+  "git_commit": "0153a6c",
+  "network_chain_id": 11155111,
+  "deploy_block": 11954760,
+  "contract": "0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f",
+  "sender": "0x860F433F8144f8CE80c49F62705F66ef5119DD67",
+  "deploy_tx": "0x68c7cae0e68385d6a2d3678d45aa038f46bc9505276592e23e542631299996a5",
+  "anchors": [
+    {
+      "kind": "audit",
+      "seq": 31,
+      "hash": "1af366ff6678647caa9d32250d95cd31e6b8df1f39c275ddaa2048cc0d11c86a",
+      "tx_hash": "0x55ce561154d3cb244b732b5827c0e0c4f48c90d5d14437ad2b98a8ad00e702b7",
+      "block": 11954798
+    },
+    {
+      "kind": "policy",
+      "seq": 0,
+      "hash": "26ccbdec8b69a8e45c07bd1b5919bd26dc78e6f39c6e81e1ea5d6932f6e952a4",
+      "tx_hash": "0x8f0fcfb759f3acd67498c710081d2826c61eb0fbf3c2c967edd9477d60800adf",
+      "block": 11954800
+    }
+  ],
+  "verify": {
+    "ok": true,
+    "checked": 2,
+    "anchors": [
+      {
+        "seq": 29,
+        "tx_hash": "0x4253742a6458835b9b9600cd778eb748f884e1913838e9f76e86de1bf7157829",
+        "on_chain": true,
+        "database_matches": true,
+        "ok": true
+      },
+      {
+        "seq": 31,
+        "tx_hash": "0x55ce561154d3cb244b732b5827c0e0c4f48c90d5d14437ad2b98a8ad00e702b7",
+        "on_chain": true,
+        "database_matches": true,
+        "ok": true
+      }
+    ],
+    "expected_sender": "0x860F433F8144f8CE80c49F62705F66ef5119DD67"
+  },
+  "explorer": {
+    "contract": "https://sepolia.etherscan.io/address/0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f",
+    "deploy_tx": "https://sepolia.etherscan.io/tx/0x68c7cae0e68385d6a2d3678d45aa038f46bc9505276592e23e542631299996a5",
+    "anchor_txs": [
+      "https://sepolia.etherscan.io/tx/0x55ce561154d3cb244b732b5827c0e0c4f48c90d5d14437ad2b98a8ad00e702b7",
+      "https://sepolia.etherscan.io/tx/0x8f0fcfb759f3acd67498c710081d2826c61eb0fbf3c2c967edd9477d60800adf"
+    ]
+  }
+}

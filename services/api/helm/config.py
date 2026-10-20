@@ -41,3 +41,4 @@ OWNER_TOKEN_SECRET = os.getenv("OWNER_TOKEN_SECRET", BANK_SIGNING_SECRET + "-own
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "")  # gemini | anthropic | empty = pick from the keys that exist
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+ANCHOR_FROM_BLOCK = int(os.getenv("ANCHOR_FROM_BLOCK", "0"))  # the block the contract was deployed in; logs are read from here

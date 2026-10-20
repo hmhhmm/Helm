@@ -89,7 +89,7 @@ Each audit row is `{id, ts, actor, event, payload}` and its hash is `sha256(prev
 
 ### 2.7 On-chain anchor (`anchor.py`, `contracts/AuditAnchor.sol`)
 
-The contract has two functions that only emit events, `anchor(seq, headHash)` and `anchorPolicy(version, policyHash)`. It stores nothing, has no payable function and no fallback, so it cannot receive funds. The client sends the hash of the last audit row and a hash of the canonical owner policy and mandate. To verify, the client recomputes the chain from the database, reads the events, keeps only events sent by the expected anchor address, and compares. If a row has been edited, the recomputed hash no longer equals the anchored one and verification fails. Only hashes are written. This is checked by a test that scans every transaction on an in process chain for business words.
+The contract has two functions that only emit events, `anchor(seq, headHash)` and `anchorPolicy(version, policyHash)`. It stores nothing, has no payable function and no fallback, so it cannot receive funds. Events are read in windows from the deploy block, because a public node refuses wide queries (this was found on the real network). The client sends the hash of the last audit row and a hash of the canonical owner policy and mandate. To verify, the client recomputes the chain from the database, reads the events, keeps only events sent by the expected anchor address, and compares. If a row has been edited, the recomputed hash no longer equals the anchored one and verification fails. Only hashes are written. This is checked by a test that scans every transaction on an in process chain for business words.
 
 ### 2.8 Bank keys (`bank/service.py`)
 
@@ -105,7 +105,7 @@ The permission tiers, the threat table with tests, and the known risk list are i
 |---|---|
 | Forecast, optimiser, policy engine, audit chain, hash anchor client, red team tests | Real code, run for real |
 | Contract bytecode | Compiled from source with solc 0.8.26 and executed on a real in process EVM in the tests |
-| Public test network deployment | Needs a funded throwaway key. The wallet exists in `.env` on the build machine and has no test ETH yet, so no public transaction hash is claimed anywhere |
+| Public test network deployment | Deployed to Ethereum Sepolia at `0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f`. The audit head and the policy hash were anchored and verified against the chain. Transaction hashes are in `docs/evidence/onchain.json` |
 | Frankfurter exchange rates | Real calls, saved in `docs/evidence/fx-frankfurter.json` |
 | Bank | Simulated (the Demo bank). A real sandbox needs an account and keys from the owner |
 | Language model | Fixture mode by default. With `LLM_MODE=live` the Reader and Explainer call Gemini (`helm/llm.py`). Real responses for four documents are recorded in `services/api/tests/fixtures/llm/recorded.json` and replayed in the tests |

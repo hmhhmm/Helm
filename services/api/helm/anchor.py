@@ -75,8 +75,11 @@ def _b32(hex_hash: str) -> bytes:
 class ChainClient:
     """Thin wrapper over web3. In production it points at a test network; in tests at an in-process EVM."""
 
-    def __init__(self, w3: Any, contract_address: str, private_key: str | None = None, account: str | None = None):
+    LOG_WINDOW = 40_000  # public RPC nodes refuse log queries wider than about 50,000 blocks
+
+    def __init__(self, w3: Any, contract_address: str, private_key: str | None = None, account: str | None = None, from_block: int = 0):
         art = load_artifact()
+        self.from_block = from_block
         self.w3 = w3
         self.contract = w3.eth.contract(address=w3.to_checksum_address(contract_address), abi=art["abi"])
         self.account = account
@@ -91,7 +94,7 @@ class ChainClient:
         from web3 import Web3
 
         return cls(Web3(Web3.HTTPProvider(config.ANCHOR_RPC_URL, request_kwargs={"timeout": 30})),
-                   config.ANCHOR_CONTRACT, config.ANCHOR_PRIVATE_KEY)
+                   config.ANCHOR_CONTRACT, config.ANCHOR_PRIVATE_KEY, from_block=config.ANCHOR_FROM_BLOCK)
 
     @property
     def chain_id(self) -> int:
@@ -117,13 +120,24 @@ class ChainClient:
     def anchor_policy(self, version: int, phash: str) -> dict:
         return self._send(self.contract.functions.anchorPolicy(version, _b32(phash)))
 
+    def _logs(self, event) -> list:
+        """Read events in windows, so a public node never sees a range that is too wide."""
+        latest = int(self.w3.eth.block_number)
+        out: list = []
+        start = self.from_block
+        while start <= latest:
+            end = min(start + self.LOG_WINDOW - 1, latest)
+            out += event.get_logs(from_block=start, to_block=end)
+            start = end + 1
+        return out
+
     def anchored_events(self) -> list[dict]:
         return [{"seq": int(e["args"]["seq"]), "hash": bytes(e["args"]["headHash"]).hex(), "by": e["args"]["by"], "tx": "0x" + bytes(e["transactionHash"]).hex().removeprefix("0x")}
-                for e in self.contract.events.Anchored().get_logs(from_block=0)]
+                for e in self._logs(self.contract.events.Anchored())]
 
     def policy_events(self) -> list[dict]:
         return [{"version": int(e["args"]["version"]), "hash": bytes(e["args"]["policyHash"]).hex(), "by": e["args"]["by"], "tx": "0x" + bytes(e["transactionHash"]).hex().removeprefix("0x")}
-                for e in self.contract.events.PolicyAnchored().get_logs(from_block=0)]
+                for e in self._logs(self.contract.events.PolicyAnchored())]
 
 
 # --- anchoring and verifying ---------------------------------------------------------------

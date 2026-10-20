@@ -69,7 +69,7 @@ Everything below was produced by running this code. Each file carries its date a
 | Real model responses | `python scripts/record_llm.py` calls Gemini on seeded and poisoned documents | `services/api/tests/fixtures/llm/recorded.json` |
 | Real exchange rates | `python scripts/record_fx.py` calls Frankfurter | `docs/evidence/fx-frankfurter.json` |
 | Dependency audits | `pip-audit` and `pnpm audit` | `docs/evidence/pip-audit.txt`, `docs/evidence/pnpm-audit.txt` |
-| Public test network transaction hashes | `python scripts/deploy_anchor.py` with a funded throwaway key | `docs/evidence/onchain.json`. **Not produced yet.** No public network hash is claimed anywhere until this file exists |
+| Public test network transaction hashes | `python scripts/deploy_anchor.py` with a funded throwaway key | `docs/evidence/onchain.json`. Real, on Ethereum Sepolia (chain 11155111). Contract [`0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f`](https://sepolia.etherscan.io/address/0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f), deployment [`0x68c7cae0e683…`](https://sepolia.etherscan.io/tx/0x68c7cae0e68385d6a2d3678d45aa038f46bc9505276592e23e542631299996a5), audit anchor [`0x55ce561154d3…`](https://sepolia.etherscan.io/tx/0x55ce561154d3cb244b732b5827c0e0c4f48c90d5d14437ad2b98a8ad00e702b7), policy anchor [`0x8f0fcfb759f3…`](https://sepolia.etherscan.io/tx/0x8f0fcfb759f3acd67498c710081d2826c61eb0fbf3c2c967edd9477d60800adf). Also confirmed through a second, unrelated RPC provider |
 
 ## On-chain audit anchor
 
@@ -81,9 +81,11 @@ python scripts/new_anchor_wallet.py      # creates a throwaway wallet, saves its
 python scripts/deploy_anchor.py          # deploys, anchors, verifies, writes docs/evidence/onchain.json
 ```
 
-Then put the printed contract address in `.env` as `ANCHOR_CONTRACT`. The Audit screen has **Anchor now** and **Verify on-chain** buttons, and the API has `GET /anchor`, `POST /anchor/run` and `POST /anchor/verify`. To rebuild the contract artifact, run `cd contracts && npm i && npm run compile`.
+Then put the printed contract address in `.env` as `ANCHOR_CONTRACT`, and the deploy block as `ANCHOR_FROM_BLOCK`. Running the script again reuses an existing contract. The Audit screen has **Anchor now** and **Verify on-chain** buttons, and the API has `GET /anchor`, `POST /anchor/run` and `POST /anchor/verify`. To rebuild the contract artifact, run `cd contracts && npm i && npm run compile`.
 
-To verify one anchor by hand, open `docs/evidence/onchain.json` once it exists. Open the contract link on the block explorer and look at the Events tab. Find the `Anchored` event with the row number from the file. Its `headHash` must equal the `hash` in the file, and its `by` address must be the sender in the file. Then run the verify button in the app. It recomputes the hash from the database and compares it with the one on chain.
+The contract is live on Ethereum Sepolia at `0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f`. The wallet that sent the anchors is `0x860F433F8144f8CE80c49F62705F66ef5119DD67` and it only ever holds test ETH. Note that this wallet also sent some extra anchors automatically while the tests were running against the live settings, before the tests were isolated from `.env`. Those events are on the contract but are not referenced by the evidence file, and the verifier ignores anything that is not recorded in the database.
+
+To verify one anchor by hand, open `docs/evidence/onchain.json`. Open the contract link on the block explorer and look at the Events tab. Find the `Anchored` event with the row number from the file. Its `headHash` must equal the `hash` in the file, and its `by` address must be the sender in the file. Then run the verify button in the app. It recomputes the hash from the database and compares it with the one on chain.
 
 What the anchor proves is that the log has not changed since it was anchored. It does not prove that the original events were true.
 

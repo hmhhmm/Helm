@@ -43,19 +43,28 @@ def main() -> None:
     if balance == 0:
         sys.exit("The sender has no test ETH. Use a faucet first.")
     art = anchor.load_artifact()
-    Contract = w3.eth.contract(abi=art["abi"], bytecode=art["bytecode"])
-    tx = Contract.constructor().build_transaction({"from": acct.address, "nonce": w3.eth.get_transaction_count(acct.address), "chainId": chain_id})
-    signed = w3.eth.account.sign_transaction(tx, key)
-    raw = getattr(signed, "raw_transaction", None) or signed.rawTransaction
-    deploy_hash = w3.eth.send_raw_transaction(raw)
-    rcpt = w3.eth.wait_for_transaction_receipt(deploy_hash, timeout=240)
-    address = rcpt["contractAddress"]
-    dh = "0x" + bytes(deploy_hash).hex().removeprefix("0x")
-    print("deployed", address, "tx", dh)
+    existing = os.environ.get("ANCHOR_CONTRACT")
+    if existing and w3.eth.get_code(Web3.to_checksum_address(existing)):
+        address = Web3.to_checksum_address(existing)
+        dh = os.environ.get("ANCHOR_DEPLOY_TX", "")
+        from_block = int(os.environ.get("ANCHOR_FROM_BLOCK", "0"))
+        print("reusing the contract already deployed at", address)
+    else:
+        Contract = w3.eth.contract(abi=art["abi"], bytecode=art["bytecode"])
+        tx = Contract.constructor().build_transaction({"from": acct.address, "nonce": w3.eth.get_transaction_count(acct.address), "chainId": chain_id})
+        signed = w3.eth.account.sign_transaction(tx, key)
+        raw = getattr(signed, "raw_transaction", None) or signed.rawTransaction
+        deploy_hash = w3.eth.send_raw_transaction(raw)
+        rcpt = w3.eth.wait_for_transaction_receipt(deploy_hash, timeout=240)
+        address = rcpt["contractAddress"]
+        from_block = int(rcpt["blockNumber"])
+        dh = "0x" + bytes(deploy_hash).hex().removeprefix("0x")
+        print("deployed", address, "tx", dh, "block", from_block)
 
     os.environ["ANCHOR_CONTRACT"] = address
+    os.environ["ANCHOR_FROM_BLOCK"] = str(from_block)
     ensure_seeded()
-    client = anchor.ChainClient(w3, address, private_key=key)
+    client = anchor.ChainClient(w3, address, private_key=key, from_block=from_block)
     with SessionLocal() as s:
         rows = anchor.anchor_now(s, client)
         s.commit()
@@ -64,7 +73,7 @@ def main() -> None:
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     out = {
         "produced_at": datetime.now(timezone.utc).isoformat(), "git_commit": commit,
-        "network_chain_id": chain_id, "contract": address, "sender": acct.address, "deploy_tx": dh,
+        "network_chain_id": chain_id, "deploy_block": from_block, "contract": address, "sender": acct.address, "deploy_tx": dh,
         "anchors": [{"kind": r.kind, "seq": r.seq, "hash": r.hash, "tx_hash": r.tx_hash, "block": r.block_number} for r in rows],
         "verify": result,
         "explorer": {"contract": f"{base}/address/{address}", "deploy_tx": f"{base}/tx/{dh}", "anchor_txs": [f"{base}/tx/{r.tx_hash}" for r in rows]},

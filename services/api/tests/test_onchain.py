@@ -151,3 +151,13 @@ def test_pipeline_runs_normally_when_the_anchor_is_not_configured(fresh, session
     assert anchor.ChainClient.from_env() is None
     pipeline.run_pipeline(session, mode="gate", trigger="no anchor")
     assert verify_chain(session)["ok"]
+
+
+def test_logs_are_read_in_windows_so_a_public_node_never_sees_a_wide_range(fresh, session, chain):
+    """A public RPC refused a query from block 0 (found on Sepolia). Events must be read in windows from the deploy block."""
+    anchor.anchor_now(session, chain)
+    anchor.anchor_now(session, chain)
+    session.commit()
+    chain.LOG_WINDOW = 1  # force one block per query
+    assert len(chain.anchored_events()) == 2 and len(chain.policy_events()) == 2
+    assert anchor.verify_anchors(session, chain)["ok"]
