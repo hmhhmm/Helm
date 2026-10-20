@@ -13,12 +13,16 @@ services:
       interval: 3s
       retries: 20
   api:
-    build: ./services/api
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
     environment:
       DATABASE_URL: postgresql+psycopg://helm:helm@db:5432/helm
       LLM_MODE: fixtures
       BANK_SIGNING_SECRET: ${BANK_SIGNING_SECRET:-change-me-in-env}
       DEMO_MODE: ${DEMO_MODE:-false}
+      OWNER_PASSCODE: ${OWNER_PASSCODE:-helm-demo}
+      OWNER_TOKEN_SECRET: ${OWNER_TOKEN_SECRET:-change-me-in-env}
     depends_on:
       db: { condition: service_healthy }
     ports: ["8000:8000"]

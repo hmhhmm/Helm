@@ -18,7 +18,17 @@ from helm import config
 from helm.audit import GENESIS, append, canonical_json, now_iso, row_hash
 from helm.models import Anchor, AuditLog, Rules
 
-ARTIFACT = Path(__file__).resolve().parents[3] / "contracts" / "AuditAnchor.json"
+def _find_artifact() -> Path:
+    """The compiled contract lives in <repo>/contracts, or in /app/contracts inside the container."""
+    here = Path(__file__).resolve()
+    for up in (3, 1, 2):
+        cand = here.parents[up] / "contracts" / "AuditAnchor.json"
+        if cand.exists():
+            return cand
+    return here.parents[3] / "contracts" / "AuditAnchor.json"
+
+
+ARTIFACT = _find_artifact()
 
 
 def load_artifact() -> dict:

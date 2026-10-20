@@ -1,7 +1,9 @@
+# Build from the repository root:  docker build -f services/api/Dockerfile .
 FROM python:3.12-slim
 WORKDIR /app
-COPY pyproject.toml ./
-COPY helm ./helm
+COPY services/api/pyproject.toml ./
+COPY services/api/helm ./helm
+COPY contracts/AuditAnchor.json ./contracts/AuditAnchor.json
 RUN pip install --no-cache-dir .
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8000

@@ -1,0 +1,16 @@
+{
+  "produced_at": "2026-10-20T10:02:47.321812+00:00",
+  "git_commit": "cfa875e",
+  "request": "https://api.frankfurter.dev/v1/latest?base=MYR&symbols=USD%2CSGD%2CCNY",
+  "http_status": 200,
+  "response": {
+    "amount": 1.0,
+    "base": "MYR",
+    "date": "2026-10-19",
+    "rates": {
+      "CNY": 1.6364,
+      "SGD": 0.31329,
+      "USD": 0.24495
+    }
+  }
+}

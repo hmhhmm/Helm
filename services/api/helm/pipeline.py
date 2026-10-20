@@ -414,7 +414,7 @@ def run_pipeline(session: Session, *, mode: str = "full", trigger: str = "manual
             d_hist = [d.verdict for d in session.execute(select(Decision).where(Decision.proposal_id == p.id).order_by(Decision.id)).scalars()]
             last = executor.latest_decision(session, p.id)
             due = date.fromisoformat(p.meta["due"]) if p.meta.get("due") else today
-            r.explanation = explainer.run(explainer.ExplainerIn(p.payee, p.amount, today, due, last.why if last else "", d_hist)).text
+            r.explanation = explainer.run_with_model(explainer.ExplainerIn(p.payee, p.amount, today, due, last.why if last else "", d_hist)).text
         _record(session, run_id, "explainer", "ok", t, f"Explained {len(receipts)} payment(s); CFO brief ready" if receipts else "CFO brief ready")
     else:
         _record(session, run_id, "explainer", "skipped", t, "Nothing new to explain")

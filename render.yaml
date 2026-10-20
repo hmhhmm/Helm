@@ -1,0 +1,25 @@
+# One-click API host on Render (free tier). Web goes on Vercel with root directory apps/web.
+# Set NEXT_PUBLIC_API_URL in Vercel to the API URL that Render prints after the first deploy.
+databases:
+  - name: helm-db
+    plan: free
+    databaseName: helm
+services:
+  - type: web
+    name: helm-api
+    runtime: docker
+    dockerfilePath: ./services/api/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: helm-db, property: connectionString }
+      - key: DEMO_MODE
+        value: "true"
+      - key: LLM_MODE
+        value: fixtures
+      - key: BANK_SIGNING_SECRET
+        generateValue: true
+      - key: OWNER_TOKEN_SECRET
+        generateValue: true

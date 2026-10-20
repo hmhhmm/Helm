@@ -2,8 +2,11 @@
 
 Fixture mode is a deterministic template. LLM_MODE=live may re-word it, but never changes a number.
 """
+import re
 from dataclasses import dataclass
 from datetime import date
+
+from helm import config
 
 from helm.fmt import fdate, rm
 
@@ -37,3 +40,34 @@ def run(inp: ExplainerIn) -> ExplainerOut:
     why = ("It was held first because paying earlier risked dropping under your minimum; it was released once the forecast said it was safe. "
            if held else "")
     return ExplainerOut(f"{lead} {why}{inp.decision_why}")
+
+
+_NUM = re.compile(r"\d[\d,]*\.?\d*")
+
+
+def numbers_preserved(original: str, reworded: str) -> bool:
+    """A model may change the wording but never a number or a date."""
+    return sorted(_NUM.findall(original)) == sorted(_NUM.findall(reworded))
+
+
+def _live_reword(text: str) -> str | None:
+    try:
+        import anthropic  # type: ignore
+
+        msg = anthropic.Anthropic().messages.create(
+            model=config.LLM_MODEL, max_tokens=300,
+            system="Rewrite this payment explanation in plain, friendly English. Keep every number and date exactly as written. Reply with the rewritten text only.",
+            messages=[{"role": "user", "content": text}],
+        )
+        return msg.content[0].text.strip()
+    except Exception:
+        return None
+
+
+def run_with_model(inp: ExplainerIn) -> ExplainerOut:
+    """Fixture text first; with LLM_MODE=live the model may re-word it, and the result is used only if no number changed."""
+    base = run(inp)
+    if config.LLM_MODE != "live":
+        return base
+    reworded = _live_reword(base.text)
+    return ExplainerOut(reworded) if reworded and numbers_preserved(base.text, reworded) else base

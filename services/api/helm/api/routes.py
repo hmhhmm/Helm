@@ -362,3 +362,11 @@ def anchor_verify(session: Session = Depends(get_session)):
     if chain is None:
         raise HTTPException(409, "On-chain anchoring is not configured.")
     return _a.verify_anchors(session, chain)
+
+
+# --- live FX (Frankfurter) -----------------------------------------------------------------
+@router.get("/fx", tags=["fx"])
+def fx():
+    from helm import fx as _fx
+    data = _fx.fetch_rates()
+    return data or {"source": "frankfurter.dev", "available": False}
