@@ -84,3 +84,16 @@ def test_owner_entered_payment_waits_for_approval_then_goes_to_wise(monkeypatch)
         assert sent == [("Live Test Supplier", 500.0, "LIVE-1")]
         assert any(r.get("provider_ref") == "4242" for r in c.get("/bank/ledger").json()["rows"])
         c.post("/sim/reset")  # leave the shared test database as the seed made it
+
+
+def test_a_wise_start_has_one_payment_waiting_for_the_owner(monkeypatch):
+    from helm.bootstrap import reset_demo
+    from tests.conftest import owner_client
+
+    monkeypatch.setattr(config, "BANK_PROVIDER", "wise")
+    reset_demo()
+    with owner_client() as c:
+        rows = [r for v in c.get("/payments").json()["groups"].values() for r in v if r["payee"] == "Ladang Kertas Utama"]
+        assert len(rows) == 1 and rows[0]["verdict"] == "ESCALATE" and rows[0]["status"] == "queued"
+    monkeypatch.setattr(config, "BANK_PROVIDER", "demo")
+    reset_demo()
