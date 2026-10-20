@@ -53,7 +53,7 @@ function Payments() {
                                   </div>
                 {s.rows.length === 0 ? (s.key === "paid" ? null : <EmptyState title={t("payments.none")} />) : (
                   <DecisionList>
-                    {s.rows.map((r) => <DecisionRow key={r.proposal_id} row={r} onOpen={() => openDecision(r.proposal_id)} />)}
+                    {s.rows.map((r) => <DecisionRow key={r.proposal_id} row={r} onOpen={() => openDecision(r.proposal_id)} onReview={() => openApproval(r.proposal_id)} />)}
                   </DecisionList>
                 )}
               </section>

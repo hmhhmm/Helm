@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Pause } from "lucide-react";
 import { useT, type Key } from "@/i18n";
 import type { Row } from "@/lib/api";
 import { daysBetween, fdate, rm } from "@/lib/format";
@@ -18,9 +18,11 @@ export function DecisionList({ children, className }: { children: React.ReactNod
 }
 
 /** One payment: payee and amount, verdict, release date, and a one-sentence reason. */
-export function DecisionRow({ row, onOpen, compact }: { row: Row; onOpen: () => void; compact?: boolean }) {
+export function DecisionRow({ row, onOpen, onReview, compact }: { row: Row; onOpen: () => void; onReview?: () => void; compact?: boolean }) {
   const { t, lang } = useT();
   const late = row.release_on && row.due ? daysBetween(row.due, row.release_on) : 0;
+  const held = row.status === "held_by_owner";
+  const actionable = !!onReview && row.verdict === "ESCALATE" && (row.status === "queued" || held);
   const flipped = row.previous_verdict && row.previous_verdict !== row.verdict;
   const dateLine =
     row.status === "sent"
@@ -39,23 +41,27 @@ export function DecisionRow({ row, onOpen, compact }: { row: Row; onOpen: () => 
   return (
     <li>
       <button
-        onClick={onOpen}
-        className="group grid w-full cursor-pointer grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 px-4 py-3 text-left transition-colors duration-150 hover:bg-subtle md:grid-cols-[minmax(0,1.4fr)_148px_minmax(0,1fr)_104px_76px]"
+        onClick={actionable ? onReview : onOpen}
+        className="group grid w-full cursor-pointer grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 px-4 py-3 text-left transition-colors duration-150 hover:bg-subtle md:grid-cols-[minmax(0,1.4fr)_148px_minmax(0,1fr)_104px_112px]"
       >
         <span className="min-w-0">
           <span className="block truncate text-sm font-medium">{row.payee}</span>
           <span className="num block truncate text-xs text-muted">{t("decision.due", { date: fdate(row.due, lang) })}</span>
         </span>
         <span className="num order-2 text-right text-sm font-semibold md:order-4">{rm(row.amount)}</span>
-        <span key={`${row.verdict}-${row.release_on}`} className={cn(flipped && "stamp", "order-3 inline-flex items-center justify-self-start md:order-2")}><VerdictBadge verdict={row.verdict} /></span>
+        <span key={`${row.verdict}-${row.release_on}`} className={cn(flipped && "stamp", "order-3 inline-flex items-center justify-self-start md:order-2")}>{held ? <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-subtle px-2 py-0.5 text-xs font-medium text-muted"><Pause aria-hidden className="size-3.5" />{t("verdict.heldByYou")}</span> : <VerdictBadge verdict={row.verdict} />}</span>
         <span className="num order-4 text-[13px] md:order-3">
           {dateLine}
           {flipped && <span className="ml-2 text-xs text-muted">{t("row.wasBefore", { was: t(`verdict.${row.previous_verdict!}`) })}</span>}
           {row.quarantined && <span className="ml-2 rounded-md bg-deny/10 px-2 py-0.5 text-xs font-medium text-deny">{t("doc.quarantined")}</span>}
         </span>
-        <span className="order-5 hidden items-center justify-end text-xs font-medium text-accent md:inline-flex">
-          <span className="sr-only">{t("row.seeWorking")}</span><ChevronRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
-        </span>
+        {actionable ? (
+          <span className="order-5 hidden items-center justify-end md:inline-flex"><span className="rounded-md bg-accent-solid px-2.5 py-1 text-xs font-medium text-on-accent">{held ? t("row.reconsider") : t("today.review")}</span></span>
+        ) : (
+          <span className="order-5 hidden items-center justify-end text-xs font-medium text-accent md:inline-flex">
+            <span className="sr-only">{t("row.seeWorking")}</span><ChevronRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        )}
         {!compact && row.verdict !== "ALLOW" && row.status === "queued" && <span className="order-6 col-span-full text-[13px] text-muted">{t(`row.why.${row.verdict}` as Key)}</span>}
       </button>
     </li>

@@ -112,7 +112,7 @@ export default function TodayPage() {
               ) : (
                 <div data-testid="week-decisions">
                   <DecisionList>
-                    {d.week_decisions.map((r) => <DecisionRow key={r.proposal_id} row={r} compact onOpen={() => openDecision(r.proposal_id)} />)}
+                    {d.week_decisions.map((r) => <DecisionRow key={r.proposal_id} row={r} compact onOpen={() => openDecision(r.proposal_id)} onReview={() => openApproval(r.proposal_id)} />)}
                   </DecisionList>
                 </div>
               )}
