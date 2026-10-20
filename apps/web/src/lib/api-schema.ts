@@ -140,6 +140,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payments/new": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * New Payment
+         * @description The owner enters a live payment. A payee Helm has not paid before is a new payee, so it waits for the owner's approval.
+         */
+        post: operations["new_payment_payments_new_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/collections": {
         parameters: {
             query?: never;
@@ -1195,6 +1215,18 @@ export interface components {
             /** Proposal Id */
             proposal_id?: string | null;
         };
+        /** NewPaymentIn */
+        NewPaymentIn: {
+            /** Payee */
+            payee: string;
+            /** Amount */
+            amount: number;
+            /**
+             * Reference
+             * @default
+             */
+            reference: string;
+        };
         /** Node */
         Node: {
             /** Id */
@@ -1778,6 +1810,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    new_payment_payments_new_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewPaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimOut"];
                 };
             };
             /** @description Validation Error */

@@ -91,9 +91,9 @@ function Agents() {
               <Card className="overflow-hidden p-0">
                 {ledger.data && ledger.data.rows.length > 0 ? (
                   <div className="max-h-72 overflow-auto" tabIndex={0} aria-label={t("agents.ledger")}>
-                    <table className="w-full min-w-[520px] text-left text-sm"><caption className="sr-only">{t("agents.ledger")}</caption>
-                      <thead className="border-b border-border bg-bg text-xs uppercase tracking-wide text-muted"><tr><th scope="col" className="px-4 py-2">#</th><th scope="col" className="px-4 py-2">{t("agents.ledger.to")}</th><th scope="col" className="px-4 py-2 text-right">{t("table.amount")}</th><th scope="col" className="px-4 py-2">{t("agents.ledger.status")}</th></tr></thead>
-                      <tbody className="num">{ledger.data.rows.map((r) => <tr key={r.id} className="border-b border-border last:border-0"><td className="px-4 py-2 text-muted">{r.id}</td><td className="px-4 py-2">{r.to}</td><td className="px-4 py-2 text-right">{rm(r.amount)}</td><td className="px-4 py-2">{r.status === "accepted" ? "✓ " + t("agents.ledger.accepted") : "✕ " + t("agents.ledger.rejected") + (r.reason ? ` (${r.reason})` : "")}</td></tr>)}</tbody>
+                    <table className="w-full min-w-[600px] text-left text-sm"><caption className="sr-only">{t("agents.ledger")}</caption>
+                      <thead className="border-b border-border bg-bg text-xs uppercase tracking-wide text-muted"><tr><th scope="col" className="px-4 py-2">#</th><th scope="col" className="px-4 py-2">{t("agents.ledger.to")}</th><th scope="col" className="px-4 py-2 text-right">{t("table.amount")}</th><th scope="col" className="px-4 py-2">{t("agents.ledger.status")}</th><th scope="col" className="px-4 py-2">{t("agents.ledger.provider")}</th></tr></thead>
+                      <tbody className="num">{ledger.data.rows.map((r) => <tr key={r.id} className="border-b border-border last:border-0"><td className="px-4 py-2 text-muted">{r.id}</td><td className="px-4 py-2">{r.to}</td><td className="px-4 py-2 text-right">{rm(r.amount)}</td><td className="px-4 py-2">{r.status === "accepted" ? "✓ " + t("agents.ledger.accepted") : "✕ " + t("agents.ledger.rejected") + (r.reason ? ` (${r.reason})` : "")}</td><td className="px-4 py-2 text-muted">{(r as { provider_ref?: string | null }).provider_ref ?? "–"}</td></tr>)}</tbody>
                     </table>
                   </div>
                 ) : <EmptyState title={t("agents.ledger.none")} />}

@@ -7,8 +7,7 @@ test.beforeEach(async ({ page }) => { await resetDemo(page); await asOwner(page)
 
 test("the 60-second story: today -> forecast -> payments -> decision trace", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText("Synthetic demo data").first()).toBeVisible();
-  await expect(page.getByText("Demo bank").first()).toBeVisible();
+  await expect(page.getByText("Synthetic demo data")).toHaveCount(0);
   await expect(page.getByTestId("headline")).toContainText("Dip expected around 28 Nov");
   await expect(page.getByText("Syarikat Kertas Sdn Bhd RM 18,400 is on hold until 6 Dec")).toBeVisible();
 
@@ -98,7 +97,7 @@ test("tampering with the audit log is caught and shown; the kill switch stops mo
   expect(ledger.rows.length).toBe(0);
 });
 
-test("advance a week: payments are sent through the Demo bank with receipts", async ({ page }) => {
+test("advance a week: payments are sent through the bank with receipts", async ({ page }) => {
   await page.goto("/");
   await openSimulator(page);
   await page.getByTestId("sim-advance").click();
@@ -107,7 +106,7 @@ test("advance a week: payments are sent through the Demo bank with receipts", as
   await page.goto("/payments");
   await expect(page.getByTestId("group-paid")).toContainText("Sent");
   await page.goto("/agents");
-  await expect(page.getByRole("heading", { name: "Demo bank statement" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bank statement" })).toBeVisible();
   await expect(page.getByText("accepted").first()).toBeVisible();
 });
 
@@ -167,4 +166,14 @@ test("bahasa malaysia toggle and the command palette", async ({ page }) => {
   await page.keyboard.press("Control+k");
   await page.getByRole("combobox").fill("kertas");
   await expect(page.getByRole("option").first()).toContainText("Kertas");
+});
+
+test("a payment the owner enters waits for approval, then goes to the bank", async ({ page }) => {
+  await page.goto("/payments");
+  await page.getByTestId("new-payment").click();
+  await page.getByLabel("Payee").fill("Live Test Supplier");
+  await page.getByLabel("Amount (RM)").fill("500");
+  await page.getByRole("button", { name: "Send to Helm" }).click();
+  await expect(page.getByText("Live Test Supplier").first()).toBeVisible();
+  await expect(page.getByRole("alert").filter({ hasText: "needs you" }).or(page.getByText(/needs? you/i)).first()).toBeVisible();
 });

@@ -120,7 +120,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {s?.demo_mode && <div className="border-b border-border bg-subtle px-4 py-1.5 text-center text-xs text-muted">{t("banner.demo")}</div>}
 
         <main id="main" className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 md:px-8">{children}</main>
-        {!pathname.startsWith("/policy") && <footer className="mx-auto w-full max-w-[1200px] px-4 pb-6 text-xs text-muted md:px-8">{t("synthetic")} · {s?.bank_label ?? t("bank.label")}</footer>}
       </div>
 
       <nav aria-label={t("nav.label")} className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 border-t border-border bg-surface md:hidden">

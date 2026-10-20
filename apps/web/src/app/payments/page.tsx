@@ -5,6 +5,7 @@ import { Suspense, useEffect } from "react";
 import { Async } from "@/components/async";
 import { DecisionList, DecisionRow } from "@/components/decision-row";
 import { useOverlays } from "@/components/overlays";
+import { NewPayment } from "@/components/new-payment";
 import { BlockSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,7 +37,7 @@ function Payments() {
         ];
         return (
           <>
-            <ScreenHeader title={t("payments.title")} answer={txt(d.summary)} />
+            <ScreenHeader title={t("payments.title")} answer={txt(d.summary)}><NewPayment /></ScreenHeader>
             {escal.length > 0 && (
               <Card className="mb-6 border-escalate/50" role="alert">
                 <p className="font-semibold">{t("payments.needsYou", { n: escal.length })}</p>
