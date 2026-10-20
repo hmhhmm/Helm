@@ -64,7 +64,7 @@ With Docker, `docker compose up` starts Postgres 16, the API and the web app on 
 |---|---|---|
 | `DATABASE_URL` | SQLite file | Use a Postgres URL for the hardened role setup |
 | `LLM_MODE`, `LLM_PROVIDER`, `GEMINI_API_KEY` | `fixtures` | `live` makes the Reader and Explainer call Gemini |
-| `BANK_PROVIDER`, `WISE_API_KEY` | `demo` | `wise` pays through the Wise sandbox |
+| `BANK_PROVIDER`, `WISE_API_KEY` | `wise` when a Wise key is set, otherwise `demo` | `wise` pays through the Wise sandbox |
 | `ANCHOR_RPC_URL`, `ANCHOR_PRIVATE_KEY`, `ANCHOR_CONTRACT` | empty | Turn on the on-chain anchor |
 | `OWNER_PASSCODE`, `OWNER_TOKEN_SECRET` | demo values | Set both anywhere outside the demo |
 | `DEMO_MODE` | off | Resets the database on a timer for a public demo |
@@ -81,7 +81,7 @@ No public deployment has been made from this repository yet.
 
 This is the flow to show a judge. Helm checks the payment, you approve it on the spot, and Wise receives it.
 
-1. Put `WISE_API_KEY` in `.env` and start with `BANK_PROVIDER=wise pnpm dev`. The Audit screen then calls the bank "Wise sandbox".
+1. Put `WISE_API_KEY` in `.env` and run `pnpm dev`. A Wise key switches the bank to the Wise sandbox on its own. The Audit screen then calls the bank "Wise sandbox".
 2. Open **Payments**, press **New payment**, and enter a payee, an amount and a reference.
 3. A payee Helm has not paid before waits for you under **Needs you**. Nothing has gone to Wise yet.
 4. Press **Approve**. Helm sends the payment through the Wise sandbox and the row shows as sent.
