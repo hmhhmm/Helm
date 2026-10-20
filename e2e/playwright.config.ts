@@ -13,7 +13,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: "cd ../services/api && rm -f e2e.db e2e.db-wal e2e.db-shm && DATABASE_URL=sqlite:///./e2e.db .venv/bin/uvicorn helm.main:app --port 8000",
+      command: "cd ../services/api && rm -f e2e.db e2e.db-wal e2e.db-shm && DATABASE_URL=sqlite:///./e2e.db ANCHOR_RPC_URL= ANCHOR_PRIVATE_KEY= ANCHOR_CONTRACT= GEMINI_API_KEY= LLM_MODE=fixtures BANK_PROVIDER=demo WISE_API_KEY= .venv/bin/uvicorn helm.main:app --port 8000",
       url: "http://localhost:8000/health", reuseExistingServer: !process.env.CI, timeout: 90_000,
     },
     {
