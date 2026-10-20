@@ -29,8 +29,8 @@ export function EinvoiceButton({ invoiceId, number, customer }: { invoiceId: str
   };
   return (
     <>
-      <button onClick={() => setOpen(true)} aria-label={`${t("einv.title")} ${number}`} className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md px-2 text-xs font-medium text-accent hover:bg-subtle md:min-h-8">
-        <FileText aria-hidden className="size-3.5" />{t("einv.open")}
+      <button onClick={() => setOpen(true)} className="relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md px-2 text-xs font-medium text-accent hover:bg-subtle md:min-h-8">
+        <FileText aria-hidden className="size-3.5" />{t("einv.open")}<span className="sr-only"> {t("einv.title")} {number}</span>
       </button>
       <Sheet open={open} onOpenChange={setOpen} title={`${t("einv.title")} ${number}`} description={customer} side="center">
         {q.isError ? <p role="alert" className="text-sm text-deny">{t("einv.failed")}</p> : !inv ? <div className="skeleton h-24" /> : (
