@@ -157,6 +157,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/invoices/{invoice_id}/einvoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Einvoice
+         * @description The MyInvois e-invoice document for one invoice. It is generated, not submitted.
+         */
+        get: operations["einvoice_invoices__invoice_id__einvoice_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/collections/{customer_id}/tone": {
         parameters: {
             query?: never;
@@ -552,6 +572,23 @@ export interface paths {
         put?: never;
         /** Anchor Verify */
         post: operations["anchor_verify_anchor_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fx": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fx */
+        get: operations["fx_fx_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1377,6 +1414,11 @@ export interface components {
             demo_mode: boolean;
             /** Llm Mode */
             llm_mode: string;
+            /**
+             * Bank Label
+             * @default Demo bank
+             */
+            bank_label: string;
             /** Escalations */
             escalations: string[];
             /** Alerts */
@@ -1765,6 +1807,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CollectionsOut"];
+                };
+            };
+        };
+    };
+    einvoice_invoices__invoice_id__einvoice_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -2420,6 +2493,26 @@ export interface operations {
         };
     };
     anchor_verify_anchor_verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    fx_fx_get: {
         parameters: {
             query?: never;
             header?: never;

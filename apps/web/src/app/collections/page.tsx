@@ -4,6 +4,7 @@ import { Copy, Mail } from "lucide-react";
 import { useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Async } from "@/components/async";
+import { EinvoiceButton } from "@/components/einvoice-sheet";
 import { BlockSkeleton, CardsSkeleton, EmptyState, ScreenHeader } from "@/components/screen";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -70,10 +71,10 @@ export default function CollectionsPage() {
             </div>
             <Card className="overflow-hidden p-0">
               <div className="max-h-[26rem] overflow-auto" tabIndex={0} aria-label={t("collections.ageing")}>
-                <table className="w-full min-w-[560px] text-left text-sm">
+                <table className="w-full min-w-[640px] text-left text-sm">
                   <caption className="sr-only">{t("collections.ageing")}</caption>
                   <thead className="sticky top-0 border-b border-border bg-surface text-xs text-muted">
-                    <tr><th scope="col" className="px-4 py-2 font-medium">{t("collections.col.customer")}</th><th scope="col" className="px-4 py-2 font-medium">{t("collections.col.invoice")}</th><th scope="col" className="px-4 py-2 font-medium">{t("collections.col.status")}</th><th scope="col" className="px-4 py-2 text-right font-medium">{t("table.amount")}</th></tr>
+                    <tr><th scope="col" className="px-4 py-2 font-medium">{t("collections.col.customer")}</th><th scope="col" className="px-4 py-2 font-medium">{t("collections.col.invoice")}</th><th scope="col" className="px-4 py-2 font-medium">{t("collections.col.status")}</th><th scope="col" className="px-4 py-2 text-right font-medium">{t("table.amount")}</th><th scope="col" className="px-4 py-2 font-medium">{t("einv.col")}</th></tr>
                   </thead>
                   <tbody className="num">
                     {(["d60", "d31_60", "d1_30", "not_due"] as const).flatMap((k) => d.ageing[k]).map((inv) => (
@@ -82,6 +83,7 @@ export default function CollectionsPage() {
                         <td className="px-4 py-2 text-muted">{inv.number}</td>
                         <td className={cn("px-4 py-2", inv.days_overdue > 0 ? "text-hold" : "text-muted")}>{inv.days_overdue > 0 ? t("collections.late", { n: inv.days_overdue }) : t("decision.due", { date: fdate(inv.due, lang) })}</td>
                         <td className="px-4 py-2 text-right font-semibold">{rm(inv.amount)}</td>
+                        <td className="px-2 py-1"><EinvoiceButton invoiceId={inv.id} number={inv.number} customer={inv.customer} /></td>
                       </tr>
                     ))}
                   </tbody>
