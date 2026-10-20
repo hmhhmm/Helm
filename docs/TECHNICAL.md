@@ -107,6 +107,7 @@ The permission tiers, the threat table with tests, and the known risk list are i
 | Contract bytecode | Compiled from source with solc 0.8.26 and executed on a real in process EVM in the tests |
 | Public test network deployment | Deployed to Ethereum Sepolia at `0xD82F22e34Eaa2136d9ef091AD2b4e857fE33981f`. The audit head and the policy hash were anchored and verified against the chain. Transaction hashes are in `docs/evidence/onchain.json` |
 | Frankfurter exchange rates | Real calls, saved in `docs/evidence/fx-frankfurter.json` |
-| Bank | Simulated (the Demo bank). A real sandbox needs an account and keys from the owner |
+| Bank | The default is the simulated Demo bank. With `BANK_PROVIDER=wise` payments go through the real Wise sandbox (test money, synthetic payee numbers, funding by the sandbox's own simulation steps). Evidence is in `docs/evidence/sandbox-bank-log.txt` |
+| LHDN MyInvois | The e-invoice document is generated for real (`helm/einvoice.py`) but never submitted. Submitting needs the owner's own MyInvois account |
 | Language model | Fixture mode by default. With `LLM_MODE=live` the Reader and Explainer call Gemini (`helm/llm.py`). Real responses for four documents are recorded in `services/api/tests/fixtures/llm/recorded.json` and replayed in the tests |
 | Business data | Synthetic and labelled so |

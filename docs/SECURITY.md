@@ -43,7 +43,8 @@ A finding from the red team suite itself was that the first version of the injec
 |---|---|---|---|
 | R1 | Owner login is one shared passcode. In the public demo it is shown on the login dialog on purpose, because the data is synthetic. There are no per user roles | High for a real deployment, accepted for the demo | Replace with a proper identity provider and roles before any pilot |
 | R2 | The injection detector is a set of patterns and can be bypassed with new wording | Medium | The real protection is that the Reader has no tools and every payment still passes the Policy Engine. Add a model based check and keep growing the red team suite |
-| R3 | Real bank failures such as delays, partial failures and reversals are not exercised, because the bank is a simulation | Medium | Run in shadow mode against a real sandbox, then with a licensed partner |
+| R3 | Real bank failures such as delays, partial failures and reversals are not exercised, because the default bank is a simulation and the Wise sandbox is a test environment | Medium | Run in shadow mode against a real bank sandbox with a licensed partner |
+| R14 | A Wise sandbox personal token cannot fund a transfer by API, so sandbox simulation steps stand in for funding. The Wise token is a secret held only in `.env` | Low | Rotate the token if it is ever shared, and use a business sandbox profile for full funding |
 | R4 | The mandate caps are checked at the payment's own date and do not yet look at the whole plan beyond the same pass | Low | Add a rolling window check |
 | R5 | The forecast can be too confident on short histories. On the seeded data the 80 percent range covered 77 percent of outcomes | Medium | Validate on real business data |
 | R6 | The self assessment was done by the builders and there was no independent penetration test | Medium | Commission an independent test |
