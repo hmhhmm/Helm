@@ -88,6 +88,26 @@ def owner_choice(proposal_id: str, body: S.OwnerIn, session: Session = Depends(g
     return views._row(p, hist)
 
 
+@router.post("/payments/new", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["decisions"])
+def new_payment(body: S.NewPaymentIn, session: Session = Depends(get_session)):
+    """The owner enters a live payment. A payee Helm has not paid before is a new payee, so it waits for the owner's approval."""
+    import hashlib
+    import uuid
+
+    from helm.models import Bill
+
+    today = sim_today(session)
+    ref = body.reference.strip() or "LIVE-" + uuid.uuid4().hex[:6].upper()
+    b = Bill(id="bl_" + uuid.uuid4().hex[:8], kind="supplier", supplier_id=None, payee=body.payee.strip(), ref=ref,
+             account_ref="ACC-" + hashlib.sha256(body.payee.strip().lower().encode()).hexdigest()[:10].upper(),
+             label=body.payee.strip(), amount=round(body.amount, 2), issued=today, due=today, source="owner_entry", confidence=1.0)
+    session.add(b)
+    append(session, "human", "owner.entered_payment", {"bill_id": b.id, "payee": b.payee, "amount": b.amount, "ref": ref})
+    pipeline.run_pipeline(session, mode="gate", trigger=f"owner entered {b.id}")
+    session.commit()
+    return S.SimOut(message=f"Payment to {b.payee} is ready for your decision.", data={"proposal_id": f"p_{b.id}"})
+
+
 # ---- collections -------------------------------------------------------------------
 @router.get("/collections", response_model=S.CollectionsOut, tags=["screens"])
 def collections(session: Session = Depends(get_session)):

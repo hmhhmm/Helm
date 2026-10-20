@@ -65,3 +65,22 @@ def test_bank_checks_key_before_calling_wise(session, monkeypatch):
     monkeypatch.setattr(wise, "pay", lambda *a, **k: called.append(1) or {})
     r = bank.submit(session, key="forged", instruction_id="i1", from_account="A", to_account="B", amount=5.0, scope="x", external=True)
     assert r["status"] == "rejected" and not called
+
+
+def test_owner_entered_payment_waits_for_approval_then_goes_to_wise(monkeypatch):
+    from fastapi.testclient import TestClient
+    from helm.main import app
+    from tests.conftest import owner_client
+
+    monkeypatch.setattr(config, "BANK_PROVIDER", "wise")
+    monkeypatch.setattr(config, "BANK_LABEL", "Wise sandbox")
+    sent = []
+    monkeypatch.setattr(wise, "pay", lambda payee, acct, amt, ref, client=None: sent.append((payee, amt, ref)) or {"provider": "wise_sandbox", "transfer_id": 4242, "status": "outgoing_payment_sent"})
+    with owner_client() as c:
+        c.post("/sim/reset")
+        pid = c.post("/payments/new", json={"payee": "Live Test Supplier", "amount": 500, "reference": "LIVE-1"}).json()["data"]["proposal_id"]
+        assert not sent  # nothing moves until the owner approves
+        row = c.post(f"/decisions/{pid}/owner", json={"choice": "approve"}).json()
+        assert sent == [("Live Test Supplier", 500.0, "LIVE-1")]
+        assert any(r.get("provider_ref") == "4242" for r in c.get("/bank/ledger").json()["rows"])
+        c.post("/sim/reset")  # leave the shared test database as the seed made it

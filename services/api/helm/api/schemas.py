@@ -478,3 +478,9 @@ class SimOut(BaseModel):
     ok: bool = True
     message: str
     data: dict[str, Any] = {}
+
+
+class NewPaymentIn(BaseModel):
+    payee: str = Field(min_length=2, max_length=80, pattern=r"^[A-Za-z0-9 .,&()'\-]+$")
+    amount: float = Field(gt=0, le=100_000)
+    reference: str = Field(default="", max_length=35)
