@@ -29,7 +29,7 @@ class StateOut(BaseModel):
     last_run_id: str | None
     demo_mode: bool
     llm_mode: str
-    bank_label: str = "Demo bank"
+    bank_label: str = "Bank"
     escalations: list[str]
     alerts: list[Alert]
     chain_ok: bool

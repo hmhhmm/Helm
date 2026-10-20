@@ -295,7 +295,7 @@ def decision_view(session: Session, pid: str) -> dict | None:
         "document": ({"id": doc.id, "source": doc.source, "received_on": doc.received_on.isoformat(), "raw_text": doc.raw_text,
                       "extracted": doc.reader_json, "quarantined": doc.quarantined, "flags": doc.flags} if doc else None),
         "plan": ({"plan_date": plan.plan_date.isoformat() if plan.plan_date else None, "days_late": plan.days_late, "note": plan.note, "rank": plan.rank} if plan else None),
-        "receipt": ({"id": receipt.id, "date": receipt.sim_date.isoformat(), "explanation": receipt.explanation, "bank": "Demo bank"} if receipt else None),
+        "receipt": ({"id": receipt.id, "date": receipt.sim_date.isoformat(), "explanation": receipt.explanation, "bank": __import__("helm.config", fromlist=["BANK_LABEL"]).BANK_LABEL} if receipt else None),
         "min_balance": session.get(Rules, 1).min_balance, "required": 1 - session.get(Rules, 1).risk_tolerance,
         "amount": p.amount,
     }

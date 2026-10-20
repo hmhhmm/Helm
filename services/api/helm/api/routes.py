@@ -183,7 +183,7 @@ def cash_execute(proposal_id: str, session: Session = Depends(get_session)):
         raise HTTPException(409, "The Executor refused (kill switch is on)")
     pipeline.run_pipeline(session, mode="full", trigger=f"owner moved cash {p.id}", execute=False)
     session.commit()
-    return {"ok": r.status == "accepted", "message": f"Moved {rm(p.amount)} ({'reserve to operating' if p.kind == 'top_up' else 'operating to reserve'}) via the Demo bank.", "data": {"receipt": r.id}}
+    return {"ok": r.status == "accepted", "message": f"Moved {rm(p.amount)} ({'reserve to operating' if p.kind == 'top_up' else 'operating to reserve'}).", "data": {"receipt": r.id}}
 
 
 # ---- policy --------------------------------------------------------------------------

@@ -49,4 +49,4 @@ WISE_API_KEY = os.getenv("WISE_API_KEY", "")
 WISE_BASE_URL = os.getenv("WISE_BASE_URL", "https://api.wise-sandbox.com")
 WISE_PROFILE_ID = int(os.getenv("WISE_PROFILE_ID", "0") or 0)
 WISE_SOURCE_CURRENCY = os.getenv("WISE_SOURCE_CURRENCY", "GBP")  # the currency of the sandbox test balance
-BANK_LABEL = {"demo": "Demo bank", "wise": "Wise sandbox"}.get(BANK_PROVIDER, "Demo bank")
+BANK_LABEL = {"demo": "Bank", "wise": "Wise sandbox"}.get(BANK_PROVIDER, "Bank")

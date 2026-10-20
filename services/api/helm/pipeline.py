@@ -372,7 +372,7 @@ def run_pipeline(session: Session, *, mode: str = "full", trigger: str = "manual
                     "direction": "to_reserve" if idea.kind == "sweep" else "to_operating",
                     "covers_date": idea.covers_date.isoformat() if idea.covers_date else None}
             if p is None:
-                session.add(Proposal(id=pid, kind=idea.kind, bill_id=None, payee="Reserve account (Demo bank)", account_ref=RESERVE_ACCOUNT,
+                session.add(Proposal(id=pid, kind=idea.kind, bill_id=None, payee="Reserve account", account_ref=RESERVE_ACCOUNT,
                                      amount=idea.amount, proposed_date=idea.on, origin="treasury", status="open", meta=meta, created_at=now_iso()))
             elif p.status in ("superseded", "open"):
                 p.status, p.amount, p.proposed_date, p.meta = "open", idea.amount, idea.on, meta
@@ -403,7 +403,7 @@ def run_pipeline(session: Session, *, mode: str = "full", trigger: str = "manual
         summary = _write_cash_range(session, run_id, today, rules, res, ctx)
     sent = [r for r in receipts if r.status == "accepted"]
     _record(session, run_id, "executor", "ok" if receipts else "skipped", t,
-            f"Sent {len(sent)} payment(s) to the Demo bank" if receipts else ("Kill switch is on: nothing sent" if rules.kill_switch else "Nothing due to send"),
+            f"Sent {len(sent)} payment(s)" if receipts else ("Kill switch is on: nothing sent" if rules.kill_switch else "Nothing due to send"),
             {"receipts": [r.id for r in receipts]})
 
     # Explainer ----------------------------------------------------------------------------------------
