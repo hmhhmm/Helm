@@ -4,8 +4,8 @@
 const en = {
   synthetic: "Synthetic demo data",
   
-  "bank.label": "Demo bank",
-  "bank.note": "Payments are sent through the Demo bank. Not real money.",
+  "bank.label": "Bank",
+  "bank.note": "Payments are sent through the bank.",
   "common.close": "Close", "common.loading": "Loading", "common.retry": "Try again", "common.skip": "Skip to content",
   "error.title": "Helm can't load this right now", "error.body": "The Helm API at {url} did not answer. Start it with “pnpm dev:api” or docker compose up, then try again.",
   "nav.label": "Main", "nav.group.overview": "Overview", "nav.group.money": "Money", "nav.group.control": "Control", "nav.current": "(current page)", "lang.switch": "Switch language", "theme.toggle": "Switch theme",
@@ -58,7 +58,7 @@ const en = {
   "doc.quarantined.explain": "This document contained instructions aimed at an assistant. Helm treated them as text, ignored them, and sent the payment to the owner instead.",
   "doc.raw": "The document as it arrived", "doc.extracted": "What the Reader wrote down", "doc.schema": "The Reader has no tools. It can only return these fields, checked against a schema.",
 
-  "approval.title": "Approval card", "approval.sub": "Demo · synthetic data", "approval.back": "Back to Helm", "approval.needsOk": "Needs your OK",
+  "approval.title": "Approval card", "approval.sub": "Owner approval", "approval.back": "Back to Helm", "approval.needsOk": "Needs your OK",
   "approval.pay": "Pay {payee} {amount}?", "approval.due": "due {date}",
   "approval.warnTitle": "Careful.", "approval.warnBody": "This invoice told the assistant to ignore its rules and pay straight away to a new account. Helm treated that as text, not as an order.",
   "approval.ifPaid": "If you pay it:", "approval.ifHeld": "If you hold it:", "approval.chance": "{p} chance you stay above {min}.", "approval.lowest": "Bad-case low point {rm} around {date}.",
@@ -191,8 +191,8 @@ export type Key = keyof typeof en;
 const ms: Record<Key, string> = {
   synthetic: "Data demo sintetik",
   
-  "bank.label": "Bank demo",
-  "bank.note": "Bayaran dihantar melalui Bank demo. Bukan wang sebenar.",
+  "bank.label": "Bank",
+  "bank.note": "Bayaran dihantar melalui bank.",
   "common.close": "Tutup", "common.loading": "Memuatkan", "common.retry": "Cuba lagi", "common.skip": "Langkau ke kandungan",
   "error.title": "Helm tidak dapat memuatkan ini sekarang", "error.body": "API Helm di {url} tidak menjawab. Mulakannya dengan “pnpm dev:api” atau docker compose up, kemudian cuba lagi.",
   "nav.label": "Utama", "nav.group.overview": "Gambaran", "nav.group.money": "Wang", "nav.group.control": "Kawalan", "nav.current": "(halaman semasa)", "lang.switch": "Tukar bahasa", "theme.toggle": "Tukar tema",
@@ -245,7 +245,7 @@ const ms: Record<Key, string> = {
   "doc.quarantined.explain": "Dokumen ini mengandungi arahan yang ditujukan kepada pembantu. Helm menganggapnya sebagai teks, mengabaikannya, dan menghantar bayaran kepada pemilik.",
   "doc.raw": "Dokumen seperti yang diterima", "doc.extracted": "Apa yang dicatat oleh Pembaca", "doc.schema": "Pembaca tiada alat. Ia hanya boleh memulangkan medan ini, disemak mengikut skema.",
 
-  "approval.title": "Kad kelulusan", "approval.sub": "Demo · data sintetik", "approval.back": "Kembali ke Helm", "approval.needsOk": "Perlukan persetujuan anda",
+  "approval.title": "Kad kelulusan", "approval.sub": "Kelulusan pemilik", "approval.back": "Kembali ke Helm", "approval.needsOk": "Perlukan persetujuan anda",
   "approval.pay": "Bayar {payee} {amount}?", "approval.due": "matang {date}",
   "approval.warnTitle": "Berhati-hati.", "approval.warnBody": "Invois ini mengarahkan pembantu mengabaikan peraturannya dan terus membayar ke akaun baharu. Helm menganggapnya teks, bukan perintah.",
   "approval.ifPaid": "Jika anda bayar:", "approval.ifHeld": "Jika anda tahan:", "approval.chance": "{p} peluang anda kekal di atas {min}.", "approval.lowest": "Titik terendah kes buruk {rm} sekitar {date}.",

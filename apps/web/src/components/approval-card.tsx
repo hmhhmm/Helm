@@ -47,7 +47,7 @@ export function ApprovalCard({ id, onDone }: { id: string; onDone?: () => void }
       <Bubble>
         <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-escalate"><ShieldAlert aria-hidden className="size-4" />{t("approval.needsOk")}</p>
         <p className="text-base font-bold">{t("approval.pay", { payee: d.row.payee, amount: rm(d.row.amount) })}</p>
-        <p className="text-sm text-muted">{d.row.ref} · {t("approval.due", { date: fdate(d.row.due, lang) })}</p>
+        <p className="text-sm text-muted">{[d.row.ref, d.row.due ? t("approval.due", { date: fdate(d.row.due, lang) }) : null].filter(Boolean).join(" · ")}</p>
       </Bubble>
 
       {d.row.quarantined && (
@@ -56,7 +56,7 @@ export function ApprovalCard({ id, onDone }: { id: string; onDone?: () => void }
         </Bubble>
       )}
 
-      <Bubble>
+      {d.row.kind === "pay_bill" && <Bubble>
         <p className="text-sm">
           <b>{t("approval.ifPaid")}</b>{" "}
           {t("approval.chance", { p: pct(c.p_if_paid ?? 0), min: rm(d.min_balance) })}
@@ -66,7 +66,7 @@ export function ApprovalCard({ id, onDone }: { id: string; onDone?: () => void }
           <b>{t("approval.ifHeld")}</b> {t("approval.chance", { p: pct(c.p_if_held ?? 0), min: rm(d.min_balance) })} {t("approval.nothingMoves")}
         </p>
         {c.safe_date && <p className="mt-2 text-sm text-muted">{t("approval.safeDate", { date: fdate(c.safe_date, lang) })}</p>}
-      </Bubble>
+      </Bubble>}
 
       {asked && (
         <Bubble>
