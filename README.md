@@ -83,7 +83,7 @@ This is the flow to show a judge. Helm checks the payment, you approve it on the
 
 1. Put `WISE_API_KEY` in `.env` and run `pnpm dev`. A Wise key switches the bank to the Wise sandbox on its own. The Audit screen then calls the bank "Wise sandbox".
 2. Open **Payments**, press **New payment**, and enter a payee, an amount and a reference.
-3. A payee Helm has not paid before waits for you under **Needs you**. Nothing has gone to Wise yet.
+3. With Wise connected, a payment to Ladang Kertas Utama (RM 1,200) is already waiting under **Needs you** after a reset, so you can skip the form. Any other new payee waits there too. Nothing has gone to Wise yet.
 4. Press **Approve**. Helm sends the payment through the Wise sandbox and the row shows as sent.
 5. Open **Audit**. The bank statement shows the Wise transfer id next to the accepted instruction, and the same id is in the Wise sandbox dashboard.
 
