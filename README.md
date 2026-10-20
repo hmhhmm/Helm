@@ -142,3 +142,7 @@ docs/            architecture image, demo script
 scripts/         gen-api.sh (regenerates the typed client)
 DECISIONS.md     every judgement call made where the brief was silent
 ```
+
+## LHDN MyInvois
+
+Each invoice on the Collections page has a generated MyInvois e-invoice document (UBL JSON, type 01, version 1.1) that can be viewed and downloaded. Helm does not submit it. Submitting needs your own MyInvois taxpayer account, which was not available in time, and the company tax numbers in the document are placeholders for the fictional business. The status is shown as ready to submit.
