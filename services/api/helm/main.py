@@ -26,7 +26,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="Helm API", version="0.1.0", lifespan=lifespan,
-              description="Helm decides what to pay, when, and where to park spare cash. All data is synthetic demo data; payments go through a simulated Demo bank.")
+              description="Helm decides what to pay, when, and where to park spare cash. All data is synthetic; payments go through the connected bank.")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3100"],

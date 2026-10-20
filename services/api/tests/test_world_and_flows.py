@@ -147,7 +147,7 @@ def test_holding_a_flagged_invoice_keeps_it_out_of_the_queue_for_good(fresh, ses
         pid = c.post("/sim/malicious-invoice").json()["data"]["proposal_id"]
         assert c.post(f"/decisions/{pid}/owner", json={"choice": "hold"}).json()["status"] == "held_by_owner"
         c.post("/sim/advance-week")
-        assert c.get("/bank/ledger").json()["rows"] == [] or all(r["to"] != "DEMO-9999-0042" for r in c.get("/bank/ledger").json()["rows"])
+        assert c.get("/bank/ledger").json()["rows"] == [] or all(r["to"] != "MY-9999-0042" for r in c.get("/bank/ledger").json()["rows"])
         assert pid not in [r["proposal_id"] for g in c.get("/payments").json()["groups"].values() for r in g if r["status"] == "queued"]
 
 

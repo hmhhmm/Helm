@@ -53,7 +53,7 @@ def build_pdf(session: Session) -> bytes:
     small = ParagraphStyle("s", parent=body, fontSize=8, textColor=colors.HexColor("#5B6170"))
     el = [
         Paragraph("Helm CFO brief", h1),
-        Paragraph(f"Warisan Printing Sdn Bhd (fictional) &middot; week to {fdate(today)} {today.year} &middot; <b>Synthetic demo data</b> &middot; Payments via Demo bank", small),
+        Paragraph(f"Warisan Printing Sdn Bhd (fictional) &middot; week to {fdate(today)} {today.year} &middot; <b>Synthetic data</b>", small),
         Spacer(1, 6),
         Paragraph(t["headline"]["en"], body),
         Spacer(1, 6),
@@ -101,6 +101,6 @@ def build_pdf(session: Session) -> bytes:
             el.append(Spacer(1, 3))
     el += [Spacer(1, 10), Paragraph(
         "Targets and methods are not results. Every number here comes from a simulation on synthetic data. Helm is a non-custodial decision layer; "
-        "payments in this demo are sent through the Demo bank, a simulation. Mentions of EPF, SOCSO, EIS, PCB, SST and LHDN are context, not compliance claims.", small)]
+        "payments are sent through the connected bank, which is a simulation unless a sandbox is configured. Mentions of EPF, SOCSO, EIS, PCB, SST and LHDN are context, not compliance claims.", small)]
     doc.build(el)
     return buf.getvalue()

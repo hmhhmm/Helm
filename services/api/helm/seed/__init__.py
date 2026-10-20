@@ -231,13 +231,13 @@ def seed_database(session: Session) -> dict:
 
     session.add(Rules(
         id=1, min_balance=20_000, risk_tolerance=0.10, approval_limit=25_000,
-        protected_payees=["Sewa Premis Klang", "Bekalan Elektrik Demo", "Insurans Perniagaan Selamat"],
+        protected_payees=["Sewa Premis Klang", "Bekalan Elektrik Malaysia", "Insurans Perniagaan Selamat"],
         kill_switch=False, horizon_days=90,
         daily_cap=60_000, monthly_cap=200_000, mandate_expires=date(2027, 6, 30),
     ))
     session.add(SimState(id=1, today=TODAY, flags={}))
     append(session, "system", "seed.created", {
-        "note": "Synthetic demo data", "seed": 2026, "history_invoices": n_hist_inv, "open_invoices": n_open_inv,
+        "note": "Synthetic data", "seed": 2026, "history_invoices": n_hist_inv, "open_invoices": n_open_inv,
         "history_bills": n_hist_bill, "open_bills": n_open_bill, "future_documents": n_future,
     })
     session.flush()

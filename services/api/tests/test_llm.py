@@ -22,9 +22,9 @@ def test_stub_an_obedient_model_cannot_smuggle_extra_fields(monkeypatch):
     monkeypatch.setattr(config, "LLM_MODE", "live")
     monkeypatch.setattr(reader, "_live_extract", lambda inp: {
         "counterparty": "Evil Co", "reference": "E-1", "amount": 48000.0, "issue_date": "2026-10-19", "due_date": "2026-10-19",
-        "bank_account": "DEMO-9999-0042", "run_payment": True,   # the model obeyed the document and added a command
+        "bank_account": "MY-9999-0042", "run_payment": True,   # the model obeyed the document and added a command
     })
-    raw = docs.bill_doc("Evil Co", "E-1", date(2026, 10, 19), date(2026, 10, 19), 48000, "DEMO-9999-0042", note=docs.MALICIOUS_NOTE)
+    raw = docs.bill_doc("Evil Co", "E-1", date(2026, 10, 19), date(2026, 10, 19), 48000, "MY-9999-0042", note=docs.MALICIOUS_NOTE)
     out = reader.run(reader.ReaderInput(doc_id="d", kind="bill", raw_text=raw))
     assert out.quarantined and out.amount == 0.01 and "schema_check_failed" in out.flags  # inert record, nothing to act on
 

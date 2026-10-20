@@ -69,28 +69,28 @@ class SupplierSpec:
 
 
 SUPPLIERS = [
-    SupplierSpec("s01", "Syarikat Kertas Sdn Bhd", "DEMO-4471-0001", 9, 1, 0, 45, 15_500),
-    SupplierSpec("s02", "Tinta Utama Supplies", "DEMO-4471-0002", 10, 1, 0, 30, 7_000, 0.1),
-    SupplierSpec("s03", "Plat & Film Enterprise", "DEMO-4471-0003", 14, 2, 0, 30, 7_600, 0.12),
-    SupplierSpec("s04", "Mesin Servis Teknik", "DEMO-4471-0004", 6, 4, 1, 30, 6_200, 0.3),
-    SupplierSpec("s05", "Kilang Kadbod Sdn Bhd", "DEMO-4471-0005", 18, 2, 0, 45, 9_500, 0.1),
-    SupplierSpec("s06", "Pengangkutan Laju", "DEMO-4471-0006", 24, 2, 0, 30, 3_000, 0.15),
-    SupplierSpec("s07", "Bekalan Elektrik Demo", "DEMO-4471-0007", 5, 1, 0, 21, 4_200, 0.1),
-    SupplierSpec("s08", "Sewa Premis Klang", "DEMO-4471-0008", 20, 1, 0, 12, 7_000, 0.0, True),
-    SupplierSpec("s09", "Pek Bungkus Mesra", "DEMO-4471-0009", 12, 2, 1, 45, 3_600, 0.12),
-    SupplierSpec("s10", "Insurans Perniagaan Selamat", "DEMO-4471-0010", 8, 6, 2, 30, 4_200, 0.0, True),
-    SupplierSpec("s11", "Telekom Bersama", "DEMO-4471-0011", 3, 2, 0, 30, 1_050, 0.05),
-    SupplierSpec("s12", "Kimia Cuci Pantas", "DEMO-4471-0012", 22, 2, 0, 30, 2_200, 0.15),
+    SupplierSpec("s01", "Syarikat Kertas Sdn Bhd", "MY-4471-0001", 9, 1, 0, 45, 15_500),
+    SupplierSpec("s02", "Tinta Utama Supplies", "MY-4471-0002", 10, 1, 0, 30, 7_000, 0.1),
+    SupplierSpec("s03", "Plat & Film Enterprise", "MY-4471-0003", 14, 2, 0, 30, 7_600, 0.12),
+    SupplierSpec("s04", "Mesin Servis Teknik", "MY-4471-0004", 6, 4, 1, 30, 6_200, 0.3),
+    SupplierSpec("s05", "Kilang Kadbod Sdn Bhd", "MY-4471-0005", 18, 2, 0, 45, 9_500, 0.1),
+    SupplierSpec("s06", "Pengangkutan Laju", "MY-4471-0006", 24, 2, 0, 30, 3_000, 0.15),
+    SupplierSpec("s07", "Bekalan Elektrik Malaysia", "MY-4471-0007", 5, 1, 0, 21, 4_200, 0.1),
+    SupplierSpec("s08", "Sewa Premis Klang", "MY-4471-0008", 20, 1, 0, 12, 7_000, 0.0, True),
+    SupplierSpec("s09", "Pek Bungkus Mesra", "MY-4471-0009", 12, 2, 1, 45, 3_600, 0.12),
+    SupplierSpec("s10", "Insurans Perniagaan Selamat", "MY-4471-0010", 8, 6, 2, 30, 4_200, 0.0, True),
+    SupplierSpec("s11", "Telekom Bersama", "MY-4471-0011", 3, 2, 0, 30, 1_050, 0.05),
+    SupplierSpec("s12", "Kimia Cuci Pantas", "MY-4471-0012", 22, 2, 0, 30, 2_200, 0.15),
 ]
 
 # Statutory payees (registry entries, not counted among the 12 suppliers).
 STATUTORY = [
-    ("g01", "EPF (statutory)", "GOV-DEMO-EPF", "statutory"),
-    ("g02", "SOCSO (statutory)", "GOV-DEMO-SOCSO", "statutory"),
-    ("g03", "EIS (statutory)", "GOV-DEMO-EIS", "statutory"),
-    ("g04", "LHDN PCB (statutory)", "GOV-DEMO-PCB", "statutory"),
-    ("g05", "SST (statutory)", "GOV-DEMO-SST", "statutory"),
-    ("g06", "Warisan payroll run", "PAYROLL-DEMO-01", "payroll"),
+    ("g01", "EPF (statutory)", "GOV-EPF", "statutory"),
+    ("g02", "SOCSO (statutory)", "GOV-SOCSO", "statutory"),
+    ("g03", "EIS (statutory)", "GOV-EIS", "statutory"),
+    ("g04", "LHDN PCB (statutory)", "GOV-PCB", "statutory"),
+    ("g05", "SST (statutory)", "GOV-SST", "statutory"),
+    ("g06", "Warisan payroll run", "PAYROLL-01", "payroll"),
 ]
 
 PAYROLL = 41_500.0

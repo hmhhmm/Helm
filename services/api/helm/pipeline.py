@@ -35,7 +35,7 @@ from helm.models import (
 from helm.rules_view import RulesView, load_rules, sim_today
 
 NODES = ["reader", "forecaster", "collections", "scheduler", "treasury", "policy", "human", "executor", "explainer", "watchdog"]
-RESERVE_ACCOUNT = "RESERVE-DEMO"
+RESERVE_ACCOUNT = "RESERVE-001"
 
 
 # ----------------------------------------------------------------------------- helpers

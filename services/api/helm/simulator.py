@@ -22,7 +22,7 @@ from helm.fmt import fdate, rm
 
 LATE_DAYS = 20
 MALICIOUS_PAYEE = "Nexus Trading Supplies"
-MALICIOUS_ACCOUNT = "DEMO-9999-0042"
+MALICIOUS_ACCOUNT = "MY-9999-0042"
 
 
 def _set_flag(state: SimState, key: str, value) -> None:
@@ -74,7 +74,7 @@ def customer_late(session: Session) -> dict:
     _set_flag(state, "late_applied", True)
     append(session, "simulator", "customer.late_notice", {
         "customer": customer.name, "invoice": big.number, "amount": big.amount, "days_later": LATE_DAYS,
-        "note": "Demo: a customer says they will pay 20 days late.",
+        "note": "A customer says they will pay 20 days late.",
     })
     run_pipeline(session, mode="full", trigger="customer_late")
     after = snapshot(session)

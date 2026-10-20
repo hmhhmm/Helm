@@ -158,9 +158,9 @@ def chase(customer_id: str, session: Session = Depends(get_session)):
         t = session.get(SimTruth, i.id)
         if t:  # simulated world: a reminder pulls payment forward by up to 5 days
             t.pay_date = max(today + __import__("datetime").timedelta(days=1), t.pay_date - __import__("datetime").timedelta(days=5))
-    append(session, "owner", "chase.sent", {"customer": c.name, "invoices": [i.number for i in invs], "note": "Demo: no message was actually sent."})
+    append(session, "owner", "chase.sent", {"customer": c.name, "invoices": [i.number for i in invs], "note": "Marked as chased. Helm sent no message."})
     session.commit()
-    return {"ok": True, "message": f"Marked {len(invs)} invoice(s) for {c.name} as chased. Demo: nothing was actually sent.", "data": {}}
+    return {"ok": True, "message": f"Marked {len(invs)} invoice(s) for {c.name} as chased. Helm sent no message.", "data": {}}
 
 
 # ---- cash ---------------------------------------------------------------------------
@@ -332,12 +332,12 @@ def sim_malicious(session: Session = Depends(get_session)):
 def sim_reset():
     from helm.bootstrap import reset_demo
     reset_demo()
-    return {"ok": True, "message": "Demo reset to the seeded start (19 Oct 2026).", "data": {}}
+    return {"ok": True, "message": "Reset to the seeded start (19 Oct 2026).", "data": {}}
 
 
 @router.post("/sim/tamper", dependencies=[Depends(require_owner)], response_model=S.SimOut, tags=["simulator"])
 def sim_tamper(session: Session = Depends(get_session)):
-    """Demo only: edit one audit row the way someone with database admin rights could."""
+    """Edit one audit row the way someone with database admin rights could."""
     session.commit()
     r = audit.tamper_for_demo()
     return {"ok": True, "message": f"Audit row {r['tampered']} was edited directly in the database. Press Verify chain.", "data": r}

@@ -36,7 +36,7 @@ def _engage_kill_switch(session: Session, why: str) -> None:
 
 def attack_selftest(ctx: PolicyContext, today: date) -> dict:
     """Feed a poisoned invoice through Reader and Policy in a dry run. Must never come out ALLOW."""
-    raw = docs.bill_doc("Selftest Supplies", "SELFTEST-1", today, today, 48_000, "DEMO-0000-0000", note=docs.MALICIOUS_NOTE)
+    raw = docs.bill_doc("Selftest Supplies", "SELFTEST-1", today, today, 48_000, "MY-0000-0000", note=docs.MALICIOUS_NOTE)
     out = reader.run(reader.ReaderInput(doc_id="selftest", kind="bill", raw_text=raw))
     p = ProposalIn("selftest", "pay_bill", out.counterparty, out.bank_account or "?", out.amount, 0, "supplier", out.reference, out.quarantined)
     scratch = PolicyContext(rules=ctx.rules, today=ctx.today, scen=ctx.scen, registry=ctx.registry, paid_refs=set(ctx.paid_refs), receipts=list(ctx.receipts),
