@@ -36,8 +36,8 @@ docker compose up        # Postgres 16 + API + web  ->  http://localhost:3000
 ### Tests
 
 ```bash
-pnpm test:api            # 123 pytest tests (122 passed, 1 skipped on SQLite)
-DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres 16 (123 passed, adds the role grant test)
+pnpm test:api            # 124 pytest tests (123 passed, 1 skipped on SQLite)
+DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres 16 (124 passed, adds the role grant test)
 pnpm --filter web build && pnpm test:e2e   # 32 Playwright tests: demo flows, owner login, anchor card, mandate, axe accessibility in both themes, 375px phone checks
 ```
 
