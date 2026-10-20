@@ -4,7 +4,7 @@
 
 [GitHub repository](https://github.com/hmhhmm/Helm) · [Technical documentation](docs/TECHNICAL.md) · [Security self-assessment](docs/SECURITY.md) · [Demo script](docs/demo-script.md)
 
-> All business data is **synthetic**. Warisan Printing Sdn Bhd is fictional. Helm is a non-custodial decision layer. It holds no funds, is not licensed, and is not connected to any real bank, payment rail or LHDN service. The default bank is a built in **Demo bank**, and the real **Wise sandbox** (test money) is available as an option.
+> All business data is **synthetic**. Warisan Printing Sdn Bhd is fictional. Helm is a non-custodial decision layer. It holds no funds, is not licensed, and is not connected to any real bank, payment rail or LHDN service. The default bank is a built in simulation, and the real **Wise sandbox** (test money) is available as an option.
 
 ```
 P( min over the next H days of balance  >=  B  |  we pay )   >=   1 - alpha
@@ -77,12 +77,24 @@ With Docker, `docker compose up` starts Postgres 16, the API and the web app on 
 
 No public deployment has been made from this repository yet.
 
+## Live demo with the Wise sandbox
+
+This is the flow to show a judge. Helm checks the payment, you approve it on the spot, and Wise receives it.
+
+1. Put `WISE_API_KEY` in `.env` and start with `BANK_PROVIDER=wise pnpm dev`. The Audit screen then calls the bank "Wise sandbox".
+2. Open **Payments**, press **New payment**, and enter a payee, an amount and a reference.
+3. A payee Helm has not paid before waits for you under **Needs you**. Nothing has gone to Wise yet.
+4. Press **Approve**. Helm sends the payment through the Wise sandbox and the row shows as sent.
+5. Open **Audit**. The bank statement shows the Wise transfer id next to the accepted instruction, and the same id is in the Wise sandbox dashboard.
+
+A run of this exact flow is recorded in [docs/evidence/sandbox-bank-log.txt](docs/evidence/sandbox-bank-log.txt). The seeded Warisan data stays in the database as the background business. The Wise sandbox uses test money.
+
 ## Test cases and results
 
 ```bash
-pnpm test:api                              # 129 passed, 1 skipped on SQLite
+pnpm test:api                              # 130 passed, 1 skipped on SQLite
 DATABASE_URL=postgresql+psycopg:///helm_test pnpm test:api   # the same suite on Postgres 16, adds the role grant test
-pnpm --filter web build && pnpm test:e2e   # 32 Playwright tests passed
+pnpm --filter web build && pnpm test:e2e   # 33 Playwright tests passed
 ```
 
 The skipped test is the Postgres role grant test. The Playwright suite covers the demo flows, owner login, the anchor card, the mandate, axe accessibility checks in both themes, and 375px phone checks. Full output is in [docs/evidence/pytest-sqlite.txt](docs/evidence/pytest-sqlite.txt) and [docs/evidence/pytest-postgres.txt](docs/evidence/pytest-postgres.txt). Each file carries its date and commit hash.

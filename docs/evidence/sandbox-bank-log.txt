@@ -96,3 +96,17 @@ Wise sandbox, test money only. Payee bank details are synthetic test numbers. A 
 
 Helm ledger:
 {'bank': 'Wise sandbox', 'rows': [{'id': 13, 'ts': '2026-10-20T11:12:47.322464Z', 'from': 'operating', 'to': 'DEMO-4471-0004', 'amount': 12000.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573252'}, {'id': 12, 'ts': '2026-10-20T11:12:42.039812Z', 'from': 'operating', 'to': 'GOV-DEMO-PCB', 'amount': 1640.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573246'}, {'id': 11, 'ts': '2026-10-20T11:12:36.843998Z', 'from': 'operating', 'to': 'GOV-DEMO-EIS', 'amount': 176.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573241'}, {'id': 10, 'ts': '2026-10-20T11:12:31.797682Z', 'from': 'operating', 'to': 'GOV-DEMO-SOCSO', 'amount': 880.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573238'}, {'id': 9, 'ts': '2026-10-20T11:12:26.697379Z', 'from': 'operating', 'to': 'GOV-DEMO-EPF', 'amount': 5420.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573234'}, {'id': 8, 'ts': '2026-10-20T11:12:21.298542Z', 'from': 'operating', 'to': 'DEMO-4471-0002', 'amount': 7480.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573230'}, {'id': 7, 'ts': '2026-10-20T11:12:15.935784Z', 'from': 'operating', 'to': 'DEMO-4471-0005', 'amount': 13500.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573227'}, {'id': 6, 'ts': '2026-10-20T11:12:10.351246Z', 'from': 'operating', 'to': 'DEMO-4471-0008', 'amount': 7000.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573225'}, {'id': 5, 'ts': '2026-10-20T11:12:04.617874Z', 'from': 'operating', 'to': 'PAYROLL-DEMO-01', 'amount': 41500.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573223'}, {'id': 4, 'ts': '2026-10-20T11:11:58.987977Z', 'from': 'operating', 'to': 'DEMO-4471-0007', 'amount': 5360.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573221'}, {'id': 3, 'ts': '2026-10-20T11:11:53.071557Z', 'from': 'operating', 'to': 'DEMO-4471-0006', 'amount': 2830.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573217'}, {'id': 2, 'ts': '2026-10-20T11:11:47.888119Z', 'from': 'operating', 'to': 'DEMO-4471-0001', 'amount': 16950.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573216'}, {'id': 1, 'ts': '2026-10-20T11:11:42.247452Z', 'from': 'operating', 'to': 'DEMO-4471-0012', 'amount': 1850.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149573212'}]}
+
+Live owner entered payment, 2026-10-20T12:02:00Z, commit 1883bb7 plus working tree
+Entered through POST /payments/new, held for approval (0 Wise calls), approved by the owner, then sent through the Wise sandbox.
+entered: Payment to Live Demo Supplier is ready for your decision. | wise calls before approval: 0
+after approval verdict: ALLOW | status: sent
+bank: Wise sandbox | latest: {'id': 1, 'ts': '2026-10-20T12:01:51.981710Z', 'from': 'operating', 'to': 'ACC-5AA5087736', 'amount': 750.0, 'status': 'accepted', 'reason': '', 'provider_ref': '2149574130'}
+GET /v2/profiles 200 None None
+POST /v3/profiles/31033951/quotes 200 96ce8592-794a-4b7b-a625-31591217c3ed PENDING
+POST /v1/accounts 200 703093078 None
+POST /v1/transfers 200 2149574130 incoming_payment_waiting
+GET /v1/simulation/transfers/2149574130/processing 200 2149574130 processing
+GET /v1/simulation/transfers/2149574130/funds_converted 200 2149574130 funds_converted
+GET /v1/simulation/transfers/2149574130/outgoing_payment_sent 200 2149574130 outgoing_payment_sent
+GET /v1/transfers/2149574130 200 2149574130 outgoing_payment_sent
